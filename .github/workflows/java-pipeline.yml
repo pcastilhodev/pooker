@@ -64,7 +64,7 @@ jobs:
         name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
         working-directory: backend/api-gateway
-        run: sonar-scanner
+        run: sonar-scanner -Dsonar.qualitygate.wait=true
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -123,7 +123,7 @@ jobs:
         name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
         working-directory: backend/auth-service
-        run: sonar-scanner
+        run: sonar-scanner -Dsonar.qualitygate.wait=true
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

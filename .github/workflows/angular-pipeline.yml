@@ -55,7 +55,7 @@ jobs:
         id: sonarqube
         if: vars.SONAR_ENABLED == 'true'
         working-directory: frontend
-        run: sonar-scanner
+        run: sonar-scanner -Dsonar.qualitygate.wait=true
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
