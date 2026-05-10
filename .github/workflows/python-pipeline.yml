@@ -2,14 +2,14 @@ name: Python Services CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [master, main, develop]
     paths:
       - 'backend/alugueis-service/**'
       - 'backend/filmes-service/**'
       - 'backend/user-service/**'
       - 'backend/payment-service/**'
   pull_request:
-    branches: [main, develop]
+    branches: [master, main, develop]
     paths:
       - 'backend/alugueis-service/**'
       - 'backend/filmes-service/**'
