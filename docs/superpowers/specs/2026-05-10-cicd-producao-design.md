@@ -2,72 +2,182 @@
 
 **Data:** 2026-05-10
 **Repositório:** pcastilhodev/pooker
-**Abordagem escolhida:** Self-hosted runner + SonarQube local, incremental
+**Abordagem escolhida:** Runner containerizado + SonarQube local, incremental, portável entre máquinas
 
 ---
 
 ## Contexto
 
-O repositório `pooker` contém 7 microserviços (2 Java/Spring Boot, 4 Python/FastAPI, 1 Angular 20) com pipelines GitHub Actions já criados mas não funcionais. O SonarQube e PostgreSQL rodam localmente via Docker Desktop. O self-hosted runner ainda não está instalado. O objetivo é ter uma esteira de CI completa com build, testes unitários, análise de qualidade e quality gate bloqueante.
+O repositório `pooker` contém 7 microserviços (2 Java/Spring Boot, 4 Python/FastAPI, 1 Angular 20) com pipelines GitHub Actions já criados mas não funcionais. O SonarQube e PostgreSQL rodam localmente via Docker Desktop. O objetivo é ter uma esteira de CI completa com build, testes unitários, análise de qualidade e quality gate bloqueante — **portável entre máquinas**: qualquer colaborador com Docker Desktop consegue replicar a infraestrutura com um único `docker compose up`.
+
+---
+
+## Arquitetura de Infraestrutura
+
+Toda a infraestrutura de CI roda via `docker-compose.cicd.yml` com 3 serviços na mesma rede Docker:
+
+```
+docker-compose.cicd.yml
+├── postgres        ← banco do SonarQube (postgres:15)
+├── sonarqube       ← análise de qualidade (sonarqube:community, porta 9000)
+└── runner          ← GitHub Actions self-hosted runner (imagem customizada)
+```
+
+O runner acessa o SonarQube via nome de serviço Docker (`http://sonarqube:9000`) — sem depender de `localhost`. Isso é o que torna a stack portável.
+
+**Como um colega sobe a esteira:**
+1. Clona o repositório
+2. Gera um token de runner em `github.com/pcastilhodev/pooker → Settings → Actions → Runners → New runner`
+3. Cria `.env` na raiz com `RUNNER_TOKEN=<token>`
+4. Executa `docker compose -f docker-compose.cicd.yml up -d`
+5. Configura SonarQube (senha admin, token, projetos — feito uma única vez)
+6. Adiciona secrets no GitHub
+
+---
+
+## Novos Arquivos a Criar
+
+```
+pooker/
+├── docker-compose.cicd.yml          ← substitui docker-compose.sonar.yml
+├── .env.example                     ← documenta variáveis necessárias
+└── docker/
+    └── runner/
+        ├── Dockerfile               ← imagem do runner com todas as ferramentas
+        └── entrypoint.sh            ← registro e inicialização do runner
+```
+
+### `docker-compose.cicd.yml`
+
+```yaml
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - cicd
+
+  sonarqube:
+    image: sonarqube:community
+    depends_on: [postgres]
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+    networks:
+      - cicd
+
+  runner:
+    build: ./docker/runner
+    environment:
+      REPO_URL: https://github.com/pcastilhodev/pooker
+      RUNNER_TOKEN: ${RUNNER_TOKEN}
+      RUNNER_NAME: ${RUNNER_NAME:-pooker-runner}
+      LABELS: self-hosted
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - sonarqube
+    networks:
+      - cicd
+
+networks:
+  cicd:
+
+volumes:
+  pg_data:
+  sonar_data:
+  sonar_logs:
+```
+
+### `docker/runner/Dockerfile`
+
+Base Ubuntu 22.04 com todas as ferramentas necessárias pré-instaladas:
+
+- **Git** — checkout do código
+- **Java 17 (OpenJDK)** — build dos serviços Java
+- **Python 3.11 + pip** — testes e lint dos serviços Python
+- **Node 20 + npm** — build Angular
+- **Google Chrome** — testes Angular com ChromeHeadless
+- **Docker CLI** — acesso ao Docker Engine do host via socket montado
+- **sonar-scanner CLI** — scan de qualidade (substitui a action Docker-based)
+- **GitHub Actions runner binary** — execução dos pipelines
+
+### `docker/runner/entrypoint.sh`
+
+Script de inicialização que:
+1. Registra o runner no repositório com o token fornecido
+2. Configura trap para desregistrar ao parar o container (`docker compose down`)
+3. Inicia o processo do runner
+
+### `.env.example`
+
+```
+RUNNER_TOKEN=           # token gerado em Settings → Actions → Runners
+RUNNER_NAME=pooker-runner
+```
 
 ---
 
 ## Fases de Execução
 
-### Fase 1 — Runner + Build/Test
+### Fase 1 — Stack sobe + Build/Test funcionando
 
-**Objetivo:** todos os 3 pipelines completam build e testes sem erro.
+**Objetivo:** `docker compose -f docker-compose.cicd.yml up` sobe sem erro e os 3 pipelines completam build e testes.
 
-- Instalar GitHub Actions runner como serviço Windows
-- Registrar no repositório com label `self-hosted`
-- Desabilitar temporariamente passos de SonarQube e Docker via variável `SONAR_ENABLED=false`
-- Validar que Java (Gradle + Maven), Python (pytest) e Angular (Karma/ChromeHeadless) passam
+- Criar `docker-compose.cicd.yml`, `docker/runner/Dockerfile`, `entrypoint.sh`
+- Corrigir `auth-service` para usar H2 em testes (ver Correções)
+- Remover `filmes-service/.env` do git
+- Desabilitar passos de SonarQube e Docker via `SONAR_ENABLED=false`
+- Validar Java (Gradle + Maven), Python (pytest), Angular (Karma/ChromeHeadless)
 
-**Critério de conclusão:** 3 pipelines verdes no GitHub Actions com Sonar desabilitado.
+**Critério de conclusão:** 3 pipelines verdes com Sonar desabilitado.
 
 ### Fase 2 — SonarQube conectado
 
 **Objetivo:** análise de qualidade chegando no painel do SonarQube.
 
-- Configurar SonarQube: senha admin, token global, 7 projetos, quality gate customizado
+- Configurar SonarQube: senha admin, token global, 7 projetos, quality gate "Pooker"
 - Adicionar secrets `SONAR_TOKEN` e `SONAR_HOST_URL` no GitHub
-- Mudar `SONAR_ENABLED=true` na variável do repositório
-- Validar que os scans aparecem no painel `http://localhost:9000`
+- Mudar `SONAR_ENABLED=true`
+- Validar scans em `http://localhost:9000`
 
-**Critério de conclusão:** 7 projetos com análise no SonarQube.
+**Critério de conclusão:** 7 projetos com análise no painel Sonar.
 
 ### Fase 3 — Quality Gate bloqueante
 
 **Objetivo:** pipeline falha se qualidade estiver abaixo do threshold.
 
 - Verificar cobertura atual dos serviços Python
-- Adicionar passo `sonarqube-quality-gate-action` após cada scan
+- Adicionar `-Dsonar.qualitygate.wait=true` ao comando `sonar-scanner`
 - Ajustar testes ou thresholds conforme necessário
 
 **Critério de conclusão:** push com cobertura abaixo de 70% falha o pipeline.
 
 ---
 
-## Infraestrutura
+## Configuração do SonarQube
 
-### Self-hosted Runner
+### Quality gate customizado "Pooker"
 
-- **Instalação:** nativa no Windows (não em container)
-- **Modo de execução:** serviço Windows (inicia com a máquina)
-- **Label:** `self-hosted` (já configurado nos YAMLs)
-- **Pré-requisitos na máquina:** Git, Docker Desktop, Chrome/Chromium no PATH
-- **Ferramentas gerenciadas pelas actions:** Java 17, Python 3.11, Node 20 (baixados automaticamente pelas setup-* actions)
-- **Acesso ao SonarQube:** `http://localhost:9000` diretamente (runner nativo acessa localhost)
+Criado em `Administration → Quality Gates → Create`:
+- Coverage >= 70%
+- Sem bugs Blocker ou Critical
+- Sem vulnerabilidades Critical ou Blocker
 
-### SonarQube
+Associado a todos os 7 projetos.
 
-- **URL:** `http://localhost:9000`
-- **Stack:** `docker-compose.sonar.yml` (sonarqube:community + postgres:15)
-- **Quality gate customizado "Pooker":**
-  - Coverage >= 70%
-  - Sem bugs Blocker ou Critical
-  - Sem vulnerabilidades Critical ou Blocker
-- **Projetos (7):**
+### Projetos (7)
 
 | Serviço | Project Key |
 |---|---|
@@ -84,7 +194,7 @@ O repositório `pooker` contém 7 microserviços (2 Java/Spring Boot, 4 Python/F
 | Secret | Valor |
 |---|---|
 | `SONAR_TOKEN` | Token gerado em Administration → Security → Users |
-| `SONAR_HOST_URL` | `http://localhost:9000` |
+| `SONAR_HOST_URL` | `http://sonarqube:9000` (nome do serviço Docker — não localhost) |
 
 ### Variável do Repositório
 
@@ -96,51 +206,35 @@ O repositório `pooker` contém 7 microserviços (2 Java/Spring Boot, 4 Python/F
 
 ## Ajustes nos Pipelines
 
+### Substituição das actions Docker do SonarQube pelo CLI
+
+Como o runner roda em container, usar `sonarsource/sonarqube-scan-action` (que cria containers aninhados) causa problemas de rede. Em vez disso, o `sonar-scanner` CLI (já instalado na imagem do runner) é chamado diretamente como processo — acessando SonarQube via nome de serviço Docker.
+
+Scan + quality gate combinados num único passo:
+
+```yaml
+- name: SonarQube scan + Quality Gate
+  if: vars.SONAR_ENABLED == 'true'
+  working-directory: <service-dir>
+  run: sonar-scanner -Dsonar.qualitygate.wait=true
+  env:
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+```
+
+Os demais parâmetros (`sonar.projectKey`, `sonar.sources`, etc.) já estão no `sonar-project.properties` de cada serviço.
+
 ### Condição de fase (todos os pipelines)
 
-Adicionar `if: vars.SONAR_ENABLED == 'true'` nos passos de SonarQube scan, quality gate e Docker build:
-
 ```yaml
-- name: SonarQube scan
-  if: vars.SONAR_ENABLED == 'true'
-  uses: sonarsource/sonarqube-scan-action@v5
-  ...
-
-- name: Quality Gate check
-  if: vars.SONAR_ENABLED == 'true'
-  uses: sonarsource/sonarqube-quality-gate-action@master
-  timeout-minutes: 5
-  env:
-    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-- name: Docker build
-  if: vars.SONAR_ENABLED == 'true'
-  ...
+if: vars.SONAR_ENABLED == 'true'
 ```
 
-### Chrome para Angular (`angular-pipeline.yml`)
+Aplicado nos passos: SonarQube scan e Docker build.
 
-Adicionar passo antes dos testes se Chrome não estiver instalado na máquina:
+### Chrome no runner
 
-```yaml
-- name: Install Chrome
-  run: choco install googlechrome -y --no-progress
-```
-
-Requer Chocolatey instalado. Se Chrome já estiver no PATH, esse passo é omitido.
-
-### Quality gate step (após cada SonarQube scan)
-
-```yaml
-- name: Quality Gate check
-  if: vars.SONAR_ENABLED == 'true'
-  uses: sonarsource/sonarqube-quality-gate-action@master
-  timeout-minutes: 5
-  env:
-    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-```
+Chrome está instalado na imagem do runner — nenhum passo de instalação necessário nos pipelines. O `karma.conf.js` já está configurado para `ChromeHeadless`.
 
 ---
 
@@ -150,6 +244,7 @@ Requer Chocolatey instalado. Se Chrome já estiver no PATH, esse passo é omitid
 
 **Arquivo a criar:** `backend/auth-service/src/test/resources/application.properties`
 (sobrescreve automaticamente o de main durante testes — sem precisar de `@ActiveProfiles`)
+
 ```properties
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.driver-class-name=org.h2.Driver
@@ -173,7 +268,7 @@ spring.flyway.enabled=false
 git rm --cached backend/filmes-service/.env
 ```
 
-Garantir que `**/.env` está no `.gitignore` raiz (já está).
+`**/.env` já está no `.gitignore` raiz.
 
 ### 3. Cobertura Python — verificação antes da Fase 3
 
@@ -194,26 +289,23 @@ push main/develop
     │
     ├── java-pipeline.yml
     │   ├── Build (Gradle/Maven)
-    │   ├── Test (JUnit + JaCoCo)
-    │   ├── SonarQube scan        ← condicional SONAR_ENABLED
-    │   ├── Quality Gate check    ← bloqueia se falhar
-    │   └── Docker build          ← condicional SONAR_ENABLED
+    │   ├── Test (JUnit + JaCoCo ≥ 70%)
+    │   ├── sonar-scanner --qualitygate.wait  ← condicional SONAR_ENABLED
+    │   └── Docker build                      ← condicional SONAR_ENABLED
     │
-    ├── python-pipeline.yml (matrix × 4 serviços)
+    ├── python-pipeline.yml (matrix × 4)
     │   ├── Install deps
     │   ├── Lint (flake8)
-    │   ├── Test + Coverage (pytest, min 70%)
-    │   ├── SonarQube scan        ← condicional SONAR_ENABLED
-    │   ├── Quality Gate check    ← bloqueia se falhar
-    │   └── Docker build          ← condicional SONAR_ENABLED
+    │   ├── pytest --cov ≥ 70%
+    │   ├── sonar-scanner --qualitygate.wait  ← condicional SONAR_ENABLED
+    │   └── Docker build                      ← condicional SONAR_ENABLED
     │
     └── angular-pipeline.yml
         ├── npm ci
         ├── Lint
-        ├── Test (Karma + ChromeHeadless)
-        ├── SonarQube scan        ← condicional SONAR_ENABLED
-        ├── Quality Gate check    ← bloqueia se falhar
-        └── Build produção
+        ├── Karma + ChromeHeadless
+        ├── sonar-scanner --qualitygate.wait  ← condicional SONAR_ENABLED
+        └── npm run build --configuration production
 ```
 
 ---
@@ -221,6 +313,7 @@ push main/develop
 ## Fora do Escopo
 
 - Deploy da aplicação (destino de produção não definido)
-- Docker registry (push de imagens)
+- Docker registry / push de imagens para registry remoto
 - Secrets de banco de dados de produção
 - Configuração de ambientes (staging, production)
+- Backup/restore do volume do SonarQube
