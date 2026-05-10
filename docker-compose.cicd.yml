@@ -10,6 +10,12 @@ services:
       - pg_data:/var/lib/postgresql/data
     networks:
       - cicd
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   sonarqube:
     image: sonarqube:community
@@ -26,6 +32,13 @@ services:
       - sonar_logs:/opt/sonarqube/logs
     networks:
       - cicd
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/system/status"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
 
   runner:
     build: ./docker/runner
@@ -37,9 +50,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - sonarqube
+      sonarqube:
+        condition: service_healthy
     networks:
       - cicd
+    restart: on-failure
 
 networks:
   cicd:
