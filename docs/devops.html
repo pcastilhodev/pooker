@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pooker — Como funciona o DevOps</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --blue: #58a6ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --purple: #bc8cff;
+      --red: #f85149;
+      --teal: #39d353;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.7;
+    }
+
+    /* ─── SIDEBAR NAV ─── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 32px 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .nav-logo {
+      padding: 0 24px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-section { padding: 0 16px; margin-bottom: 8px; }
+    .nav-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 13px;
+      color: var(--muted);
+      transition: background .15s, color .15s;
+    }
+    .nav a:hover, .nav a.active { background: var(--surface2); color: var(--text); }
+    .nav-num {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ─── MAIN ─── */
+    .main {
+      margin-left: 240px;
+      min-height: 100vh;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 80px 64px 64px;
+      background: linear-gradient(160deg, #0d1117 0%, #161b22 60%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-lead {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.7;
+    }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .tag {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+    .tag-blue   { border-color: #58a6ff; color: #58a6ff; background: #0d1f38; }
+    .tag-green  { border-color: #3fb950; color: #3fb950; background: #1a2e1a; }
+    .tag-purple { border-color: #bc8cff; color: #bc8cff; background: #1f1433; }
+    .tag-orange { border-color: #d29922; color: #d29922; background: #2e1e0a; }
+
+    /* ─── CONTENT ─── */
+    .content { max-width: 820px; padding: 0 64px 80px; }
+
+    /* ─── SECTION ─── */
+    .chapter {
+      padding-top: 72px;
+      border-top: 1px solid var(--border);
+      margin-top: 72px;
+    }
+    .chapter:first-child { border-top: none; margin-top: 0; padding-top: 64px; }
+
+    .chapter-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .chapter-lead {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    p { margin-bottom: 20px; font-size: 15px; color: #c9d1d9; line-height: 1.8; }
+    p:last-child { margin-bottom: 0; }
+    strong { color: var(--text); font-weight: 600; }
+    h3 { font-size: 18px; font-weight: 600; margin: 36px 0 12px; color: var(--text); }
+    h4 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; color: var(--blue); }
+
+    /* ─── CALLOUT ─── */
+    .callout {
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 24px 0;
+      font-size: 14px;
+      line-height: 1.7;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { flex: 1; }
+    .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+    .callout.info    { background: #0d1f38; border: 1px solid #1d3a6b; }
+    .callout.success { background: #1a2e1a; border: 1px solid #2a5a2a; }
+    .callout.warning { background: #2e1e0a; border: 1px solid #5a3a10; }
+    .callout.tip     { background: #1f1433; border: 1px solid #3d2066; }
+
+    /* ─── CODE ─── */
+    code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-family: 'SF Mono', 'Cascadia Code', monospace;
+      font-size: 13px;
+      color: var(--orange);
+    }
+    pre {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: 'SF Mono', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .kw  { color: var(--purple); }
+    .st  { color: var(--green); }
+    .cm  { color: var(--muted); }
+    .at  { color: var(--blue); }
+    .nm  { color: var(--orange); }
+
+    /* ─── CARDS GRID ─── */
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .cards.three { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 700px) { .cards, .cards.three { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .card-head .icon { font-size: 20px; }
+    .card-head .title { font-weight: 600; font-size: 14px; }
+    .card p { font-size: 13px; color: var(--muted); margin-bottom: 0; line-height: 1.6; }
+
+    /* ─── TIMELINE ─── */
+    .timeline { margin: 24px 0; }
+    .tl-item { display: flex; gap: 20px; margin-bottom: 32px; }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; }
+    .tl-dot {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .tl-line { width: 2px; background: var(--border); flex: 1; margin: 6px 0; min-height: 20px; }
+    .tl-item:last-child .tl-line { display: none; }
+    .tl-right { flex: 1; padding-top: 6px; }
+    .tl-title { font-weight: 600; margin-bottom: 6px; font-size: 15px; }
+    .tl-body { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .tl-body strong { color: var(--text); }
+
+    /* ─── COMPARISON TABLE ─── */
+    .compare {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    .compare th {
+      background: var(--surface2);
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .compare td {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.6;
+      color: #c9d1d9;
+    }
+    .compare tr:nth-child(even) td { background: #0f1318; }
+    .yes { color: var(--green); font-weight: 600; }
+    .no  { color: var(--red); }
+
+    /* ─── PHASE BLOCKS ─── */
+    .phases { display: flex; flex-direction: column; gap: 16px; margin: 24px 0; }
+    .phase {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .phase-badge {
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ph1 { background: #1a2e1a; color: #3fb950; }
+    .ph2 { background: #0d1f38; color: #58a6ff; }
+    .ph3 { background: #1f1433; color: #bc8cff; }
+    .phase-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+    .phase-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .phase-desc strong { color: var(--text); }
+
+    /* ─── FOOTER ─── */
+    .footer-bar {
+      margin-left: 240px;
+      border-top: 1px solid var(--border);
+      padding: 32px 64px;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .nav { display: none; }
+      .main, .footer-bar { margin-left: 0; }
+      .hero, .content { padding-left: 24px; padding-right: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="nav">
+  <div class="nav-logo">🎬 Pooker DevOps</div>
+
+  <div class="nav-section">
+    <div class="nav-label">Contexto</div>
+    <a href="#cap1"><div class="nav-num">1</div> O que é DevOps?</a>
+    <a href="#cap2"><div class="nav-num">2</div> O projeto</a>
+  </div>
+
+  <div class="nav-section" style="margin-top:16px;">
+    <div class="nav-label">Arquitetura</div>
+    <a href="#cap3"><div class="nav-num">3</div> Decisões de design</a>
+    <a href="#cap4"><div class="nav-num">4</div> Componentes</a>
+    <a href="#cap5"><div class="nav-num">5</div> As 3 pipelines</a>
+  </div>
+
+  <div class="nav-section" style="margin-top:16px;">
+    <div class="nav-label">Implementação</div>
+    <a href="#cap6"><div class="nav-num">6</div> As 3 fases</a>
+    <a href="#cap7"><div class="nav-num">7</div> Qualidade de código</a>
+    <a href="#cap8"><div class="nav-num">8</div> Desafios reais</a>
+    <a href="#cap9"><div class="nav-num">9</div> Resultado final</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Documentação técnica</div>
+    <h1>Como funciona o <span class="highlight">DevOps</span><br>no Pooker</h1>
+    <p class="hero-lead">
+      Do zero ao pipeline completo: entenda como automatizamos a integração contínua de 7 microserviços,
+      o que motivou cada decisão técnica e como isso funciona na prática.
+    </p>
+    <div class="hero-tags">
+      <span class="tag tag-blue">GitHub Actions</span>
+      <span class="tag tag-green">Self-hosted Runner</span>
+      <span class="tag tag-purple">SonarQube</span>
+      <span class="tag tag-orange">7 microserviços</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- CAP 1: O QUE É DEVOPS -->
+    <div class="chapter" id="cap1">
+      <div class="chapter-num">1</div>
+      <h2>O que é DevOps e por que precisamos disso?</h2>
+      <p class="chapter-lead">Antes de falar sobre a implementação, vale entender o problema que o DevOps resolve.</p>
+
+      <p>
+        Imagine um time de desenvolvimento onde cada pessoa trabalha semanas no seu código, e só no final juntam tudo.
+        Resultado: conflitos, bugs difíceis de rastrear e aquela clássica frase <em>"na minha máquina funciona"</em>.
+        Esse cenário era a realidade de praticamente todos os times antes do DevOps.
+      </p>
+
+      <p>
+        <strong>DevOps</strong> é a cultura e o conjunto de práticas que aproxima o desenvolvimento de software
+        (<em>Dev</em>) da operação de infraestrutura (<em>Ops</em>). O objetivo central é
+        <strong>entregar software com mais velocidade, mais confiança e menos atrito</strong>.
+      </p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-head"><div class="icon">⚡</div><div class="title">Integração Contínua (CI)</div></div>
+          <p>Todo código enviado é automaticamente compilado e testado. Erros aparecem em minutos, não em semanas. O time recebe feedback imediato sobre a qualidade do que foi escrito.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">🚀</div><div class="title">Entrega Contínua (CD)</div></div>
+          <p>Após passar pelos testes, o código está pronto para ser colocado em produção a qualquer momento. O processo de deploy deixa de ser um evento estressante e manual.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">🔍</div><div class="title">Qualidade automatizada</div></div>
+          <p>Ferramentas de análise estática verificam automaticamente cobertura de testes, bugs em potencial, vulnerabilidades de segurança e code smells — sem depender de revisão manual.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">📦</div><div class="title">Builds reproduzíveis</div></div>
+          <p>Com Docker e pipelines automatizadas, o ambiente de build é sempre o mesmo — eliminando a variação de "funciona na minha máquina mas não no servidor".</p>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">A ideia central</div>
+          Em vez de integrar código raramente e com dor, o DevOps propõe integrar frequentemente e com automação.
+          Cada push dispara automaticamente uma sequência de verificações que garante que o código está saudável
+          antes de chegar à main branch ou ao ambiente de produção.
+        </div>
+      </div>
+    </div>
+
+    <!-- CAP 2: O PROJETO -->
+    <div class="chapter" id="cap2">
+      <div class="chapter-num">2</div>
+      <h2>O projeto Pooker</h2>
+      <p class="chapter-lead">Uma plataforma de aluguel de filmes construída como monorepo com múltiplas tecnologias.</p>
+
+      <p>
+        O Pooker é uma aplicação de aluguel de filmes estruturada como um <strong>monorepo</strong> — um único
+        repositório Git que contém todos os serviços. A arquitetura é de <strong>microserviços</strong>:
+        cada funcionalidade é um serviço independente com sua própria linguagem, banco de dados e responsabilidade.
+      </p>
+
+      <h3>Os 7 microserviços</h3>
+
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>Serviço</th>
+            <th>Tecnologia</th>
+            <th>Responsabilidade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>api-gateway</strong></td>
+            <td>Java 17 · Spring Boot · Gradle</td>
+            <td>Ponto de entrada único — roteia requisições para os serviços corretos</td>
+          </tr>
+          <tr>
+            <td><strong>auth-service</strong></td>
+            <td>Java 17 · Spring Boot · Maven</td>
+            <td>Autenticação e autorização — login, tokens JWT, controle de acesso</td>
+          </tr>
+          <tr>
+            <td><strong>filmes-service</strong></td>
+            <td>Python 3.11 · FastAPI</td>
+            <td>Catálogo de filmes — listagem, detalhes, busca</td>
+          </tr>
+          <tr>
+            <td><strong>alugueis-service</strong></td>
+            <td>Python 3.11 · FastAPI</td>
+            <td>Gestão de aluguéis — criar, listar, devolver</td>
+          </tr>
+          <tr>
+            <td><strong>user-service</strong></td>
+            <td>Python 3.11 · FastAPI</td>
+            <td>Cadastro e gerenciamento de usuários</td>
+          </tr>
+          <tr>
+            <td><strong>payment-service</strong></td>
+            <td>Python 3.11 · FastAPI</td>
+            <td>Processamento de pagamentos</td>
+          </tr>
+          <tr>
+            <td><strong>frontend</strong></td>
+            <td>Angular 20 · TypeScript</td>
+            <td>Interface web — SPA consumindo todos os serviços via API Gateway</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">O desafio do monorepo com múltiplas tecnologias</div>
+          Ter Java, Python e Angular no mesmo repositório significa que cada serviço precisa de ferramentas
+          completamente diferentes para build, teste e análise. A pipeline precisaria ser inteligente o suficiente
+          para saber o que fazer com cada um — e eficiente o suficiente para não recompilar tudo quando só um
+          arquivo foi alterado.
+        </div>
+      </div>
+    </div>
+
+    <!-- CAP 3: DECISÕES DE DESIGN -->
+    <div class="chapter" id="cap3">
+      <div class="chapter-num">3</div>
+      <h2>Por que essas escolhas?</h2>
+      <p class="chapter-lead">As decisões de arquitetura foram tomadas com base nas restrições reais do projeto — orçamento zero, máquina Windows local, prazo curto.</p>
+
+      <h3>GitHub Actions — por que não Jenkins ou GitLab CI?</h3>
+
+      <p>
+        O GitHub Actions foi escolhido porque o código já estava hospedado no GitHub, eliminando a necessidade
+        de configurar um servidor de CI separado ou pagar por uma ferramenta externa. O arquivo de configuração
+        fica junto ao código, é versionado no Git e qualquer alteração na pipeline é rastreável como qualquer
+        outro commit.
+      </p>
+
+      <table class="compare">
+        <thead><tr><th>Critério</th><th>GitHub Actions</th><th>Jenkins</th><th>GitLab CI</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Custo de setup</td>
+            <td class="yes">Zero</td>
+            <td class="no">Servidor dedicado</td>
+            <td class="no">Migração necessária</td>
+          </tr>
+          <tr>
+            <td>Integração com GitHub</td>
+            <td class="yes">Nativa</td>
+            <td>Webhook manual</td>
+            <td>Indisponível</td>
+          </tr>
+          <tr>
+            <td>Configuração como código</td>
+            <td class="yes">YAML versionado</td>
+            <td class="yes">Jenkinsfile</td>
+            <td class="yes">.gitlab-ci.yml</td>
+          </tr>
+          <tr>
+            <td>Runner gratuito</td>
+            <td>Limitado (2000 min/mês)</td>
+            <td class="yes">Self-hosted ilimitado</td>
+            <td>Limitado</td>
+          </tr>
+          <tr>
+            <td>Self-hosted runner</td>
+            <td class="yes">Suportado</td>
+            <td class="yes">Suportado</td>
+            <td class="yes">Suportado</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Runner self-hosted — por que não o runner em nuvem do GitHub?</h3>
+
+      <p>
+        O GitHub oferece runners na nuvem gratuitamente, mas com um limite de 2.000 minutos por mês para contas
+        gratuitas. Com 7 serviços sendo testados, esse limite se esgotaria rapidamente. A solução foi usar um
+        <strong>runner self-hosted</strong>: um programa instalado na própria máquina de desenvolvimento que
+        conecta ao GitHub e executa os jobs localmente.
+      </p>
+
+      <div class="callout info">
+        <div class="callout-icon">🖥️</div>
+        <div class="callout-body">
+          <div class="callout-title">Por que o runner ficou nativo no Windows (não em Docker)?</div>
+          A ideia original era rodar o runner dentro de um container Docker. Mas o projeto já tem Docker Desktop
+          rodando SonarQube e PostgreSQL — adicionar mais um container criaria dependências circulares e
+          complicaria o acesso ao localhost. Instalar o runner nativo no Windows foi mais simples,
+          mais direto e evitou problemas de rede entre containers.
+        </div>
+      </div>
+
+      <h3>SonarQube — por que analisar qualidade na pipeline?</h3>
+
+      <p>
+        Testes unitários verificam se o código <em>funciona</em>. Mas não dizem se ele é
+        <strong>seguro</strong>, <strong>manutenível</strong> ou se está sendo <strong>testado o suficiente</strong>.
+        O SonarQube faz análise estática — lê o código sem executá-lo — e detecta padrões problemáticos,
+        vulnerabilidades de segurança e mede a cobertura de testes.
+      </p>
+
+      <p>
+        Escolhemos o <strong>SonarQube Community Edition</strong> por ser open source, gratuito e rodar em Docker
+        com um único comando. Para um projeto acadêmico ou startup, é a opção mais acessível sem abrir mão
+        de funcionalidades profissionais.
+      </p>
+
+      <h3>3 pipelines separadas — por que não uma só?</h3>
+
+      <p>
+        Uma única pipeline que roda tudo seria simples de configurar, mas extremamente ineficiente.
+        Alterar um arquivo Python não deveria recompilar o código Java nem reinstalar as dependências do Angular.
+        Com 3 pipelines independentes e filtros de path, cada serviço só executa quando seus arquivos mudam.
+      </p>
+
+      <pre><code><span class="cm"># Só dispara quando arquivos do backend Java mudam</span>
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">paths</span>:
+      - <span class="st">'backend/api-gateway/**'</span>
+      - <span class="st">'backend/auth-service/**'</span></code></pre>
+    </div>
+
+    <!-- CAP 4: COMPONENTES -->
+    <div class="chapter" id="cap4">
+      <div class="chapter-num">4</div>
+      <h2>Os componentes da esteira</h2>
+      <p class="chapter-lead">Quatro peças que trabalham juntas para formar a infraestrutura de CI/CD.</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#0d1f38;">⚡</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">GitHub Actions — Orquestrador</div>
+            <div class="tl-body">
+              É o cérebro da esteira. Fica monitorando o repositório e, quando detecta um push ou PR nas branches
+              <strong>main</strong>, <strong>master</strong> ou <strong>develop</strong>, dispara os jobs correspondentes.
+              Toda a lógica fica em arquivos YAML dentro da pasta <code>.github/workflows/</code>.
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#1a2e1a;">🏃</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">Self-hosted Runner — Executor</div>
+            <div class="tl-body">
+              Um processo rodando em segundo plano no Windows que fica em modo <em>idle</em>, aguardando ordens
+              do GitHub Actions. Quando um job chega, ele faz o checkout do código, executa cada step em
+              sequência e reporta o resultado de volta ao GitHub. Por rodar localmente, tem acesso direto ao
+              SonarQube e ao Docker sem configurações de rede especiais.
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#1f1433;">🔍</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">SonarQube — Analisador de qualidade</div>
+            <div class="tl-body">
+              Roda em um container Docker na porta <code>9000</code>. Recebe os relatórios de cobertura gerados
+              pelos testes (JaCoCo para Java, coverage.xml para Python, LCOV para Angular) e faz a análise estática
+              do código. Ao final, emite um veredicto: <strong style="color:#3fb950">Quality Gate passou</strong>
+              ou <strong style="color:#f85149">Quality Gate falhou</strong>.
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#2e1e0a;">🐳</div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">Docker — Empacotador</div>
+            <div class="tl-body">
+              Ao final de uma pipeline bem-sucedida (com Quality Gate aprovado), cada serviço é empacotado em uma
+              imagem Docker. Isso garante que o artefato gerado é sempre o mesmo independentemente do ambiente
+              onde vai rodar — o mesmo container que passou nos testes é o que vai para produção.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAP 5: AS 3 PIPELINES -->
+    <div class="chapter" id="cap5">
+      <div class="chapter-num">5</div>
+      <h2>As 3 pipelines em detalhe</h2>
+      <p class="chapter-lead">Cada tecnologia tem seu próprio fluxo, adaptado às suas ferramentas nativas.</p>
+
+      <h3>☕ Pipeline Java</h3>
+      <p>
+        Cobre o <strong>api-gateway</strong> (Gradle) e o <strong>auth-service</strong> (Maven). São dois jobs
+        independentes dentro do mesmo arquivo YAML — rodam em paralelo, então não precisam esperar um pelo outro.
+      </p>
+      <p>
+        O build Java tem uma característica especial: separamos o build da execução dos testes.
+        O primeiro passo compila o código inteiro para verificar erros de compilação. Se compilar, os testes rodam.
+        Em seguida, o JaCoCo gera um relatório XML com a cobertura de cada linha e classe.
+        Esse relatório é enviado ao SonarQube para análise.
+      </p>
+
+      <div class="callout tip">
+        <div class="callout-icon">🔧</div>
+        <div class="callout-body">
+          <div class="callout-title">Detalhe técnico: banco de dados nos testes</div>
+          O auth-service usa PostgreSQL em produção, mas rodar um banco de dados no CI seria lento e complexo.
+          A solução foi criar um arquivo <code>src/test/resources/application.properties</code> que substitui
+          a configuração em tempo de teste — usando <strong>H2</strong>, um banco de dados em memória que não
+          precisa ser instalado. Os testes rodam mais rápido e de forma totalmente isolada.
+        </div>
+      </div>
+
+      <h3>🐍 Pipeline Python</h3>
+      <p>
+        Cobre 4 serviços FastAPI de uma vez usando a estratégia de <strong>matrix</strong> do GitHub Actions.
+        Em vez de copiar e colar o mesmo job 4 vezes, declaramos uma lista de serviços e o GitHub Actions
+        executa o job uma vez para cada item — em paralelo.
+      </p>
+
+      <pre><code><span class="kw">strategy</span>:
+  <span class="kw">matrix</span>:
+    <span class="kw">service</span>: [<span class="st">alugueis-service</span>, <span class="st">filmes-service</span>, <span class="st">user-service</span>, <span class="st">payment-service</span>]
+  <span class="kw">fail-fast</span>: <span class="nm">false</span>  <span class="cm"># falha num serviço não cancela os outros</span></code></pre>
+
+      <p>
+        O lint com <strong>flake8</strong> foi configurado para verificar apenas erros graves de sintaxe
+        (<code>E9, F821, F822, F823</code>) — ignorando violações de estilo que existiam no código herdado.
+        Assim a pipeline não falha por indentação ou linha longa, apenas por código que realmente não compila.
+      </p>
+
+      <h3>🅰️ Pipeline Angular</h3>
+      <p>
+        Roda o <strong>npm ci</strong> para instalar dependências de forma determinística (usando exatamente o
+        que está no <code>package-lock.json</code>), executa o lint ESLint com <code>continue-on-error</code>
+        para não bloquear por violações pré-existentes, e os testes com <strong>Karma + ChromeHeadless</strong>
+        — um navegador Chrome sem interface gráfica, ideal para ambientes de CI.
+      </p>
+      <p>
+        A cobertura de código é gerada pelo Istanbul (integrado ao Angular) no formato LCOV e enviada ao
+        SonarQube para análise. Por fim, o build de produção gera os arquivos otimizados em <code>dist/</code>.
+      </p>
+    </div>
+
+    <!-- CAP 6: AS 3 FASES -->
+    <div class="chapter" id="cap6">
+      <div class="chapter-num">6</div>
+      <h2>A implementação em 3 fases</h2>
+      <p class="chapter-lead">A esteira não foi implementada de uma vez. Construímos em fases para ter valor entregue a cada etapa.</p>
+
+      <div class="phases">
+        <div class="phase">
+          <div>
+            <span class="phase-badge ph1">Fase 1</span>
+          </div>
+          <div>
+            <div class="phase-title">Build e testes verdes</div>
+            <div class="phase-desc">
+              O objetivo da primeira fase era simples: <strong>os 3 pipelines executam sem erro</strong>.
+              Isso significou configurar o runner, ajustar os YAMLs para PowerShell (o runner roda no Windows,
+              não Linux), corrigir dependências quebradas do npm, e fazer os testes Java funcionarem sem
+              precisar de banco de dados externo. Resultado: 3 pipelines verdes, runner idle aguardando jobs.
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div>
+            <span class="phase-badge ph2">Fase 2</span>
+          </div>
+          <div>
+            <div class="phase-title">SonarQube conectado</div>
+            <div class="phase-desc">
+              Com os builds verdes, integramos o SonarQube. Cada serviço ganhou um arquivo
+              <code>sonar-project.properties</code> com sua chave única. O token de autenticação e a URL
+              do SonarQube foram guardados como <strong>secrets no GitHub</strong> — nunca no código.
+              A variável <code>SONAR_ENABLED=true</code> foi criada no repositório para ligar/desligar
+              a análise sem precisar alterar os YAMLs.
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div>
+            <span class="phase-badge ph3">Fase 3</span>
+          </div>
+          <div>
+            <div class="phase-title">Quality Gate bloqueante</div>
+            <div class="phase-desc">
+              Na fase final, o Quality Gate passou a ser <strong>bloqueante</strong>: se um serviço não atender
+              aos critérios mínimos de qualidade, o pipeline inteiro falha e o Docker build não acontece.
+              Isso é controlado pelo parâmetro <code>-Dsonar.qualitygate.wait=true</code>, que faz o
+              sonar-scanner aguardar o resultado antes de retornar o exit code para o GitHub Actions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAP 7: SONARQUBE -->
+    <div class="chapter" id="cap7">
+      <div class="chapter-num">7</div>
+      <h2>Qualidade de código com SonarQube</h2>
+      <p class="chapter-lead">O que o SonarQube analisa e como o Quality Gate funciona na prática.</p>
+
+      <p>
+        O SonarQube recebe dois tipos de entrada de cada serviço: o <strong>código-fonte</strong> e os
+        <strong>relatórios de cobertura</strong> gerados pelos testes. Com esses dados, ele calcula métricas
+        e compara com o Quality Gate configurado.
+      </p>
+
+      <h3>Como a cobertura chega ao SonarQube</h3>
+
+      <div class="cards three">
+        <div class="card">
+          <div class="card-head"><div class="icon">☕</div><div class="title">Java</div></div>
+          <p>O Gradle/Maven roda o <strong>JaCoCo</strong> após os testes e gera um <code>jacocoTestReport.xml</code>. O SonarQube lê esse arquivo para saber quais linhas foram executadas.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">🐍</div><div class="title">Python</div></div>
+          <p>O <strong>pytest-cov</strong> gera um <code>coverage.xml</code> no formato Cobertura. O SonarQube entende esse formato nativamente e calcula a cobertura por módulo.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">🅰️</div><div class="title">Angular</div></div>
+          <p>O Karma gera um arquivo <strong>LCOV</strong> em <code>coverage/looker/lcov.info</code>. O SonarQube usa esse arquivo para mapear cobertura de TypeScript.</p>
+        </div>
+      </div>
+
+      <h3>O que acontece quando o Quality Gate falha</h3>
+
+      <p>
+        Quando o Quality Gate reprovada, a pipeline marca o step de SonarQube como vermelho e
+        interrompe a execução — o Docker build não acontece. No GitHub, o check da pipeline aparece
+        como falho, o que impede o merge de um Pull Request caso a branch protection esteja configurada.
+      </p>
+
+      <div class="callout warning">
+        <div class="callout-icon">🚦</div>
+        <div class="callout-body">
+          <div class="callout-title">O fluxo de decisão do Quality Gate</div>
+          <div style="margin-top:8px;font-family:monospace;font-size:13px;line-height:2;">
+            sonar-scanner envia análise<br>
+            &nbsp;&nbsp;↓<br>
+            SonarQube avalia condições<br>
+            &nbsp;&nbsp;↓<br>
+            cobertura ≥ 70% <strong style="color:#3fb950">E</strong> bugs = 0 <strong style="color:#3fb950">E</strong> vulnerabilidades = 0<br>
+            &nbsp;&nbsp;↓<br>
+            <strong style="color:#3fb950">✓ PASSED</strong> → pipeline continua → Docker build<br>
+            <strong style="color:#f85149">✗ FAILED</strong> → exit code 1 → pipeline falha → sem Docker build
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAP 8: DESAFIOS REAIS -->
+    <div class="chapter" id="cap8">
+      <div class="chapter-num">8</div>
+      <h2>Desafios reais durante a implementação</h2>
+      <p class="chapter-lead">A esteira não saiu perfeita na primeira tentativa. Esses são os problemas reais que encontramos e como foram resolvidos.</p>
+
+      <h4>🪟 PowerShell em vez de Bash</h4>
+      <p>
+        O runner roda no Windows, onde o shell padrão é PowerShell — não Bash. Os YAMLs do GitHub Actions usam
+        Bash por padrão, então comandos como <code>if [ -f arquivo ]</code> ou <code>cd pasta &amp;&amp; comando</code>
+        falhavam com erro de sintaxe. A solução foi reescrever todos os scripts usando sintaxe PowerShell:
+        <code>if (Test-Path arquivo)</code>, <code>working-directory:</code> por step, e wrappers Windows
+        (<code>.\gradlew.bat</code>, <code>.\mvnw.cmd</code>).
+      </p>
+
+      <h4>🔍 sonar-scanner não estava no PATH</h4>
+      <p>
+        O sonar-scanner não vem pré-instalado no Windows. A abordagem inicial foi baixar o ZIP em um step e
+        adicionar o diretório ao <code>$GITHUB_PATH</code> para que o step seguinte pudesse invocar
+        <code>sonar-scanner</code> diretamente. Isso não funcionou porque a variável de PATH só é relida
+        no início de cada processo. A solução: combinar download e execução em um único step, usando
+        o caminho completo do executável:
+      </p>
+      <pre><code><span class="cm"># Em vez de dois steps separados, tudo em um:</span>
+<span class="kw">run</span>: |
+  <span class="at">$scannerDir</span> = <span class="st">"$env:USERPROFILE\.sonar\sonar-scanner-5.0.1.3006-windows"</span>
+  <span class="cm"># ... download se não existir ...</span>
+  <span class="kw">&</span> <span class="st">"$scannerDir\bin\sonar-scanner.bat"</span> <span class="st">"-Dsonar.qualitygate.wait=true"</span></code></pre>
+
+      <h4>💥 PowerShell partindo argumentos com ponto</h4>
+      <p>
+        Mesmo com o caminho completo, a chamada <code>sonar-scanner.bat -Dsonar.qualitygate.wait=true</code>
+        falhava. O PowerShell interpretava <code>-D</code> como flag e <code>sonar.qualitygate.wait=true</code>
+        como argumento solto. A correção foi colocar aspas no argumento inteiro:
+        <code>"-Dsonar.qualitygate.wait=true"</code>.
+      </p>
+
+      <h4>📦 package-lock.json fora de sincronia</h4>
+      <p>
+        O <code>npm ci</code> falhou porque o <code>package-lock.json</code> estava desatualizado em relação ao
+        <code>package.json</code> — pacotes do Angular ESLint tinham sido adicionados mas o lock não foi
+        regenerado. A solução foi rodar <code>npm install</code> localmente para atualizar o lock file
+        e commitar o resultado.
+      </p>
+
+      <h4>📁 Caminho do LCOV errado</h4>
+      <p>
+        O SonarQube apontava para <code>coverage/lcov.info</code> mas o Angular gera o arquivo em
+        <code>coverage/<em>nome-do-projeto</em>/lcov.info</code>. O projeto se chama <code>looker</code>
+        no <code>angular.json</code>, então o caminho correto era <code>coverage/looker/lcov.info</code>.
+      </p>
+
+      <div class="callout success">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Aprendizado geral</div>
+          A maior parte dos problemas veio da diferença entre o ambiente esperado (Linux/Bash, que é o padrão
+          dos tutoriais de CI) e o ambiente real (Windows/PowerShell). Cada erro ensinou algo sobre como o
+          runner interpreta scripts — e a esteira final é mais robusta por ter passado por esses problemas reais.
+        </div>
+      </div>
+    </div>
+
+    <!-- CAP 9: RESULTADO FINAL -->
+    <div class="chapter" id="cap9">
+      <div class="chapter-num">9</div>
+      <h2>Resultado final</h2>
+      <p class="chapter-lead">O que foi entregue e o que isso representa para o projeto.</p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-head"><div class="icon">✅</div><div class="title">3 pipelines funcionando</div></div>
+          <p>Java, Python e Angular têm pipelines independentes que disparam automaticamente em cada push e produzem relatórios de teste e cobertura.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">🔍</div><div class="title">7 projetos no SonarQube</div></div>
+          <p>Cada microserviço tem seu próprio projeto no dashboard do SonarQube com métricas de cobertura, bugs, vulnerabilidades e code smells.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">🚦</div><div class="title">Quality Gate bloqueante</div></div>
+          <p>Código que não atende aos critérios de qualidade mínimos não passa pela pipeline. O Docker build só acontece após aprovação do Quality Gate.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="icon">💰</div><div class="title">Custo zero</div></div>
+          <p>Toda a infraestrutura usa ferramentas open source — GitHub Actions self-hosted, SonarQube Community, Docker Desktop — sem custo de cloud.</p>
+        </div>
+      </div>
+
+      <h3>O que a esteira garante em cada push</h3>
+
+      <div class="timeline" style="margin-top:24px;">
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#1a2e1a;font-size:14px;">1</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">O código compila</div>
+            <div class="tl-body">Erros de sintaxe e compilação são detectados imediatamente, antes de chegar a qualquer revisão humana.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#0d1f38;font-size:14px;">2</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">Os testes passam</div>
+            <div class="tl-body">Toda a suíte de testes unitários roda automaticamente. Uma regressão é detectada antes de chegar à branch principal.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#1f1433;font-size:14px;">3</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">A qualidade está dentro do padrão</div>
+            <div class="tl-body">O SonarQube garante que cobertura mínima foi atingida e que nenhum bug ou vulnerabilidade crítica foi introduzida.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot" style="background:#2e1e0a;font-size:14px;">4</div>
+          </div>
+          <div class="tl-right">
+            <div class="tl-title">A imagem Docker está pronta</div>
+            <div class="tl-body">Apenas código que passou em todas as etapas anteriores gera uma imagem Docker — o artefato pronto para deploy em qualquer ambiente.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:40px;">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-body">
+          <div class="callout-title">Em resumo</div>
+          O que foi construído aqui é exatamente o que times profissionais usam em empresas de tecnologia.
+          A diferença de escala existe — grandes empresas têm mais serviços, mais stages de deploy, ambientes
+          de staging e produção separados — mas o <strong>princípio é o mesmo</strong>: automatizar verificações,
+          medir qualidade continuamente e garantir que só código saudável avança no processo.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div class="footer-bar">
+  <span><strong>Pooker</strong> — Documentação DevOps</span>
+  <span>GitHub Actions · SonarQube · Docker · Windows Runner</span>
+</div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('[id^="cap"]');
+  const links = document.querySelectorAll('.nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
