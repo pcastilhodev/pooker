@@ -3,6 +3,12 @@
 
 $root = $PSScriptRoot
 
+# Garante que o Python do runner esta no PATH desta sessao
+$runnerPython = "C:\actions-runner\_work\_tool\Python\3.11.9\x64"
+if (Test-Path "$runnerPython\python.exe") {
+    $env:PATH = "$runnerPython;$runnerPython\Scripts;" + $env:PATH
+}
+
 function Write-Step($msg) { Write-Host "" ; Write-Host $msg -ForegroundColor Cyan }
 function Write-OK($msg)   { Write-Host "  OK  $msg" -ForegroundColor Green }
 function Write-Warn($msg) { Write-Host "  >>  $msg" -ForegroundColor Yellow }
@@ -34,7 +40,7 @@ $pythonServices = @(
 
 # Detecta Python disponivel para servicos
 $pyExe = $null
-foreach ($candidate in @("py", "python3", "python", "C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
+foreach ($candidate in @("C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "py", "python3", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
     try {
         $ver = & $candidate --version 2>&1
         if ($ver -match "Python") { $pyExe = $candidate; break }
@@ -70,7 +76,7 @@ Start-Sleep -Seconds 25
 
 # Detecta Python disponivel
 $pyCmd = $null
-foreach ($candidate in @("py", "python3", "python", "C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
+foreach ($candidate in @("C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "py", "python3", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
     try {
         $ver = & $candidate --version 2>&1
         if ($ver -match "Python") { $pyCmd = $candidate; break }
