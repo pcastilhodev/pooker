@@ -32,9 +32,20 @@ $pythonServices = @(
     @{ name = "payment-service";  dir = "backend\payment-service";  port = 8005 }
 )
 
+# Detecta Python disponivel para servicos
+$pyExe = $null
+foreach ($candidate in @("py", "python3", "python", "C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
+    try {
+        $ver = & $candidate --version 2>&1
+        if ($ver -match "Python") { $pyExe = $candidate; break }
+    } catch {}
+}
+if (-not $pyExe) { $pyExe = "python" }
+Write-OK "Usando Python: $pyExe"
+
 foreach ($svc in $pythonServices) {
     $svcDir = "$root\$($svc.dir)"
-    $cmd = "Set-Location '$svcDir'; python -m pip install -r requirements.txt -q; python -m uvicorn app.main:app --host 0.0.0.0 --port $($svc.port)"
+    $cmd = "Set-Location '$svcDir'; & '$pyExe' -m pip install -r requirements.txt -q; & '$pyExe' -m uvicorn app.main:app --host 0.0.0.0 --port $($svc.port)"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -WindowStyle Minimized
     Write-OK "$($svc.name)  ->  http://localhost:$($svc.port)"
 }
@@ -57,8 +68,23 @@ Write-Step "4/5  Populando banco com dados de demo"
 Write-Warn "Aguardando servicos Python iniciarem (25s)..."
 Start-Sleep -Seconds 25
 
-python -m pip install psycopg2-binary passlib bcrypt -q
-python "$root\database\seed.py"
+# Detecta Python disponivel
+$pyCmd = $null
+foreach ($candidate in @("py", "python3", "python", "C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
+    try {
+        $ver = & $candidate --version 2>&1
+        if ($ver -match "Python") { $pyCmd = $candidate; break }
+    } catch {}
+}
+
+if (-not $pyCmd) {
+    Write-Host "  AVISO: Python nao encontrado. Rode manualmente depois:" -ForegroundColor Red
+    Write-Host "    python database\seed.py" -ForegroundColor Yellow
+} else {
+    Write-OK "Python encontrado: $pyCmd"
+    & $pyCmd -m pip install psycopg2-binary passlib bcrypt -q
+    & $pyCmd "$root\database\seed.py"
+}
 
 # -- 5. ANGULAR ---------------------------------------------------------------
 Write-Step "5/5  Frontend Angular"
