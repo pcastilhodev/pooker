@@ -1,0 +1,152 @@
+<div class="movie-page">
+  <!-- NAV -->
+  <nav class="film-nav" id="filmNav">
+    <button class="nav-back" (click)="goBack()">← Voltar</button>
+    <div class="nav-logo">LOOKER</div>
+    <button class="nav-watchlist">+ Watchlist</button>
+  </nav>
+
+  <!-- PROGRESS DOTS -->
+  <div id="progress-line">
+    <div class="prog-dot active" title="Hero"></div>
+    <div class="prog-dot" title="Sinopse"></div>
+    <div class="prog-dot" title="Stats"></div>
+    <div class="prog-dot" title="Diretor"></div>
+    <div class="prog-dot" title="Elenco"></div>
+    <div class="prog-dot" title="Críticas"></div>
+    <div class="prog-dot" title="Similares"></div>
+  </div>
+
+  <div *ngIf="film">
+
+    <!-- ── SEC 1: HERO ── -->
+    <section class="panel hero" data-section="hero">
+      <div class="hero-bg panel-bg">
+        <img *ngIf="film.imagem_url" class="hero-bg-img" [src]="film.imagem_url" [alt]="film.titulo" />
+        <svg class="hero-bg-grade" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient [id]="gradId" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   [attr.stop-color]="palette.c1"/>
+              <stop offset="55%"  [attr.stop-color]="palette.c2"/>
+              <stop offset="100%" [attr.stop-color]="palette.c3"/>
+            </linearGradient>
+            <radialGradient [id]="radId" cx="68%" cy="38%" r="62%">
+              <stop offset="0%"   [attr.stop-color]="palette.accent"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+          <rect width="1600" height="900" [attr.fill]="'url(#'+gradId+')'"/>
+          <rect width="1600" height="900" [attr.fill]="'url(#'+radId+')'"/>
+          <line x1="900" y1="0" x2="1200" y2="900" stroke="rgba(255,255,255,0.02)" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="vignette-lr"></div>
+      <div class="hero-content">
+        <div class="film-eyebrow">{{ film.genero }} · {{ filmYear }}</div>
+        <h1 class="film-title">{{ film.titulo.toUpperCase() }}</h1>
+        <div class="film-bottom-row">
+          <span class="film-chip">{{ durationFormatted }}</span>
+          <div class="vbar"></div>
+          <span class="film-chip">{{ film.diretor }}</span>
+          <div class="vbar"></div>
+          <span class="film-chip">{{ film.classificacao_indicativa }}</span>
+        </div>
+        <button class="btn-rent" (click)="rentMovie()" [disabled]="rentLoading">
+          {{ rentLoading ? 'Processando…' : 'Alugar — R$ ' + film.preco_aluguel.toFixed(2) }}
+        </button>
+      </div>
+    </section>
+
+    <!-- ── SEC 2: SINOPSE ── -->
+    <section class="synopsis-panel" data-section="synopsis">
+      <app-scroll-reveal-section>
+        <div class="synopsis-inner">
+          <div class="panel-label">Sinopse</div>
+          <p class="synopsis-text">{{ film.sinopse || 'Sinopse não disponível.' }}</p>
+        </div>
+      </app-scroll-reveal-section>
+    </section>
+
+    <!-- ── SEC 3: STATS ── -->
+    <div class="stats-row" data-section="stats">
+      <app-scroll-reveal-section>
+        <div class="stat-cell"><div class="stat-k">Diretor</div><div class="stat-v">{{ film.diretor }}</div></div>
+        <div class="stat-cell"><div class="stat-k">Ano</div><div class="stat-v">{{ filmYear }}</div></div>
+        <div class="stat-cell"><div class="stat-k">Duração</div><div class="stat-v">{{ durationFormatted }}</div></div>
+        <div class="stat-cell"><div class="stat-k">Gênero</div><div class="stat-v">{{ film.genero }}</div></div>
+        <div class="stat-cell"><div class="stat-k">Classificação</div><div class="stat-v">{{ film.classificacao_indicativa }}</div></div>
+        <div class="stat-cell"><div class="stat-k">Preço</div><div class="stat-v gold">R$ {{ film.preco_aluguel.toFixed(2) }}</div></div>
+      </app-scroll-reveal-section>
+    </div>
+
+    <!-- ── SEC 4: DIRETOR ── -->
+    <div class="director-panel" data-section="director">
+      <div class="director-visual">
+        <svg viewBox="0 0 800 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;position:absolute;inset:0">
+          <rect width="800" height="560" [attr.fill]="palette.c1"/>
+          <text x="400" y="280" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="11" fill="rgba(255,255,255,0.08)" letter-spacing="2">FOTO · {{ film.diretor.toUpperCase() }}</text>
+        </svg>
+      </div>
+      <app-scroll-reveal-section>
+        <div class="director-info-block">
+          <div class="director-role">Direção</div>
+          <div class="director-name">{{ film.diretor.toUpperCase() }}</div>
+          <p class="director-bio">Informações sobre o diretor em breve.</p>
+        </div>
+      </app-scroll-reveal-section>
+    </div>
+
+    <!-- ── SEC 5: ELENCO ── -->
+    <section class="cast-panel" data-section="cast">
+      <app-scroll-reveal-section>
+        <div class="cast-header">
+          <div class="sec-sub">Elenco principal</div>
+          <div class="sec-title">Intérpretes</div>
+        </div>
+      </app-scroll-reveal-section>
+      <div class="cast-track" id="castTrack">
+        <div class="cast-card" *ngFor="let p of castMock; let i = index">
+          <div class="cast-img">
+            <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+              <rect width="200" height="300" [attr.fill]="palette.c1"/>
+              <text x="100" y="150" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="9" fill="rgba(255,255,255,0.12)">{{ p.name.split(' ')[0].toUpperCase() }}</text>
+            </svg>
+          </div>
+          <div class="cast-name">{{ p.name }}</div>
+          <div class="cast-char">{{ p.char }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SEC 6: CRÍTICAS ── -->
+    <section class="reviews-panel" data-section="reviews">
+      <app-scroll-reveal-section>
+        <div class="reviews-header">
+          <div class="sec-sub">Imprensa especializada</div>
+          <div class="sec-title">Críticas</div>
+        </div>
+      </app-scroll-reveal-section>
+      <div class="reviews-track">
+        <div class="review-card" *ngFor="let r of reviewsMock">
+          <div class="review-outlet">{{ r.outlet }}</div>
+          <div class="review-score">{{ r.score }}</div>
+          <p class="review-text">{{ r.text }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SEC 7: SIMILARES ── -->
+    <section class="similar-panel" data-section="similar">
+      <app-scroll-reveal-section>
+        <div class="similar-header">
+          <div class="sec-sub">Você também pode gostar</div>
+          <div class="sec-title">Similares</div>
+        </div>
+      </app-scroll-reveal-section>
+      <div class="similar-track">
+        <app-movie-card *ngFor="let f of similarFilms" [film]="f"></app-movie-card>
+      </div>
+    </section>
+
+  </div>
+</div>

@@ -1,0 +1,54 @@
+/* ====== Reset ====== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ====== Tokens ====== */
+:root {
+  --bg:          #090810;
+  --bg-elev:     #0c0b18;
+  --card:        #0f0e1c;
+  --border:      rgba(255, 255, 255, 0.06);
+  --fg:          #f0eee8;
+  --muted:       #6a6870;
+  --primary:     #e11d48;
+  --primary-end: #7c3aed;
+  --gradient:    linear-gradient(90deg, #e11d48, #7c3aed);
+  --glow-red:    rgba(225, 29, 72, 0.18);
+  --glow-purple: rgba(124, 58, 237, 0.18);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+}
+
+/* ====== Grain ====== */
+#grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+/* ====== Focus ====== */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ====== Scrollbar ====== */
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Reduced motion ====== */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

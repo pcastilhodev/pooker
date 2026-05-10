@@ -1,0 +1,7 @@
+_/_pycache__/
+*.pyc
+app/__pycache__/main.cpython-313.pyc
+app/__pycache__/main.cpython-313.pyc
+app/routes/endpoints/__pycache__/user.cpython-313.pyc
+app/core/.env
+app/routes/endpoints/__pycache__/user.cpython-313.pyc

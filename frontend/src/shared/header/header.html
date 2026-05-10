@@ -1,0 +1,15 @@
+<nav [class.scrolled]="scrolled" [class.hidden]="hidden">
+  <div class="nav-logo" (click)="router.navigate([''])">LOOKER</div>
+  <div class="nav-right">
+    <a routerLink="/" class="nav-link">Filmes</a>
+    <button class="nav-enter" (click)="openLogin()">Entrar</button>
+  </div>
+</nav>
+
+<app-login
+  *ngIf="loginVisible"
+  [startVisible]="true"
+  (loginSubmit)="handleLogin($event)"
+  (registerSubmit)="handleRegister($event)"
+  (closed)="closeLogin()">
+</app-login>

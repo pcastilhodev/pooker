@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Brutalist — Looker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --fg: #f0eee8;
+  --muted: #6a6870;
+  --gold: #d4a843;
+  --bg: #090810;
+}
+html { scroll-behavior: auto; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── GRAIN ─── */
+#grain {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9000;
+  opacity: 0.07; mix-blend-mode: overlay;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 200; padding: 28px 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.3s;
+}
+nav.scrolled { background: rgba(9,8,16,0.9); backdrop-filter: blur(20px); }
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 0.2em;
+  color: var(--fg); opacity: 0.9; cursor: pointer;
+}
+.nav-back {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(240,238,232,0.35);
+  text-decoration: none; transition: color 0.2s;
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-back::before { content: '←'; }
+.nav-back:hover { color: var(--fg); }
+.nav-enter {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
+  text-transform: uppercase; color: rgba(240,238,232,0.4);
+  background: none; border: 1px solid rgba(240,238,232,0.12);
+  padding: 8px 20px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.nav-enter:hover { color: var(--fg); border-color: rgba(240,238,232,0.4); }
+
+/* ─── SECTION BASE ─── */
+.panel {
+  position: relative;
+  width: 100%; overflow: hidden;
+}
+.panel-bg {
+  position: absolute; inset: 0; will-change: transform;
+}
+.panel-bg svg { width: 100%; height: 100%; display: block; }
+
+/* ─── HERO ─── */
+.hero {
+  height: 100vh; min-height: 700px;
+  display: flex; align-items: flex-end;
+}
+.vignette-lr {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to right, rgba(9,8,16,0.9) 0%, rgba(9,8,16,0.45) 55%, rgba(9,8,16,0.15) 100%),
+    linear-gradient(to top, rgba(9,8,16,1) 0%, rgba(9,8,16,0.35) 30%, transparent 60%);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  padding: 0 52px 72px;
+}
+.film-eyebrow {
+  display: flex; align-items: center; gap: 16px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 18px;
+  clip-path: inset(0 100% 0 0);
+}
+.film-eyebrow::after {
+  content: ''; width: 36px; height: 1px;
+  background: currentColor; opacity: 0.5;
+}
+.film-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(88px, 11vw, 160px);
+  line-height: 0.88; letter-spacing: 0.01em;
+  margin-bottom: 28px;
+  opacity: 0; transform: translateY(80px) scale(0.93);
+  transform-origin: left bottom;
+}
+.film-bottom-row {
+  display: flex; align-items: center; gap: 28px;
+  opacity: 0; transform: translateY(20px);
+}
+.film-stars { font-size: 14px; color: var(--gold); letter-spacing: 4px; }
+.film-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; color: var(--gold); letter-spacing: 0.08em;
+}
+.vbar { width: 1px; height: 14px; background: rgba(240,238,232,0.12); }
+.film-chip {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(240,238,232,0.12);
+  padding: 4px 12px; color: rgba(240,238,232,0.4);
+}
+
+/* ─── SYNOPSIS PANEL ─── */
+.synopsis-panel {
+  min-height: 70vh;
+  display: flex; align-items: center;
+  padding: 120px 52px;
+  background: #0c0b18;
+}
+.synopsis-inner { max-width: 860px; }
+.panel-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 16px;
+  opacity: 0;
+}
+.panel-label::after { content:''; flex:1; height:1px; background:rgba(212,168,67,0.2); }
+.synopsis-text {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.55;
+  font-weight: 300;
+  color: rgba(240,238,232,0.65);
+  letter-spacing: -0.01em;
+  opacity: 0; transform: translateY(40px);
+}
+
+/* ─── STATS ROW ─── */
+.stats-row {
+  display: flex;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: #090810;
+}
+.stat-cell {
+  flex: 1; padding: 40px 52px;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  opacity: 0; transform: translateY(16px);
+}
+.stat-cell:last-child { border-right: none; }
+.stat-k {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.stat-v {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 0.04em; color: var(--fg);
+}
+.stat-v.gold { color: var(--gold); }
+
+/* ─── DIRECTOR PANEL ─── */
+.director-panel {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  background: #000;
+}
+.director-visual {
+  position: relative; min-height: 560px; overflow: hidden;
+  background: #0a0918;
+}
+.director-info-block {
+  background: #0f0e1c;
+  padding: 80px 52px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.director-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 5vw, 88px);
+  line-height: 0.88; letter-spacing: 0.02em;
+  margin-bottom: 16px;
+  opacity: 0; transform: translateY(40px);
+}
+.director-role {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 20px; opacity: 0;
+}
+.director-bio {
+  font-size: 14px; line-height: 1.75;
+  color: rgba(240,238,232,0.45);
+  max-width: 400px;
+  opacity: 0; transform: translateY(20px);
+}
+
+/* ─── CAST ─── */
+.cast-panel {
+  padding: 100px 0;
+  background: var(--bg);
+}
+.cast-header {
+  padding: 0 52px; margin-bottom: 48px;
+  opacity: 0; transform: translateY(24px);
+}
+.cast-track {
+  display: flex; gap: 2px;
+  padding: 0 52px;
+  overflow-x: auto; scrollbar-width: none;
+  cursor: grab;
+}
+.cast-track:active { cursor: grabbing; }
+.cast-track::-webkit-scrollbar { display: none; }
+.cast-card {
+  flex: 0 0 200px;
+  opacity: 0; transform: translateY(32px);
+}
+.cast-img {
+  width: 200px; aspect-ratio: 2/3;
+  overflow: hidden; margin-bottom: 14px;
+  position: relative;
+}
+.cast-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(9,8,16,0.6) 0%, transparent 40%);
+}
+.cast-name { font-size: 14px; font-weight: 500; color: var(--fg); }
+.cast-char { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+/* ─── REVIEWS ─── */
+.reviews-panel {
+  padding: 100px 0;
+  background: #0c0b18;
+  overflow: hidden;
+}
+.reviews-header {
+  padding: 0 52px; margin-bottom: 60px;
+  opacity: 0; transform: translateY(24px);
+}
+.reviews-track {
+  display: flex; gap: 2px;
+  padding: 0 52px;
+}
+.review-card {
+  flex: 0 0 calc(33.33% - 2px);
+  padding: 48px 40px;
+  background: rgba(255,255,255,0.025);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  opacity: 0; transform: translateY(36px);
+}
+.review-outlet {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
+}
+.review-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px; line-height: 1; color: var(--fg);
+  margin-bottom: 20px; letter-spacing: 0.02em;
+}
+.review-text {
+  font-size: 15px; line-height: 1.72;
+  color: rgba(240,238,232,0.5);
+  font-style: italic;
+}
+.review-author { font-size: 11px; color: var(--muted); margin-top: 20px; letter-spacing: 0.06em; }
+
+/* ─── SIMILAR ─── */
+.similar-panel {
+  padding: 100px 0 140px;
+  background: var(--bg);
+}
+.similar-header {
+  padding: 0 52px; margin-bottom: 48px;
+  opacity: 0; transform: translateY(24px);
+}
+.similar-track {
+  display: flex; gap: 12px;
+  padding: 0 52px;
+  overflow-x: auto; scrollbar-width: none; cursor: grab;
+}
+.similar-track:active { cursor: grabbing; }
+.similar-track::-webkit-scrollbar { display: none; }
+.similar-card {
+  flex: 0 0 160px; cursor: pointer;
+  opacity: 0; transform: translateY(20px);
+}
+.similar-poster { width: 160px; aspect-ratio: 2/3; margin-bottom: 12px; }
+.similar-name { font-size: 12px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.similar-stars { font-size: 10px; color: var(--gold); letter-spacing: 2px; margin-top: 3px; }
+
+/* ─── SECTION HEADER ─── */
+.sec-sub {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.sec-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px; letter-spacing: 0.04em; line-height: 1;
+}
+
+/* ─── PROGRESS LINE ─── */
+#progress-line {
+  position: fixed; right: 52px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  display: flex; flex-direction: column;
+  align-items: flex-end; gap: 8px;
+}
+.prog-dot {
+  width: 1px; height: 20px;
+  background: rgba(240,238,232,0.15);
+  transition: all 0.4s; cursor: pointer;
+}
+.prog-dot.active {
+  background: var(--gold); height: 36px;
+}
+
+/* ─── TWEAKS ─── */
+#tweaks-panel {
+  display: none; position: fixed; bottom: 24px; right: 24px;
+  background: rgba(9,8,16,0.95); border: 1px solid rgba(212,168,67,0.2);
+  backdrop-filter: blur(20px); padding: 20px; z-index: 10000; min-width: 200px;
+  font-family: 'DM Sans', sans-serif;
+}
+#tweaks-panel h3 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+  letter-spacing: 0.12em; color: var(--gold); margin-bottom: 16px;
+}
+.tweak-row { margin-bottom: 14px; }
+.tweak-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 7px; display: block;
+}
+.tweak-opts { display: flex; gap: 6px; }
+.topt {
+  flex: 1; background: none; border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(240,238,232,0.5); font-family: 'DM Sans', sans-serif;
+  font-size: 11px; padding: 7px 4px; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.topt.active, .topt:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.07); }
+</style>
+</head>
+<body>
+
+<canvas id="grain"></canvas>
+
+<nav id="navbar">
+  <a href="Looker v2.html" class="nav-back">Voltar</a>
+  <div class="nav-logo">LOOKER</div>
+  <button class="nav-enter">+ Watchlist</button>
+</nav>
+
+<div id="progress-line"></div>
+
+<!-- ── HERO ── -->
+<section class="panel hero" id="sec0" data-screen-label="01 Hero">
+  <div class="panel-bg" id="heroBg">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0e0818"/>
+          <stop offset="55%" stop-color="#1a0e2e"/>
+          <stop offset="100%" stop-color="#2a1240"/>
+        </linearGradient>
+        <radialGradient id="hr" cx="68%" cy="38%" r="62%">
+          <stop offset="0%" stop-color="rgba(120,80,200,0.28)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="hr2" cx="18%" cy="78%" r="38%">
+          <stop offset="0%" stop-color="rgba(212,168,67,0.07)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#hg)"/>
+      <rect width="1600" height="900" fill="url(#hr)"/>
+      <rect width="1600" height="900" fill="url(#hr2)"/>
+      <line x1="900" y1="0" x2="1200" y2="900" stroke="rgba(255,255,255,0.022)" stroke-width="1"/>
+      <line x1="980" y1="0" x2="1340" y2="900" stroke="rgba(255,255,255,0.015)" stroke-width="1"/>
+      <rect x="1100" y="100" width="340" height="620" fill="rgba(0,0,0,0.1)"/>
+      <text x="1210" y="520" text-anchor="middle" font-family="Georgia" font-style="italic"
+        font-size="220" fill="rgba(255,255,255,0.012)" letter-spacing="-8">B</text>
+    </svg>
+  </div>
+  <div class="vignette-lr"></div>
+  <div class="hero-content">
+    <div class="film-eyebrow" id="eyebrow">Drama épico · 2024</div>
+    <h1 class="film-title" id="filmTitle">THE<br>BRUTALIST</h1>
+    <div class="film-bottom-row" id="filmRow">
+      <span class="film-stars">★★★★½</span>
+      <span class="film-score">4.5</span>
+      <div class="vbar"></div>
+      <span class="film-chip">3h 35m</span>
+      <span class="film-chip">Brady Corbet</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── SYNOPSIS ── -->
+<section class="synopsis-panel" id="sec1" data-screen-label="02 Sinopse">
+  <div class="synopsis-inner">
+    <div class="panel-label" id="synLabel">Sinopse</div>
+    <p class="synopsis-text" id="synText">
+      László Tóth sobrevive ao Holocausto e emigra para os Estados Unidos. Arquiteto brilhante, ele tenta reconstruir vida e carreira num país que tanto promete quanto exige. Quando comissionado por um magnata americano para uma obra ambiciosa, os dois homens entram em uma relação de poder, admiração e exploração — um espelho do próprio sonho americano.
+    </p>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-row" id="sec2" data-screen-label="03 Stats">
+  <div class="stat-cell"><div class="stat-k">Diretor</div><div class="stat-v">Brady Corbet</div></div>
+  <div class="stat-cell"><div class="stat-k">Ano</div><div class="stat-v">2024</div></div>
+  <div class="stat-cell"><div class="stat-k">Duração</div><div class="stat-v">3h 35m</div></div>
+  <div class="stat-cell"><div class="stat-k">País</div><div class="stat-v">EUA</div></div>
+  <div class="stat-cell"><div class="stat-k">Nota</div><div class="stat-v gold">4.5</div></div>
+  <div class="stat-cell"><div class="stat-k">Listas</div><div class="stat-v">12.4k</div></div>
+</div>
+
+<!-- ── DIRECTOR ── -->
+<div class="director-panel" id="sec3" data-screen-label="04 Diretor">
+  <div class="director-visual" id="dirVisual">
+    <svg viewBox="0 0 800 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;inset:0">
+      <defs>
+        <linearGradient id="dvg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0a0818"/>
+          <stop offset="100%" stop-color="#180f30"/>
+        </linearGradient>
+        <pattern id="dvp" patternUnits="userSpaceOnUse" width="4" height="4">
+          <line x1="0" y1="4" x2="4" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="800" height="560" fill="url(#dvg)"/>
+      <rect width="800" height="560" fill="url(#dvp)"/>
+      <text x="400" y="280" text-anchor="middle" dominant-baseline="middle"
+        font-family="Georgia" font-style="italic" font-size="11"
+        fill="rgba(255,255,255,0.1)" letter-spacing="2">FOTO · BRADY CORBET</text>
+    </svg>
+  </div>
+  <div class="director-info-block">
+    <div class="director-role" id="dirRole">Direção</div>
+    <div class="director-name" id="dirName">BRADY<br>CORBET</div>
+    <p class="director-bio" id="dirBio">Ator e cineasta americano formado pela escola europeia. The Brutalist é sua obra mais ambiciosa — filmado em VistaVision, com intermissão, num formato que homenageia David Lean. Uma declaração de amor ao cinema como arte do tempo.</p>
+  </div>
+</div>
+
+<!-- ── CAST ── -->
+<section class="cast-panel" id="sec4" data-screen-label="05 Elenco">
+  <div class="cast-header" id="castHeader">
+    <div class="sec-sub">Elenco principal</div>
+    <div class="sec-title">Intérpretes</div>
+  </div>
+  <div class="cast-track" id="castTrack"></div>
+</section>
+
+<!-- ── REVIEWS ── -->
+<section class="reviews-panel" id="sec5" data-screen-label="06 Críticas">
+  <div class="reviews-header" id="revHeader">
+    <div class="sec-sub">Imprensa especializada</div>
+    <div class="sec-title">Críticas</div>
+  </div>
+  <div class="reviews-track">
+    <div class="review-card" data-rev>
+      <div class="review-outlet">The Guardian</div>
+      <div class="review-score">5 / 5</div>
+      <p class="review-text">"Uma obra que não apenas conta uma história — ela é construída como um edifício, com estrutura que desafia e maravilha."</p>
+      <div class="review-author">Peter Bradshaw</div>
+    </div>
+    <div class="review-card" data-rev>
+      <div class="review-outlet">Sight & Sound</div>
+      <div class="review-score">★★★★★</div>
+      <p class="review-text">"Adrien Brody entrega o melhor trabalho de sua carreira. Um filme que exige paciência e recompensa cada minuto."</p>
+      <div class="review-author">Ela Bhatt</div>
+    </div>
+    <div class="review-card" data-rev>
+      <div class="review-outlet">Variety</div>
+      <div class="review-score">A+</div>
+      <p class="review-text">"Brady Corbet não faz um filme sobre o século XX — ele faz um filme que parece ter sido feito dentro dele. Esmagador."</p>
+      <div class="review-author">Owen Gleiberman</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SIMILAR ── -->
+<section class="similar-panel" id="sec6" data-screen-label="07 Similar">
+  <div class="similar-header" id="simHeader">
+    <div class="sec-sub">Você também pode gostar</div>
+    <div class="sec-title">Similares</div>
+  </div>
+  <div class="similar-track" id="simTrack"></div>
+</section>
+
+<!-- TWEAKS -->
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <div class="tweak-row">
+    <span class="tweak-label">Grain</span>
+    <div class="tweak-opts">
+      <button class="topt" onclick="setGrain(0.03,this)">Leve</button>
+      <button class="topt active" onclick="setGrain(0.07,this)">Médio</button>
+      <button class="topt" onclick="setGrain(0.12,this)">Forte</button>
+    </div>
+  </div>
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── GRAIN ──────────────────────────────────────────────────────
+const gc = document.getElementById('grain');
+const gx = gc.getContext('2d');
+let gW, gH;
+function resizeG() {
+  gW = gc.width  = innerWidth  || document.documentElement.clientWidth  || 1440;
+  gH = gc.height = innerHeight || document.documentElement.clientHeight || 900;
+}
+resizeG();
+window.addEventListener('resize', resizeG);
+function grain() {
+  if (!gW || !gH) { requestAnimationFrame(grain); return; }
+  const d = gx.createImageData(gW, gH), b = d.data;
+  for (let i = 0; i < b.length; i += 4) {
+    const v = Math.random() * 255;
+    b[i] = b[i+1] = b[i+2] = v;
+    b[i+3] = 16 + Math.random() * 22;
+  }
+  gx.putImageData(d, 0, 0);
+  requestAnimationFrame(grain);
+}
+grain();
+
+// ─── NAV SCROLL ─────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ─── PROGRESS DOTS ──────────────────────────────────────────────
+const sections = document.querySelectorAll('[data-screen-label]');
+const progLine = document.getElementById('progress-line');
+sections.forEach((sec, i) => {
+  const d = document.createElement('div');
+  d.className = 'prog-dot' + (i === 0 ? ' active' : '');
+  d.title = sec.dataset.screenLabel;
+  d.onclick = () => sec.scrollIntoView ? window.scrollTo({ top: sec.offsetTop, behavior: 'smooth' }) : null;
+  progLine.appendChild(d);
+});
+
+function updateProgress() {
+  const scrollY = window.scrollY + window.innerHeight * 0.4;
+  sections.forEach((sec, i) => {
+    const top = sec.offsetTop;
+    const bot = top + sec.offsetHeight;
+    const dots = progLine.querySelectorAll('.prog-dot');
+    dots[i].classList.toggle('active', scrollY >= top && scrollY < bot);
+  });
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// ─── HERO THROW ENTRANCE ────────────────────────────────────────
+gsap.set(['#eyebrow','#filmTitle','#filmRow'], { opacity: 0 });
+
+// bg throw
+gsap.fromTo('#heroBg',
+  { scale: 1.14, filter: 'blur(14px)' },
+  { scale: 1,    filter: 'blur(0px)', duration: 1.1, ease: 'power4.out', delay: 0.05 }
+);
+// eyebrow wipe
+gsap.to('#eyebrow', { clipPath: 'inset(0 0% 0 0)', opacity: 1, duration: 0.65, ease: 'power3.out', delay: 0.22 });
+// title throw
+gsap.to('#filmTitle', {
+  opacity: 1, y: 0, scale: 1,
+  duration: 0.72, ease: 'power4.out', delay: 0.3
+});
+// row
+gsap.to('#filmRow', { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out', delay: 0.5 });
+
+// ─── HERO PARALLAX ──────────────────────────────────────────────
+gsap.to('#heroBg', {
+  yPercent: 18, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+
+// ─── SYNOPSIS REVEAL ────────────────────────────────────────────
+gsap.to('#synLabel', {
+  opacity: 1, duration: 0.6, ease: 'power3.out',
+  scrollTrigger: { trigger: '#synLabel', start: 'top 85%' }
+});
+gsap.to('#synText', {
+  opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+  scrollTrigger: { trigger: '#synText', start: 'top 82%' }
+});
+
+// ─── STATS STAGGER ──────────────────────────────────────────────
+gsap.utils.toArray('.stat-cell').forEach((el, i) => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 0.6, delay: i * 0.07, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 90%' }
+  });
+});
+
+// ─── DIRECTOR REVEALS ───────────────────────────────────────────
+gsap.to('#dirRole', {
+  opacity: 1, duration: 0.5, ease: 'power3.out',
+  scrollTrigger: { trigger: '#dirRole', start: 'top 85%' }
+});
+gsap.to('#dirName', {
+  opacity: 1, y: 0, duration: 0.75, ease: 'power4.out',
+  scrollTrigger: { trigger: '#dirName', start: 'top 88%' }
+});
+gsap.to('#dirBio', {
+  opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.1,
+  scrollTrigger: { trigger: '#dirBio', start: 'top 88%' }
+});
+
+// Director visual parallax
+gsap.to('#dirVisual svg', {
+  yPercent: 10, ease: 'none',
+  scrollTrigger: { trigger: '.director-panel', start: 'top bottom', end: 'bottom top', scrub: true }
+});
+
+// ─── CAST ───────────────────────────────────────────────────────
+const castData = [
+  { name: 'Adrien Brody',   char: 'László Tóth',             c1:'#111020', c2:'#1c1a38' },
+  { name: 'Felicity Jones', char: 'Erzsébet',                 c1:'#0c1018', c2:'#141c30' },
+  { name: 'Guy Pearce',     char: 'Harrison Van Buren',       c1:'#100c08', c2:'#1e1610' },
+  { name: 'Joe Alwyn',      char: 'Harry Van Buren Jr.',      c1:'#0c1008', c2:'#141c10' },
+  { name: 'Raffey Cassidy', char: 'Zsuzsi',                   c1:'#10080c', c2:'#1e1018' },
+  { name: 'Stacy Martin',   char: 'Maggie',                   c1:'#0c1018', c2:'#161c2e' },
+];
+const castTrack = document.getElementById('castTrack');
+castData.forEach((p, i) => {
+  const card = document.createElement('div');
+  card.className = 'cast-card';
+  card.innerHTML = `<div class="cast-img"><svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+    <defs>
+      <linearGradient id="cg${i}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${p.c1}"/><stop offset="100%" stop-color="${p.c2}"/></linearGradient>
+      <pattern id="cp${i}" patternUnits="userSpaceOnUse" width="4" height="4"><line x1="0" y1="4" x2="4" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/></pattern>
+    </defs>
+    <rect width="200" height="300" fill="url(#cg${i})"/>
+    <rect width="200" height="300" fill="url(#cp${i})"/>
+    <text x="100" y="150" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="9" fill="rgba(255,255,255,0.12)">${p.name.split(' ')[0].toUpperCase()}</text>
+  </svg></div>
+  <div class="cast-name">${p.name}</div><div class="cast-char">${p.char}</div>`;
+  castTrack.appendChild(card);
+  gsap.to(card, {
+    opacity: 1, y: 0, duration: 0.6, delay: i * 0.08, ease: 'power3.out',
+    scrollTrigger: { trigger: card, start: 'top 90%' }
+  });
+});
+
+gsap.to('#castHeader', {
+  opacity: 1, y: 0, duration: 0.65, ease: 'power3.out',
+  scrollTrigger: { trigger: '#castHeader', start: 'top 85%' }
+});
+
+// Drag cast
+let isDown = false, sX, sL;
+castTrack.addEventListener('mousedown', e => { isDown=true; sX=e.pageX-castTrack.offsetLeft; sL=castTrack.scrollLeft; });
+castTrack.addEventListener('mouseleave', ()=>isDown=false);
+castTrack.addEventListener('mouseup', ()=>isDown=false);
+castTrack.addEventListener('mousemove', e => { if(!isDown)return; e.preventDefault(); castTrack.scrollLeft = sL-(e.pageX-castTrack.offsetLeft-sX)*1.5; });
+
+// ─── REVIEWS ────────────────────────────────────────────────────
+gsap.to('#revHeader', {
+  opacity: 1, y: 0, duration: 0.65, ease: 'power3.out',
+  scrollTrigger: { trigger: '#revHeader', start: 'top 85%' }
+});
+document.querySelectorAll('[data-rev]').forEach((el, i) => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 0.7, delay: i * 0.12, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%' }
+  });
+});
+
+// ─── SIMILAR ────────────────────────────────────────────────────
+const simData = [
+  { name: 'There Will Be Blood', stars: '★★★★★', c1:'#180c06', c2:'#2e1810' },
+  { name: 'Phantom Thread',      stars: '★★★★½', c1:'#101018', c2:'#1c1c2e' },
+  { name: 'The Master',          stars: '★★★★',  c1:'#100c08', c2:'#1e1610' },
+  { name: 'Her',                 stars: '★★★★½', c1:'#0c1018', c2:'#141c30' },
+  { name: 'Roma',                stars: '★★★★★', c1:'#0a0c0a', c2:'#121810' },
+  { name: 'Moonlight',           stars: '★★★★★', c1:'#060c14', c2:'#0a1828' },
+  { name: 'Portrait of a Lady',  stars: '★★★★★', c1:'#180c06', c2:'#2a1008' },
+];
+const simTrack = document.getElementById('simTrack');
+simData.forEach((f, i) => {
+  const card = document.createElement('div');
+  card.className = 'similar-card';
+  card.innerHTML = `<div class="similar-poster"><svg viewBox="0 0 160 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+    <defs>
+      <linearGradient id="sg${i}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${f.c1}"/><stop offset="100%" stop-color="${f.c2}"/></linearGradient>
+      <pattern id="sp${i}" patternUnits="userSpaceOnUse" width="4" height="4"><line x1="0" y1="4" x2="4" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/></pattern>
+    </defs>
+    <rect width="160" height="240" fill="url(#sg${i})"/>
+    <rect width="160" height="240" fill="url(#sp${i})"/>
+    <text x="80" y="120" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="8" fill="rgba(255,255,255,0.14)">${f.name.split(' ').slice(0,2).join(' ').toUpperCase()}</text>
+  </svg></div>
+  <div class="similar-name">${f.name}</div><div class="similar-stars">${f.stars}</div>`;
+  simTrack.appendChild(card);
+  gsap.to(card, {
+    opacity: 1, y: 0, duration: 0.55, delay: i * 0.06, ease: 'power3.out',
+    scrollTrigger: { trigger: card, start: 'top 92%' }
+  });
+});
+gsap.to('#simHeader', {
+  opacity: 1, y: 0, duration: 0.65, ease: 'power3.out',
+  scrollTrigger: { trigger: '#simHeader', start: 'top 85%' }
+});
+
+// Drag similar
+let sd=false,sdX,sdL;
+simTrack.addEventListener('mousedown', e=>{sd=true;sdX=e.pageX-simTrack.offsetLeft;sdL=simTrack.scrollLeft;});
+simTrack.addEventListener('mouseleave',()=>sd=false);
+simTrack.addEventListener('mouseup',()=>sd=false);
+simTrack.addEventListener('mousemove',e=>{if(!sd)return;e.preventDefault();simTrack.scrollLeft=sdL-(e.pageX-simTrack.offsetLeft-sdX)*1.5;});
+
+// ─── TWEAKS ──────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"grain": 0.07}/*EDITMODE-END*/;
+
+function setGrain(v, btn) {
+  gc.style.opacity = v;
+  document.querySelectorAll('.topt[onclick^="setGrain"]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { grain: v } }, '*');
+}
+
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'block';
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+});
+window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+name: Python Services CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/alugueis-service/**'
+      - 'backend/filmes-service/**'
+      - 'backend/user-service/**'
+      - 'backend/payment-service/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/alugueis-service/**'
+      - 'backend/filmes-service/**'
+      - 'backend/user-service/**'
+      - 'backend/payment-service/**'
+
+jobs:
+  build-python-service:
+    runs-on: self-hosted
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        service: [alugueis-service, filmes-service, user-service, payment-service]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip dependencies
+        id: cache-pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.service }}-${{ hashFiles(format('backend/{0}/requirements.txt', matrix.service)) }}
+
+      - name: Install dependencies
+        id: install-deps
+        run: |
+          cd backend/${{ matrix.service }}
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest pytest-cov flake8
+
+      - name: Lint with flake8
+        id: lint
+        run: |
+          cd backend/${{ matrix.service }}
+          flake8 app/ --count --select=E,F --show-source --statistics
+
+      - name: Run tests with coverage (fail if < 70%)
+        id: test-coverage
+        run: |
+          cd backend/${{ matrix.service }}
+          pytest --junitxml=report.xml -v --cov=app --cov-report=xml:coverage.xml --cov-fail-under=70
+
+      - name: Upload test results
+        id: upload-test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-test-results-${{ matrix.service }}
+          path: backend/${{ matrix.service }}/report.xml
+
+      - name: SonarQube scan
+        id: sonarqube-scan
+        uses: sonarsource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: backend/${{ matrix.service }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Docker build
+        id: docker-build
+        run: |
+          docker build -t pooker/${{ matrix.service }}:${{ github.sha }} backend/${{ matrix.service }}/

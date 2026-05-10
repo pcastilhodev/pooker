@@ -1,0 +1,11 @@
+{
+  "/gateway/**": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite" : {
+      "^/gateway": ""
+    }, 
+    "logLevel": "debug"
+  }
+}

@@ -1,0 +1,61 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal">
+    <div class="modal-shine"></div>
+
+    <!-- TABS -->
+    <div class="modal-tabs">
+      <button class="tab" [class.active]="activeTab === 'login'"    (click)="setTab('login')">Entrar</button>
+      <button class="tab" [class.active]="activeTab === 'register'" (click)="setTab('register')">Criar conta</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form *ngIf="activeTab === 'login'" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" class="modal-form">
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" formControlName="username" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <div class="form-group form-group--checkbox">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="remember" />
+          Lembrar-me
+        </label>
+      </div>
+      <button class="btn-submit" type="submit">Entrar</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form *ngIf="activeTab === 'register'" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" class="modal-form">
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" type="text" formControlName="username" placeholder="Seu nome" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" type="password" formControlName="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">CPF</label>
+        <input class="form-input" type="text" formControlName="cpf" placeholder="00000000000" maxlength="11" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" type="tel" formControlName="phone" placeholder="00000000000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de nascimento</label>
+        <input class="form-input" type="date" formControlName="dateOfBirth" />
+      </div>
+      <button class="btn-submit" type="submit">Criar conta</button>
+    </form>
+
+    <button class="modal-close" (click)="closeModal()" aria-label="Fechar">&#x2715;</button>
+  </div>
+</div>

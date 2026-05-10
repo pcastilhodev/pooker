@@ -1,0 +1,132 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/api-gateway/**'
+      - 'backend/auth-service/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/api-gateway/**'
+      - 'backend/auth-service/**'
+
+jobs:
+  build-apigateway:
+    name: Build & Test API Gateway
+    runs-on: self-hosted
+
+    steps:
+      - id: checkout
+        name: Checkout source code
+        uses: actions/checkout@v4
+
+      - id: setup-java
+        name: Set up Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - id: cache-gradle
+        name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/api-gateway/**/*.gradle*', 'backend/api-gateway/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - id: build-no-tests
+        name: Build API Gateway (skip tests)
+        run: cd backend/api-gateway && ./gradlew build -x test
+
+      - id: test
+        name: Run API Gateway tests
+        run: cd backend/api-gateway && ./gradlew test
+
+      - id: upload-test-results
+        name: Upload API Gateway test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apigateway-test-results
+          path: backend/api-gateway/build/test-results/**/*.xml
+
+      - id: coverage
+        name: Check API Gateway code coverage (minimum 70%)
+        run: cd backend/api-gateway && ./gradlew jacocoTestReport jacocoTestCoverageVerification
+
+      - id: sonarqube
+        name: SonarQube scan for API Gateway
+        uses: sonarsource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: backend/api-gateway
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - id: docker-build
+        name: Build API Gateway Docker image
+        run: docker build -t pooker/api-gateway:${{ github.sha }} backend/api-gateway/
+
+  build-auth-service:
+    name: Build & Test Auth Service
+    runs-on: self-hosted
+
+    steps:
+      - id: checkout
+        name: Checkout source code
+        uses: actions/checkout@v4
+
+      - id: setup-java
+        name: Set up Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - id: cache-maven
+        name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('backend/auth-service/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - id: build-no-tests
+        name: Build Auth Service (skip tests)
+        run: cd backend/auth-service && ./mvnw package -DskipTests
+
+      - id: test
+        name: Run Auth Service tests
+        run: cd backend/auth-service && ./mvnw test
+
+      - id: upload-test-results
+        name: Upload Auth Service test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-service-test-results
+          path: backend/auth-service/target/surefire-reports/**/*.xml
+
+      - id: coverage
+        name: Check Auth Service code coverage (minimum 70%)
+        run: cd backend/auth-service && ./mvnw jacoco:report jacoco:check
+
+      - id: sonarqube
+        name: SonarQube scan for Auth Service
+        uses: sonarsource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: backend/auth-service
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - id: docker-build
+        name: Build Auth Service Docker image
+        run: docker build -t pooker/auth-service:${{ github.sha }} backend/auth-service/

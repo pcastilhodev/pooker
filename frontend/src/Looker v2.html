@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Looker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --fg: #f0eee8;
+  --muted: #6a6870;
+  --gold: #d4a843;
+}
+
+html, body {
+  background: #090810;
+  color: var(--fg);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+/* ─── INTRO ─── */
+#intro {
+  position: fixed; inset: 0;
+  background: #090810;
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+}
+#intro-line-wrap {
+  width: 80px; height: 1px;
+  overflow: hidden;
+  margin-bottom: 36px;
+  position: relative;
+}
+#intro-line-fill {
+  position: absolute; top: 0; left: 0;
+  height: 100%; width: 0%;
+  background: var(--gold);
+}
+#intro-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(90px, 12vw, 160px);
+  letter-spacing: 0.18em;
+  color: var(--fg);
+  clip-path: inset(0 100% 0 0);
+  line-height: 0.9;
+  text-align: center;
+}
+#intro-tagline {
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0);
+  margin-top: 22px;
+  text-align: center;
+}
+#intro-hint {
+  position: absolute;
+  bottom: 52px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0);
+  display: flex; align-items: center; gap: 14px;
+}
+#intro-hint::before, #intro-hint::after {
+  content: '';
+  display: block;
+  width: 28px; height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+#intro-frame-count {
+  position: absolute;
+  top: 52px; right: 52px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(212,168,67,0);
+  font-feature-settings: 'tnum';
+}
+
+/* ─── GRAIN ─── */
+#grain {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 32px 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  mix-blend-mode: normal;
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.2em;
+  color: var(--fg);
+  opacity: 0.9;
+  cursor: pointer;
+}
+.nav-right {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+}
+.nav-link {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0.4);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--fg); }
+.nav-enter {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0.6);
+  background: none;
+  border: 1px solid rgba(240,238,232,0.15);
+  padding: 9px 22px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.nav-enter:hover {
+  color: var(--fg);
+  border-color: rgba(240,238,232,0.5);
+}
+
+/* ─── SCROLL CONTAINER ─── */
+#scroll-container {
+  position: fixed;
+  inset: 0;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+#scroll-container::-webkit-scrollbar { display: none; }
+
+/* ─── SECTIONS ─── */
+.film-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  will-change: transform;
+}
+
+/* BG */
+.film-bg {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.film-bg svg {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* Vignette */
+.film-vignette {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(9,8,16,0.6) 100%),
+    linear-gradient(to top, rgba(9,8,16,0.96) 0%, rgba(9,8,16,0.3) 30%, transparent 60%),
+    linear-gradient(to right, rgba(9,8,16,0.7) 0%, transparent 50%);
+}
+
+/* CONTENT */
+.film-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 52px 72px;
+  max-width: 800px;
+}
+.film-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 18px;
+  opacity: 0;
+  transform: translateX(-20px);
+}
+.film-label::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+.film-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 9vw, 140px);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(50px);
+  text-wrap: balance;
+}
+.film-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.film-rating {
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  color: var(--gold);
+}
+.film-year {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(240,238,232,0.35);
+  letter-spacing: 0.1em;
+}
+.film-director {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(240,238,232,0.35);
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+.film-actions {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.film-action-primary {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: gap 0.25s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.film-action-primary::after { content: '→'; font-size: 14px; }
+.film-action-primary:hover { gap: 18px; }
+.film-action-secondary {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0.4);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: color 0.2s;
+}
+.film-action-secondary:hover { color: var(--fg); }
+
+/* ─── COUNTER ─── */
+#counter {
+  position: fixed;
+  bottom: 36px;
+  right: 52px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+}
+.counter-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: rgba(240,238,232,0.3);
+  line-height: 1;
+}
+.counter-num span { color: rgba(240,238,232,0.7); }
+.counter-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.counter-dot {
+  width: 1px;
+  background: rgba(240,238,232,0.2);
+  height: 24px;
+  transition: all 0.4s;
+  cursor: pointer;
+}
+.counter-dot.active {
+  background: var(--gold);
+  height: 40px;
+}
+
+/* ─── SCROLL HINT ─── */
+#scroll-hint {
+  position: fixed;
+  bottom: 36px;
+  left: 52px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0.25);
+  transition: opacity 0.5s;
+}
+#scroll-hint.hidden { opacity: 0; }
+.scroll-line {
+  width: 32px;
+  height: 1px;
+  background: rgba(240,238,232,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: var(--fg);
+  animation: scanline 2s ease-in-out infinite;
+}
+@keyframes scanline {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ─── BROWSE SECTION ─── */
+.browse-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: #090810;
+  padding: 100px 52px 80px;
+}
+.browse-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+.browse-sub {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 48px;
+}
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+.browse-card {
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(24px);
+}
+.browse-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+}
+.browse-poster:hover .poster-shine {
+  opacity: 1;
+  transform: translateX(100%);
+}
+.poster-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.3s;
+}
+.browse-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(240,238,232,0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.browse-stars {
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-top: 3px;
+}
+
+/* ─── TWEAKS ─── */
+#tweaks-panel {
+  display: none;
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: rgba(9,8,16,0.95);
+  border: 1px solid rgba(212,168,67,0.2);
+  backdrop-filter: blur(20px);
+  padding: 20px 20px 16px;
+  z-index: 10000;
+  min-width: 220px;
+  font-family: 'DM Sans', sans-serif;
+}
+#tweaks-panel h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.tweak-row { margin-bottom: 14px; }
+.tweak-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(106,104,112,0.9);
+  margin-bottom: 7px;
+  display: block;
+}
+.tweak-opts { display: flex; gap: 6px; }
+.topt {
+  flex: 1;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(240,238,232,0.5);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 7px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.topt.active, .topt:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212,168,67,0.07);
+}
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div id="intro-line-wrap"><div id="intro-line-fill"></div></div>
+  <div id="intro-logo">LOOKER</div>
+  <div id="intro-tagline">Cada frame. Cada emoção.</div>
+  <div id="intro-hint">Role para explorar</div>
+  <div id="intro-frame-count">001 / 2024</div>
+</div>
+
+<canvas id="grain"></canvas>
+
+<nav>
+  <div class="nav-logo">LOOKER</div>
+  <div class="nav-right">
+    <a href="#" class="nav-link">Filmes</a>
+    <a href="#" class="nav-link">Listas</a>
+    <a href="#" class="nav-link">Membros</a>
+    <button class="nav-enter">Entrar</button>
+  </div>
+</nav>
+
+<div id="scroll-container">
+  <!-- Film sections injected by JS -->
+  <div id="films-container"></div>
+
+  <!-- Browse -->
+  <div class="browse-section" id="browseSection">
+    <div class="browse-sub">Em alta esta semana</div>
+    <div class="browse-title">Mais Vistos</div>
+    <div class="browse-grid" id="browseGrid"></div>
+  </div>
+</div>
+
+<div id="counter">
+  <div class="counter-num"><span id="curIdx">01</span> / <span id="totalIdx">06</span></div>
+  <div class="counter-dots" id="counterDots"></div>
+</div>
+
+<div id="scroll-hint">
+  <div class="scroll-line"></div>
+  Rolar
+</div>
+
+<!-- TWEAKS -->
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <div class="tweak-row">
+    <span class="tweak-label">Tom do Título</span>
+    <div class="tweak-opts">
+      <button class="topt active" id="tGold" onclick="setAccent('gold',this)">Ouro</button>
+      <button class="topt" id="tWhite" onclick="setAccent('white',this)">Branco</button>
+      <button class="topt" id="tBlue" onclick="setAccent('blue',this)">Frio</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <span class="tweak-label">Grain</span>
+    <div class="tweak-opts">
+      <button class="topt" onclick="setGrain(0.02,this)">Leve</button>
+      <button class="topt active" onclick="setGrain(0.06,this)">Médio</button>
+      <button class="topt" onclick="setGrain(0.11,this)">Forte</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <span class="tweak-label">Alinhamento</span>
+    <div class="tweak-opts">
+      <button class="topt active" onclick="setAlign('left',this)">Esq.</button>
+      <button class="topt" onclick="setAlign('center',this)">Centro</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── GRAIN ───────────────────────────────────────────────────────
+const gc = document.getElementById('grain');
+const gx = gc.getContext('2d');
+let gW, gH;
+function resizeG() {
+  gW = gc.width = innerWidth || document.documentElement.clientWidth || 1440;
+  gH = gc.height = innerHeight || document.documentElement.clientHeight || 900;
+}
+resizeG();
+window.addEventListener('resize', resizeG);
+function grain() {
+  if (!gW || !gH) { requestAnimationFrame(grain); return; }
+  const d = gx.createImageData(gW, gH);
+  const b = d.data;
+  for (let i = 0; i < b.length; i += 4) {
+    const v = Math.random() * 255;
+    b[i] = b[i+1] = b[i+2] = v;
+    b[i+3] = 20 + Math.random() * 22;
+  }
+  gx.putImageData(d, 0, 0);
+  requestAnimationFrame(grain);
+}
+grain();
+
+// ─── FILM DATA ───────────────────────────────────────────────────
+const FILMS = [
+  {
+    title: 'THE\nBRUTALIST',
+    label: 'Destaque · Drama',
+    director: 'Brady Corbet',
+    year: '2024',
+    rating: '★★★★½',
+    c1: '#0e0818', c2: '#1a0e2e', c3: '#2a1240', accent: 'rgba(120,80,200,0.3)',
+    lines: [[0.1,0.2,0.9,0.8],[0.3,0,0.7,1],[0.5,0.1,0.2,0.9]]
+  },
+  {
+    title: 'ANORA',
+    label: 'Palme d\'Or · Romance',
+    director: 'Sean Baker',
+    year: '2024',
+    rating: '★★★★★',
+    c1: '#0d1520', c2: '#0a2035', c3: '#153050', accent: 'rgba(40,100,180,0.25)',
+    lines: [[0,0.3,1,0.7],[0.2,0,0.8,1],[0.6,0.1,0.4,0.9]]
+  },
+  {
+    title: 'CONCLAVE',
+    label: 'Thriller · Mistério',
+    director: 'Edward Berger',
+    year: '2024',
+    rating: '★★★★',
+    c1: '#120c08', c2: '#1e1208', c3: '#2e1c0c', accent: 'rgba(160,80,20,0.2)',
+    lines: [[0.2,0.1,0.6,0.9],[0,0.5,1,0.5],[0.8,0,0.2,1]]
+  },
+  {
+    title: 'NICKEL\nBOYS',
+    label: 'Sundance · Drama',
+    director: 'RaMell Ross',
+    year: '2024',
+    rating: '★★★★½',
+    c1: '#0a0c10', c2: '#101520', c3: '#182030', accent: 'rgba(60,80,120,0.2)',
+    lines: [[0.1,0,0.9,1],[0,0.4,1,0.6],[0.4,0.1,0.6,0.9]]
+  },
+  {
+    title: 'DUNE\nPART TWO',
+    label: 'Épico · Ficção científica',
+    director: 'Denis Villeneuve',
+    year: '2024',
+    rating: '★★★★',
+    c1: '#0f0c06', c2: '#1c1808', c3: '#2e2810', accent: 'rgba(180,140,40,0.2)',
+    lines: [[0,0.2,1,0.8],[0.3,0,0.7,1],[0.5,0,0.5,1]]
+  },
+  {
+    title: 'FLOW',
+    label: 'Animação · Aventura',
+    director: 'Gints Zilbalodis',
+    year: '2024',
+    rating: '★★★★★',
+    c1: '#060e14', c2: '#08182a', c3: '#0c2040', accent: 'rgba(20,80,140,0.3)',
+    lines: [[0.2,0,0.8,1],[0,0.3,1,0.7],[0.4,0.2,0.6,0.8]]
+  },
+];
+
+const ALL_FILMS = [
+  { name: 'Emilia Pérez', stars: '★★★½', c1:'#100820', c2:'#1c1030' },
+  { name: 'A Complete Unknown', stars: '★★★★', c1:'#100a06', c2:'#201408' },
+  { name: 'Queer', stars: '★★★★', c1:'#080e18', c2:'#101828' },
+  { name: 'Maria', stars: '★★★½', c1:'#180a0a', c2:'#281010' },
+  { name: 'September 5', stars: '★★★', c1:'#0e0e18', c2:'#181828' },
+  { name: 'Babygirl', stars: '★★★', c1:'#180808', c2:'#2a1010' },
+  { name: 'The Room Next Door', stars: '★★★★', c1:'#080816', c2:'#10102a' },
+  { name: 'Hard Truths', stars: '★★★★½', c1:'#0a0c0a', c2:'#141c10' },
+  { name: 'A Real Pain', stars: '★★★★', c1:'#0c0c08', c2:'#1c1c0e' },
+  { name: 'I\'m Still Here', stars: '★★★★★', c1:'#0c0806', c2:'#1e1408' },
+  { name: 'The Substance', stars: '★★★½', c1:'#160808', c2:'#280e0e' },
+  { name: 'Longlegs', stars: '★★★', c1:'#0c0c0e', c2:'#16161c' },
+];
+
+// ─── BUILD FILM SECTIONS ─────────────────────────────────────────
+function makeBg(f) {
+  const lines = f.lines.map((l,i) =>
+    `<line x1="${l[0]*100}%" y1="${l[1]*100}%" x2="${l[2]*100}%" y2="${l[3]*100}%" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>`
+  ).join('');
+  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="fg${f.title.slice(0,3)}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${f.c1}"/>
+        <stop offset="60%" stop-color="${f.c2}"/>
+        <stop offset="100%" stop-color="${f.c3}"/>
+      </linearGradient>
+      <radialGradient id="rg${f.title.slice(0,3)}" cx="70%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="${f.accent}"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+    </defs>
+    <rect width="1600" height="900" fill="url(#fg${f.title.slice(0,3)})"/>
+    <rect width="1600" height="900" fill="url(#rg${f.title.slice(0,3)})"/>
+    ${lines}
+    <text x="1100" y="480" text-anchor="middle" dominant-baseline="middle" 
+      font-family="Georgia,serif" font-style="italic" font-size="220" 
+      fill="rgba(255,255,255,0.015)" letter-spacing="-5">${f.title.replace('\n',' ')}</text>
+  </svg>`;
+}
+
+const container = document.getElementById('films-container');
+FILMS.forEach((f, i) => {
+  const sec = document.createElement('div');
+  sec.className = 'film-section';
+  sec.dataset.index = i;
+  sec.dataset.screenLabel = `${String(i+1).padStart(2,'0')} ${f.title.replace('\n',' ')}`;
+  sec.innerHTML = `
+    <div class="film-bg" data-bg>${makeBg(f)}</div>
+    <div class="film-vignette"></div>
+    <div class="film-content">
+      <div class="film-label" data-label>${f.label}</div>
+      <h1 class="film-title" data-title style="white-space:pre-line">${f.title}</h1>
+      <div class="film-meta" data-meta>
+        <span class="film-rating">${f.rating}</span>
+        <span class="film-year">${f.year}</span>
+        <span class="film-director">${f.director}</span>
+      </div>
+      <div class="film-actions" data-actions>
+        <button class="film-action-primary">Ver Detalhes</button>
+        <button class="film-action-secondary">+ Watchlist</button>
+      </div>
+    </div>`;
+  container.appendChild(sec);
+});
+
+// ─── COUNTER DOTS ────────────────────────────────────────────────
+const dotsEl = document.getElementById('counterDots');
+document.getElementById('totalIdx').textContent = String(FILMS.length).padStart(2,'0');
+FILMS.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'counter-dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => scrollToSection(i);
+  dotsEl.appendChild(d);
+});
+
+// ─── BROWSE GRID ─────────────────────────────────────────────────
+const grid = document.getElementById('browseGrid');
+ALL_FILMS.forEach((f, i) => {
+  const card = document.createElement('div');
+  card.className = 'browse-card';
+  card.innerHTML = `
+    <div class="browse-poster">
+      <svg viewBox="0 0 160 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+        <defs>
+          <linearGradient id="bg${i}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${f.c1}"/>
+            <stop offset="100%" stop-color="${f.c2}"/>
+          </linearGradient>
+          <pattern id="pat${i}" patternUnits="userSpaceOnUse" width="4" height="4">
+            <line x1="0" y1="4" x2="4" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="160" height="240" fill="url(#bg${i})"/>
+        <rect width="160" height="240" fill="url(#pat${i})"/>
+        <text x="80" y="120" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="9" fill="rgba(255,255,255,0.15)" letter-spacing="1">${f.name.toUpperCase()}</text>
+      </svg>
+      <div class="poster-shine"></div>
+    </div>
+    <div class="browse-name">${f.name}</div>
+    <div class="browse-stars">${f.stars}</div>`;
+  grid.appendChild(card);
+});
+
+// ─── SCROLL LOGIC ────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+const sc = document.getElementById('scroll-container');
+const sections = document.querySelectorAll('.film-section');
+const totalSections = sections.length;
+let currentSection = 0;
+let isAnimating = false;
+let lastScroll = 0;
+
+function animateSection(sec, extraDelay = 0) {
+  const label   = sec.querySelector('[data-label]');
+  const title   = sec.querySelector('[data-title]');
+  const meta    = sec.querySelector('[data-meta]');
+  const actions = sec.querySelector('[data-actions]');
+  const bg      = sec.querySelector('[data-bg]');
+
+  // ── throw bg in: scale down from large + deblur ──
+  gsap.fromTo(bg,
+    { scale: 1.14, filter: 'blur(14px)', transformOrigin: 'center center' },
+    { scale: 1,    filter: 'blur(0px)',  duration: 1.05, ease: 'power4.out', delay: extraDelay }
+  );
+  // ── label slides from left ──
+  gsap.fromTo(label,
+    { opacity: 0, x: -36 },
+    { opacity: 1, x: 0, duration: 0.55, ease: 'power3.out', delay: extraDelay + 0.08 }
+  );
+  // ── title: scale-throw from below ──
+  gsap.fromTo(title,
+    { opacity: 0, y: 72, scale: 0.93, transformOrigin: 'left bottom' },
+    { opacity: 1, y: 0,  scale: 1,    duration: 0.68, ease: 'power4.out', delay: extraDelay + 0.14 }
+  );
+  // ── meta + actions stagger ──
+  gsap.fromTo(meta,
+    { opacity: 0, y: 22 },
+    { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', delay: extraDelay + 0.3 }
+  );
+  gsap.fromTo(actions,
+    { opacity: 0, y: 16 },
+    { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', delay: extraDelay + 0.4 }
+  );
+}
+
+function leaveSection(sec) {
+  const label = sec.querySelector('[data-label]');
+  const title = sec.querySelector('[data-title]');
+  const meta = sec.querySelector('[data-meta]');
+  const actions = sec.querySelector('[data-actions]');
+  gsap.to([label, meta, actions], { opacity:0, y:-16, duration:0.35, ease:'power2.in' });
+  gsap.to(title, { opacity:0, y:-30, duration:0.4, ease:'power2.in' });
+}
+
+function updateCounter(idx) {
+  document.getElementById('curIdx').textContent = String(idx+1).padStart(2,'0');
+  document.querySelectorAll('.counter-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+  document.getElementById('scroll-hint').classList.toggle('hidden', idx > 1);
+}
+
+function scrollToSection(idx) {
+  if (idx < 0 || idx >= totalSections || isAnimating) return;
+  isAnimating = true;
+  if (idx !== currentSection) leaveSection(sections[currentSection]);
+  currentSection = idx;
+  sc.scrollTo({ top: idx * window.innerHeight, behavior: 'smooth' });
+  updateCounter(idx);
+  setTimeout(() => {
+    animateSection(sections[idx]);
+    isAnimating = false;
+  }, 300);
+}
+
+// Wheel snap
+let wheelTimer;
+sc.addEventListener('wheel', e => {
+  e.preventDefault();
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(() => {
+    const dir = e.deltaY > 0 ? 1 : -1;
+    const browseTop = document.getElementById('browseSection').getBoundingClientRect().top;
+
+    // If we're in film sections
+    if (currentSection < totalSections - 1 || (dir < 0 && currentSection === totalSections - 1)) {
+      if (currentSection === totalSections - 1 && dir > 0) {
+        // Go to browse
+        sc.scrollTo({ top: totalSections * window.innerHeight, behavior: 'smooth' });
+        isAnimating = false;
+      } else {
+        scrollToSection(currentSection + dir);
+      }
+    } else {
+      // free scroll in browse
+      sc.scrollBy({ top: e.deltaY * 3, behavior: 'smooth' });
+    }
+  }, 40);
+}, { passive: false });
+
+// Track scroll position to update counter
+sc.addEventListener('scroll', () => {
+  const idx = Math.round(sc.scrollTop / window.innerHeight);
+  if (idx !== currentSection && idx < totalSections) {
+    currentSection = idx;
+    updateCounter(idx);
+  }
+});
+
+// Browse scroll reveals
+gsap.utils.toArray('.browse-card').forEach((card, i) => {
+  gsap.to(card, {
+    opacity: 1, y: 0, duration: 0.6,
+    delay: (i % 6) * 0.07,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: card,
+      scroller: '#scroll-container',
+      start: 'top 90%',
+    }
+  });
+});
+
+// Parallax on bg
+sections.forEach(sec => {
+  gsap.to(sec.querySelector('[data-bg]'), {
+    y: '15%',
+    ease: 'none',
+    scrollTrigger: {
+      trigger: sec,
+      scroller: '#scroll-container',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: true,
+    }
+  });
+});
+
+// ─── INTRO ───────────────────────────────────────────────────────
+function dismissIntro() {
+  gsap.to('#intro', {
+    scale: 1.07, opacity: 0, duration: 0.65, ease: 'power3.in',
+    onComplete: () => {
+      document.getElementById('intro').style.display = 'none';
+      gsap.to(['nav', '#counter', '#scroll-hint'], { opacity: 1, duration: 0.5, ease: 'power2.out' });
+      animateSection(sections[0], 0.05);
+      updateCounter(0);
+    }
+  });
+}
+
+function playIntro() {
+  gsap.set(['nav', '#counter', '#scroll-hint'], { opacity: 0 });
+
+  const tl = gsap.timeline({ onComplete: dismissIntro });
+
+  // frame counter ticks up
+  tl.to('#intro-frame-count', { color: 'rgba(212,168,67,0.35)', duration: 0.01 }, 0.2);
+
+  // line draws
+  tl.to('#intro-line-fill', { width: '100%', duration: 0.7, ease: 'power2.inOut' }, 0.3);
+
+  // logo wipe reveal
+  tl.to('#intro-logo', { clipPath: 'inset(0 0% 0 0)', duration: 1.0, ease: 'power4.out' }, 0.55);
+
+  // tagline fades
+  tl.to('#intro-tagline', { color: 'rgba(240,238,232,0.4)', duration: 0.7, ease: 'power2.out' }, 1.3);
+
+  // hint fades
+  tl.to('#intro-hint', { color: 'rgba(240,238,232,0.28)', duration: 0.6, ease: 'power2.out' }, 1.75);
+
+  // hold, then auto-dismiss
+  tl.add(() => {}, '+=1.4');
+}
+
+// click/keypress skips intro
+document.getElementById('intro').addEventListener('click', () => {
+  gsap.globalTimeline.clear();
+  dismissIntro();
+});
+document.addEventListener('keydown', () => {
+  if (document.getElementById('intro').style.display !== 'none') {
+    gsap.globalTimeline.clear();
+    dismissIntro();
+  }
+}, { once: true });
+
+// Init first section
+playIntro();
+
+// ─── TWEAKS ──────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "blue",
+  "grain": 0.11,
+  "align": "left"
+}/*EDITMODE-END*/;
+
+function setAccent(v, btn) {
+  const map = { gold: '#d4a843', white: '#f0eee8', blue: '#6ab0e8' };
+  document.documentElement.style.setProperty('--gold', map[v]);
+  document.querySelectorAll('.topt[onclick^="setAccent"]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { accent: v } }, '*');
+}
+
+function setGrain(v, btn) {
+  gc.style.opacity = v;
+  document.querySelectorAll('.topt[onclick^="setGrain"]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { grain: v } }, '*');
+}
+
+function setAlign(v, btn) {
+  document.querySelectorAll('.film-content').forEach(c => {
+    c.style.textAlign = v === 'center' ? 'center' : '';
+    c.style.margin = v === 'center' ? '0 auto' : '';
+    c.style.maxWidth = v === 'center' ? '100%' : '';
+    c.style.paddingLeft = v === 'center' ? '0' : '';
+    c.style.paddingRight = v === 'center' ? '0' : '';
+  });
+  document.querySelectorAll('.topt[onclick^="setAlign"]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { align: v } }, '*');
+}
+
+// Apply defaults
+setAccent(TWEAK_DEFAULTS.accent);
+setGrain(TWEAK_DEFAULTS.grain);
+
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'block';
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+});
+window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+</script>
+</body>
+</html>

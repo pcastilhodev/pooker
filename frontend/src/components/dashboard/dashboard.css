@@ -1,0 +1,124 @@
+#scroll-container {
+  position: fixed;
+  inset: 0;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+#scroll-container::-webkit-scrollbar { display: none; }
+
+#films-container { position: relative; }
+
+/* ─── BROWSE ─── */
+.browse-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 100px 52px 80px;
+}
+
+.browse-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.browse-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-top: 40px;
+}
+
+/* ─── COUNTER ─── */
+#counter {
+  position: fixed;
+  bottom: 36px;
+  right: 52px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+  transition: opacity 0.5s;
+}
+
+.counter-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: rgba(240,238,232,0.3);
+  line-height: 1;
+}
+
+.counter-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.counter-dot {
+  width: 1px;
+  height: 24px;
+  background: rgba(240,238,232,0.2);
+  transition: all 0.4s;
+  cursor: pointer;
+}
+
+.counter-dot.active {
+  background: var(--primary);
+  height: 40px;
+}
+
+/* ─── SCROLL HINT ─── */
+#scroll-hint {
+  position: fixed;
+  bottom: 36px;
+  left: 52px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(240,238,232,0.25);
+  transition: opacity 0.5s;
+}
+
+#scroll-hint.hidden { opacity: 0 !important; }
+
+.scroll-line {
+  width: 32px;
+  height: 1px;
+  background: rgba(240,238,232,0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: var(--fg);
+  animation: scanline 2s ease-in-out infinite;
+}
+
+@keyframes scanline {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
