@@ -15,9 +15,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # Google Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" \
-       > /etc/apt/sources.list.d/google.list \
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+    | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+       > /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
@@ -54,7 +55,7 @@ RUN useradd -m -s /bin/bash runner \
 ARG RUNNER_VERSION=2.320.0
 RUN mkdir /actions-runner \
     && cd /actions-runner \
-    && curl -o actions-runner-linux-x64.tar.gz -L \
+    && curl -fLo actions-runner-linux-x64.tar.gz \
        "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz" \
     && tar xzf actions-runner-linux-x64.tar.gz \
     && rm actions-runner-linux-x64.tar.gz \
