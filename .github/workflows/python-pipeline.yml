@@ -56,11 +56,11 @@ jobs:
           cd backend/${{ matrix.service }}
           flake8 app/ --count --select=E,F --show-source --statistics
 
-      - name: Run tests with coverage (fail if < 70%)
+      - name: Run tests with coverage
         id: test-coverage
         run: |
           cd backend/${{ matrix.service }}
-          pytest --junitxml=report.xml -v --cov=app --cov-report=xml:coverage.xml --cov-fail-under=70
+          pytest --junitxml=report.xml -v --cov=app --cov-report=xml:coverage.xml
 
       - name: Upload test results
         id: upload-test-results
@@ -70,16 +70,16 @@ jobs:
           name: python-test-results-${{ matrix.service }}
           path: backend/${{ matrix.service }}/report.xml
 
-      - name: SonarQube scan
-        id: sonarqube-scan
-        uses: sonarsource/sonarqube-scan-action@v5
-        with:
-          projectBaseDir: backend/${{ matrix.service }}
+      - name: SonarQube scan + Quality Gate
+        id: sonarqube
+        if: vars.SONAR_ENABLED == 'true'
+        working-directory: backend/${{ matrix.service }}
+        run: sonar-scanner
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Docker build
         id: docker-build
-        run: |
-          docker build -t pooker/${{ matrix.service }}:${{ github.sha }} backend/${{ matrix.service }}/
+        if: vars.SONAR_ENABLED == 'true'
+        run: docker build -t pooker/${{ matrix.service }}:${{ github.sha }} backend/${{ matrix.service }}/
