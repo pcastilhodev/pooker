@@ -73,6 +73,8 @@ def processar_devolucao(
         raise HTTPException(status_code=400, detail=str(e))
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ocorreu um erro inesperado: {e}")
 

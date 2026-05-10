@@ -6,3 +6,5 @@ alembic
 pydantic-settings
 python-dotenv
 pydantic
+pytest
+pytest-cov
