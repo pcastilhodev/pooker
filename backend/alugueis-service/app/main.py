@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from app.api.v1.routes import alugueis
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.database import engine, Base
+from app.models import aluguel  # noqa: F401 — registra model no Base
 
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Aluguéis Service")
 

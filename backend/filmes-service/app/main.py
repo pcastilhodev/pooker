@@ -3,7 +3,10 @@ from fastapi import FastAPI
 from app.api.v1.routes import filmes
 from app.api.v1.routes import reviews
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.database import engine, Base
+from app.models import filme, review  # noqa: F401 — registra models no Base
 
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Filmes Service")
 
