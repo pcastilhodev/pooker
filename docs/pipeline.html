@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pooker — Pipeline CI/CD</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --blue: #58a6ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --purple: #bc8cff;
+      --red: #f85149;
+      --java: #f89820;
+      --python: #3572a5;
+      --angular: #dd0031;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 64px 24px 48px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .hero-badge span { color: var(--green); font-weight: 600; }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+    .badge-green  { background: #1a2e1a; border-color: #3fb950; color: #3fb950; }
+    .badge-blue   { background: #0d1f38; border-color: #58a6ff; color: #58a6ff; }
+    .badge-orange { background: #2e1e0a; border-color: #d29922; color: #d29922; }
+    .badge-purple { background: #1f1433; border-color: #bc8cff; color: #bc8cff; }
+
+    /* ── SECTIONS ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+    h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .section-desc { color: var(--muted); font-size: 16px; max-width: 640px; margin-bottom: 40px; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding: 8px 0 24px;
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .flow-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 1px solid var(--border);
+    }
+    .flow-label { font-size: 12px; color: var(--muted); text-align: center; max-width: 72px; line-height: 1.3; }
+    .flow-arrow {
+      font-size: 20px;
+      color: var(--border);
+      padding: 0 8px;
+      flex-shrink: 0;
+      margin-bottom: 22px;
+    }
+    .flow-icon.push    { background: #0d1f38; }
+    .flow-icon.runner  { background: #1a2e1a; }
+    .flow-icon.test    { background: #2e1e0a; }
+    .flow-icon.sonar   { background: #1f1433; }
+    .flow-icon.gate    { background: #2e0d0d; }
+    .flow-icon.docker  { background: #0d2438; }
+
+    /* ── PIPELINES GRID ── */
+    .pipelines { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .pipeline-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .pipeline-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .card-header {
+      padding: 20px 24px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .card-icon.java    { background: #2e1e0a; }
+    .card-icon.python  { background: #0d1f38; }
+    .card-icon.angular { background: #2e0d17; }
+    .card-title { font-weight: 600; font-size: 16px; }
+    .card-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .card-body { padding: 20px 24px; }
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .step-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-text { color: var(--text); line-height: 1.4; }
+    .step-text strong { color: var(--blue); }
+    .step-text .tag {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .tag-ok    { background: #1a2e1a; color: #3fb950; }
+    .tag-warn  { background: #2e1e0a; color: #d29922; }
+    .tag-skip  { background: var(--surface2); color: var(--muted); }
+
+    /* ── SERVICES ── */
+    .services { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .service-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-java    { background: var(--java); }
+    .dot-python  { background: var(--python); }
+    .dot-angular { background: var(--angular); }
+    .service-name { font-weight: 600; font-size: 14px; }
+    .service-tech { font-size: 12px; color: var(--muted); }
+
+    /* ── SONAR ── */
+    .sonar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 640px) { .sonar-grid { grid-template-columns: 1fr; } }
+    .sonar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .sonar-card h3 { font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .metric-list { display: flex; flex-direction: column; gap: 12px; }
+    .metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+    .metric-name { color: var(--muted); }
+    .metric-value {
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+    .mv-green  { background: #1a2e1a; color: #3fb950; }
+    .mv-orange { background: #2e1e0a; color: #d29922; }
+    .mv-red    { background: #2e0d0d; color: #f85149; }
+    .mv-blue   { background: #0d1f38; color: #58a6ff; }
+
+    .gate-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .gate-block strong { color: var(--text); }
+
+    /* ── INFRA ── */
+    .infra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .infra-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .infra-icon { font-size: 28px; margin-bottom: 12px; }
+    .infra-title { font-weight: 600; margin-bottom: 6px; }
+    .infra-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    .code-block .c  { color: var(--muted); }
+    .code-block .k  { color: var(--purple); }
+    .code-block .s  { color: var(--green); }
+    .code-block .v  { color: var(--orange); }
+    .code-block .p  { color: var(--blue); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>
+    <span>Pipeline ativo</span> &nbsp;· GitHub Actions + SonarQube
+  </div>
+  <h1>Pipeline CI/CD — Pooker</h1>
+  <p>Esteira automatizada de integração contínua para o monorepo Pooker, com 7 microserviços, análise de qualidade e quality gate.</p>
+  <div class="badges">
+    <span class="badge badge-green">✓ Self-hosted Runner</span>
+    <span class="badge badge-blue">✓ 3 Pipelines independentes</span>
+    <span class="badge badge-orange">✓ SonarQube integrado</span>
+    <span class="badge badge-purple">✓ Quality Gate ativo</span>
+  </div>
+</div>
+
+<!-- FLUXO GERAL -->
+<section>
+  <div class="container">
+    <div class="section-label">Visão geral</div>
+    <h2>Como funciona o fluxo</h2>
+    <p class="section-desc">Cada push ou pull request para as branches principais dispara automaticamente a pipeline correspondente ao serviço alterado.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon push">🚀</div>
+        <div class="flow-label">git push / PR</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon runner">⚡</div>
+        <div class="flow-label">Runner Windows self-hosted</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon test">🧪</div>
+        <div class="flow-label">Build + Testes + Coverage</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon sonar">🔍</div>
+        <div class="flow-label">Análise SonarQube</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon gate">🚦</div>
+        <div class="flow-label">Quality Gate</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon docker">🐳</div>
+        <div class="flow-label">Docker Build</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section>
+  <div class="container">
+    <div class="section-label">Arquitetura</div>
+    <h2>7 Microserviços monitorados</h2>
+    <p class="section-desc">Cada serviço possui seu próprio projeto no SonarQube, métricas de cobertura independentes e análise estática.</p>
+    <div class="services">
+      <div class="service-card">
+        <div class="service-dot dot-java"></div>
+        <div>
+          <div class="service-name">api-gateway</div>
+          <div class="service-tech">Java 17 · Gradle</div>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-dot dot-java"></div>
+        <div>
+          <div class="service-name">auth-service</div>
+          <div class="service-tech">Java 17 · Maven · Spring Boot</div>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-dot dot-python"></div>
+        <div>
+          <div class="service-name">filmes-service</div>
+          <div class="service-tech">Python 3.11 · FastAPI</div>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-dot dot-python"></div>
+        <div>
+          <div class="service-name">alugueis-service</div>
+          <div class="service-tech">Python 3.11 · FastAPI</div>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-dot dot-python"></div>
+        <div>
+          <div class="service-name">user-service</div>
+          <div class="service-tech">Python 3.11 · FastAPI</div>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-dot dot-python"></div>
+        <div>
+          <div class="service-name">payment-service</div>
+          <div class="service-tech">Python 3.11 · FastAPI</div>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-dot dot-angular"></div>
+        <div>
+          <div class="service-name">frontend</div>
+          <div class="service-tech">Angular 20 · TypeScript</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINES -->
+<section>
+  <div class="container">
+    <div class="section-label">GitHub Actions</div>
+    <h2>3 Pipelines independentes</h2>
+    <p class="section-desc">Cada pipeline só dispara quando arquivos do seu escopo são alterados, evitando execuções desnecessárias.</p>
+
+    <div class="pipelines">
+
+      <!-- JAVA -->
+      <div class="pipeline-card">
+        <div class="card-header">
+          <div class="card-icon java">☕</div>
+          <div>
+            <div class="card-title">Java Pipeline</div>
+            <div class="card-subtitle">api-gateway &amp; auth-service</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="step-list">
+            <li class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-text">Checkout do repositório</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-text">Setup <strong>Java 17</strong> Temurin + cache Gradle/Maven</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-text">Build sem testes <span class="tag tag-skip">-x test</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-text">Execução dos testes unitários <span class="tag tag-ok">JUnit</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">5</div>
+              <div class="step-text">Geração de relatório de cobertura <strong>JaCoCo</strong></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">6</div>
+              <div class="step-text">Análise SonarQube + Quality Gate <span class="tag tag-ok">bloqueante</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">7</div>
+              <div class="step-text">Docker build da imagem <span class="tag tag-ok">pooker/…</span></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PYTHON -->
+      <div class="pipeline-card">
+        <div class="card-header">
+          <div class="card-icon python">🐍</div>
+          <div>
+            <div class="card-title">Python Pipeline</div>
+            <div class="card-subtitle">4 serviços em paralelo (matrix)</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="step-list">
+            <li class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-text">Checkout do repositório</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-text">Setup <strong>Python 3.11</strong> + cache pip por serviço</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-text">Instalação de dependências + <strong>pytest</strong> + flake8</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-text">Lint <strong>flake8</strong> — erros de sintaxe <span class="tag tag-ok">E9/F8xx</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">5</div>
+              <div class="step-text">Testes com cobertura <strong>pytest-cov</strong> → coverage.xml</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">6</div>
+              <div class="step-text">Análise SonarQube + Quality Gate <span class="tag tag-ok">bloqueante</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">7</div>
+              <div class="step-text">Docker build da imagem <span class="tag tag-ok">pooker/…</span></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ANGULAR -->
+      <div class="pipeline-card">
+        <div class="card-header">
+          <div class="card-icon angular">🅰️</div>
+          <div>
+            <div class="card-title">Angular Pipeline</div>
+            <div class="card-subtitle">frontend SPA</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="step-list">
+            <li class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-text">Checkout do repositório</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-text">Setup <strong>Node.js 20</strong> + cache npm</div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-text">Instalação de dependências <strong>npm ci</strong></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-text">Lint ESLint <span class="tag tag-warn">continue-on-error</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">5</div>
+              <div class="step-text">Testes com cobertura <strong>Karma + ChromeHeadless</strong></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">6</div>
+              <div class="step-text">Análise SonarQube + Quality Gate <span class="tag tag-ok">bloqueante</span></div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">7</div>
+              <div class="step-text">Build de produção <strong>--configuration production</strong></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SONARQUBE -->
+<section>
+  <div class="container">
+    <div class="section-label">Qualidade de Código</div>
+    <h2>SonarQube — Análise Estática</h2>
+    <p class="section-desc">Cada serviço é analisado individualmente. O Quality Gate bloqueia o pipeline se os critérios mínimos não forem atendidos.</p>
+
+    <div class="sonar-grid">
+      <div class="sonar-card">
+        <h3>📊 Métricas analisadas</h3>
+        <div class="metric-list">
+          <div class="metric">
+            <span class="metric-name">Cobertura de testes</span>
+            <span class="metric-value mv-green">≥ 70%</span>
+          </div>
+          <div class="metric">
+            <span class="metric-name">Code Smells</span>
+            <span class="metric-value mv-orange">monitorado</span>
+          </div>
+          <div class="metric">
+            <span class="metric-name">Bugs</span>
+            <span class="metric-value mv-red">zero tolerância</span>
+          </div>
+          <div class="metric">
+            <span class="metric-name">Vulnerabilidades</span>
+            <span class="metric-value mv-red">zero tolerância</span>
+          </div>
+          <div class="metric">
+            <span class="metric-name">Duplicações</span>
+            <span class="metric-value mv-orange">monitorado</span>
+          </div>
+          <div class="metric">
+            <span class="metric-name">Security Hotspots</span>
+            <span class="metric-value mv-blue">revisão</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sonar-card">
+        <h3>🚦 Quality Gate — como funciona</h3>
+        <div class="gate-block">
+          Ao final da análise, o SonarQube avalia se o projeto atende às condições definidas.<br><br>
+          <strong>Se passar:</strong> pipeline continua para o Docker build.<br><br>
+          <strong>Se reprovar:</strong> o step falha com exit code 1, o pipeline é marcado como <span style="color:#f85149">❌ Failed</span> e o PR não pode ser mergeado.<br><br>
+          O parâmetro <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:12px;">-Dsonar.qualitygate.wait=true</code> garante que o scanner aguarda o resultado antes de retornar.
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block" style="margin-top:24px;">
+      <span class="c"># sonar-project.properties — exemplo (api-gateway)</span><br>
+      <span class="p">sonar.projectKey</span>=<span class="s">pooker-api-gateway</span><br>
+      <span class="p">sonar.projectName</span>=<span class="s">Pooker - API Gateway</span><br>
+      <span class="p">sonar.sources</span>=<span class="s">src/main/java</span><br>
+      <span class="p">sonar.tests</span>=<span class="s">src/test/java</span><br>
+      <span class="p">sonar.coverage.jacoco.xmlReportPaths</span>=<span class="s">build/reports/jacoco/test/jacocoTestReport.xml</span>
+    </div>
+  </div>
+</section>
+
+<!-- INFRAESTRUTURA -->
+<section>
+  <div class="container">
+    <div class="section-label">Infraestrutura</div>
+    <h2>Componentes da esteira</h2>
+    <p class="section-desc">Toda a infraestrutura de CI/CD roda localmente, sem custo de cloud.</p>
+    <div class="infra-grid">
+      <div class="infra-card">
+        <div class="infra-icon">⚡</div>
+        <div class="infra-title">GitHub Actions Runner</div>
+        <div class="infra-desc">Self-hosted runner instalado nativamente no Windows. Fica idle aguardando jobs e executa as pipelines localmente.</div>
+      </div>
+      <div class="infra-card">
+        <div class="infra-icon">🔍</div>
+        <div class="infra-title">SonarQube Community</div>
+        <div class="infra-desc">Rodando em Docker Desktop na porta 9000. Recebe os relatórios do sonar-scanner e avalia o Quality Gate.</div>
+      </div>
+      <div class="infra-card">
+        <div class="infra-icon">🐳</div>
+        <div class="infra-title">Docker Desktop</div>
+        <div class="infra-desc">Hospeda o SonarQube e o PostgreSQL. As imagens dos serviços são buildadas ao final de cada pipeline bem-sucedida.</div>
+      </div>
+      <div class="infra-card">
+        <div class="infra-icon">🌐</div>
+        <div class="infra-title">ngrok Tunnel</div>
+        <div class="infra-desc">Expõe o SonarQube local (localhost:9000) via URL pública HTTPS, permitindo acesso remoto ao dashboard de qualidade.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIGGERS -->
+<section>
+  <div class="container">
+    <div class="section-label">Gatilhos</div>
+    <h2>Quando as pipelines disparam</h2>
+    <p class="section-desc">As pipelines usam filtros de path para executar apenas quando código relevante é alterado.</p>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:16px;">
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;">
+        <div style="font-weight:600;margin-bottom:12px;">☕ Java Pipeline dispara quando:</div>
+        <div class="code-block" style="margin-top:0;">
+          <span class="s">backend/api-gateway/**</span><br>
+          <span class="s">backend/auth-service/**</span>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;">
+        <div style="font-weight:600;margin-bottom:12px;">🐍 Python Pipeline dispara quando:</div>
+        <div class="code-block" style="margin-top:0;">
+          <span class="s">backend/filmes-service/**</span><br>
+          <span class="s">backend/alugueis-service/**</span><br>
+          <span class="s">backend/user-service/**</span><br>
+          <span class="s">backend/payment-service/**</span>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;">
+        <div style="font-weight:600;margin-bottom:12px;">🅰️ Angular Pipeline dispara quando:</div>
+        <div class="code-block" style="margin-top:0;">
+          <span class="s">frontend/**</span>
+        </div>
+        <div style="margin-top:12px;font-size:13px;color:var(--muted);">Também disponível via <strong style="color:var(--text)">workflow_dispatch</strong> para execução manual.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>Pooker</strong> — Pipeline CI/CD &nbsp;·&nbsp; GitHub Actions + SonarQube + Docker
+</footer>
+
+</body>
+</html>
