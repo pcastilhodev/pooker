@@ -82,7 +82,7 @@ jobs:
             Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
             Remove-Item $zip
           }
-          & "$scannerDir\bin\sonar-scanner.bat" -Dsonar.qualitygate.wait=true
+          & "$scannerDir\bin\sonar-scanner.bat" "-Dsonar.qualitygate.wait=true"
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
