@@ -68,7 +68,16 @@ jobs:
         name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
         working-directory: backend/api-gateway
-        run: sonar-scanner -Dsonar.qualitygate.wait=true
+        run: |
+          $version = "5.0.1.3006"
+          $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
+          if (-not (Test-Path $scannerDir)) {
+            $zip = "$env:TEMP\sonar-scanner.zip"
+            Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows.zip" -OutFile $zip
+            Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
+            Remove-Item $zip
+          }
+          & "$scannerDir\bin\sonar-scanner.bat" "-Dsonar.qualitygate.wait=true"
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -130,7 +139,16 @@ jobs:
         name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
         working-directory: backend/auth-service
-        run: sonar-scanner -Dsonar.qualitygate.wait=true
+        run: |
+          $version = "5.0.1.3006"
+          $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
+          if (-not (Test-Path $scannerDir)) {
+            $zip = "$env:TEMP\sonar-scanner.zip"
+            Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows.zip" -OutFile $zip
+            Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
+            Remove-Item $zip
+          }
+          & "$scannerDir\bin\sonar-scanner.bat" "-Dsonar.qualitygate.wait=true"
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
