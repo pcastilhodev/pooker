@@ -1,12 +1,13 @@
 name: Angular Pipeline
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main, develop]
+    branches: [master, main, develop]
     paths:
       - 'frontend/**'
   pull_request:
-    branches: [main, develop]
+    branches: [master, main, develop]
     paths:
       - 'frontend/**'
 
@@ -38,7 +39,7 @@ jobs:
         working-directory: frontend
         run: npm run lint
 
-      - name: Test
+      - name: Test with coverage
         id: test
         working-directory: frontend
         run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
@@ -51,14 +52,14 @@ jobs:
           name: angular-test-coverage
           path: frontend/coverage/
 
-      - name: SonarQube Scan
+      - name: SonarQube scan + Quality Gate
         id: sonarqube
-        uses: sonarsource/sonarqube-scan-action@v5
-        with:
-          projectBaseDir: frontend
+        if: vars.SONAR_ENABLED == 'true'
+        working-directory: frontend
+        run: sonar-scanner -Dsonar.qualitygate.wait=true
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build production
         id: build-prod

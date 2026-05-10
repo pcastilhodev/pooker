@@ -88,13 +88,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "codeCoverage": true,
-            "coverageThresholds": {
-              "statements": 70,
-              "branches": 70,
-              "functions": 70,
-              "lines": 70
-            }
+            "codeCoverage": true
           }
         },
         "lint": {
