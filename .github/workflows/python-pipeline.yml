@@ -21,9 +21,6 @@ jobs:
   build-python-service:
     runs-on: self-hosted
     timeout-minutes: 30
-    defaults:
-      run:
-        shell: bash
     strategy:
       matrix:
         service: [alugueis-service, filmes-service, user-service, payment-service]
@@ -49,22 +46,20 @@ jobs:
 
       - name: Install dependencies
         id: install-deps
+        working-directory: backend/${{ matrix.service }}
         run: |
-          cd backend/${{ matrix.service }}
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if (Test-Path requirements.txt) { pip install -r requirements.txt }
           pip install pytest pytest-cov flake8
 
       - name: Lint with flake8
         id: lint
-        run: |
-          cd backend/${{ matrix.service }}
-          flake8 app/ --count --select=E,F --show-source --statistics
+        working-directory: backend/${{ matrix.service }}
+        run: flake8 app/ --count --select=E,F --show-source --statistics
 
       - name: Run tests with coverage
         id: test-coverage
-        run: |
-          cd backend/${{ matrix.service }}
-          pytest --junitxml=report.xml -v --cov=app --cov-report=xml:coverage.xml
+        working-directory: backend/${{ matrix.service }}
+        run: pytest --junitxml=report.xml -v --cov=app --cov-report=xml:coverage.xml
 
       - name: Upload test results
         id: upload-test-results

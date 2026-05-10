@@ -17,9 +17,6 @@ jobs:
   build-apigateway:
     name: Build & Test API Gateway
     runs-on: self-hosted
-    defaults:
-      run:
-        shell: bash
 
     steps:
       - id: checkout
@@ -46,11 +43,13 @@ jobs:
 
       - id: build-no-tests
         name: Build API Gateway (skip tests)
-        run: cd backend/api-gateway && ./gradlew build -x test
+        working-directory: backend/api-gateway
+        run: .\gradlew.bat build -x test
 
       - id: test
         name: Run API Gateway tests
-        run: cd backend/api-gateway && ./gradlew test
+        working-directory: backend/api-gateway
+        run: .\gradlew.bat test
 
       - id: upload-test-results
         name: Upload API Gateway test results
@@ -62,7 +61,8 @@ jobs:
 
       - id: coverage-report
         name: Generate API Gateway coverage report
-        run: cd backend/api-gateway && ./gradlew jacocoTestReport
+        working-directory: backend/api-gateway
+        run: .\gradlew.bat jacocoTestReport
 
       - id: sonarqube
         name: SonarQube scan + Quality Gate
@@ -81,9 +81,6 @@ jobs:
   build-auth-service:
     name: Build & Test Auth Service
     runs-on: self-hosted
-    defaults:
-      run:
-        shell: bash
 
     steps:
       - id: checkout
@@ -108,11 +105,13 @@ jobs:
 
       - id: build-no-tests
         name: Build Auth Service (skip tests)
-        run: cd backend/auth-service && ./mvnw package -DskipTests
+        working-directory: backend/auth-service
+        run: .\mvnw.cmd package -DskipTests
 
       - id: test
         name: Run Auth Service tests
-        run: cd backend/auth-service && ./mvnw test
+        working-directory: backend/auth-service
+        run: .\mvnw.cmd test
 
       - id: upload-test-results
         name: Upload Auth Service test results
@@ -124,7 +123,8 @@ jobs:
 
       - id: coverage-report
         name: Generate Auth Service coverage report
-        run: cd backend/auth-service && ./mvnw jacoco:report
+        working-directory: backend/auth-service
+        run: .\mvnw.cmd jacoco:report
 
       - id: sonarqube
         name: SonarQube scan + Quality Gate
