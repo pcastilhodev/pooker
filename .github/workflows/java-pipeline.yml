@@ -17,6 +17,9 @@ jobs:
   build-apigateway:
     name: Build & Test API Gateway
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - id: checkout
@@ -78,6 +81,9 @@ jobs:
   build-auth-service:
     name: Build & Test Auth Service
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - id: checkout
