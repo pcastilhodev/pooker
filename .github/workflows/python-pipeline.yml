@@ -69,6 +69,20 @@ jobs:
           name: python-test-results-${{ matrix.service }}
           path: backend/${{ matrix.service }}/report.xml
 
+      - name: Setup sonar-scanner
+        id: setup-sonar
+        if: vars.SONAR_ENABLED == 'true'
+        run: |
+          $version = "5.0.1.3006"
+          $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
+          if (-not (Test-Path $scannerDir)) {
+            $zip = "$env:TEMP\sonar-scanner.zip"
+            Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows.zip" -OutFile $zip
+            Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
+            Remove-Item $zip
+          }
+          "$scannerDir\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
       - name: SonarQube scan + Quality Gate
         id: sonarqube
         if: vars.SONAR_ENABLED == 'true'

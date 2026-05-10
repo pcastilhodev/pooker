@@ -64,6 +64,20 @@ jobs:
         working-directory: backend/api-gateway
         run: .\gradlew.bat jacocoTestReport
 
+      - id: setup-sonar
+        name: Setup sonar-scanner
+        if: vars.SONAR_ENABLED == 'true'
+        run: |
+          $version = "5.0.1.3006"
+          $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
+          if (-not (Test-Path $scannerDir)) {
+            $zip = "$env:TEMP\sonar-scanner.zip"
+            Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows.zip" -OutFile $zip
+            Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
+            Remove-Item $zip
+          }
+          "$scannerDir\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
       - id: sonarqube
         name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
@@ -125,6 +139,20 @@ jobs:
         name: Generate Auth Service coverage report
         working-directory: backend/auth-service
         run: .\mvnw.cmd jacoco:report
+
+      - id: setup-sonar
+        name: Setup sonar-scanner
+        if: vars.SONAR_ENABLED == 'true'
+        run: |
+          $version = "5.0.1.3006"
+          $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
+          if (-not (Test-Path $scannerDir)) {
+            $zip = "$env:TEMP\sonar-scanner.zip"
+            Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows.zip" -OutFile $zip
+            Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
+            Remove-Item $zip
+          }
+          "$scannerDir\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 
       - id: sonarqube
         name: SonarQube scan + Quality Gate
