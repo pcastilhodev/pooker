@@ -34,7 +34,7 @@ $pythonServices = @(
 
 foreach ($svc in $pythonServices) {
     $svcDir = "$root\$($svc.dir)"
-    $cmd = "Set-Location '$svcDir'; pip install -r requirements.txt -q; python -m uvicorn app.main:app --host 0.0.0.0 --port $($svc.port)"
+    $cmd = "Set-Location '$svcDir'; python -m pip install -r requirements.txt -q; python -m uvicorn app.main:app --host 0.0.0.0 --port $($svc.port)"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -WindowStyle Minimized
     Write-OK "$($svc.name)  ->  http://localhost:$($svc.port)"
 }
@@ -57,7 +57,7 @@ Write-Step "4/5  Populando banco com dados de demo"
 Write-Warn "Aguardando servicos Python iniciarem (25s)..."
 Start-Sleep -Seconds 25
 
-pip install psycopg2-binary passlib bcrypt -q
+python -m pip install psycopg2-binary passlib bcrypt -q
 python "$root\database\seed.py"
 
 # -- 5. ANGULAR ---------------------------------------------------------------
