@@ -53,9 +53,10 @@ jobs:
           name: angular-test-coverage
           path: frontend/coverage/
 
-      - name: Setup sonar-scanner
-        id: setup-sonar
+      - name: SonarQube scan + Quality Gate
+        id: sonarqube
         if: vars.SONAR_ENABLED == 'true'
+        working-directory: frontend
         run: |
           $version = "5.0.1.3006"
           $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
@@ -65,13 +66,7 @@ jobs:
             Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
             Remove-Item $zip
           }
-          "$scannerDir\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
-
-      - name: SonarQube scan + Quality Gate
-        id: sonarqube
-        if: vars.SONAR_ENABLED == 'true'
-        working-directory: frontend
-        run: sonar-scanner -Dsonar.qualitygate.wait=true
+          & "$scannerDir\bin\sonar-scanner.bat" -Dsonar.qualitygate.wait=true
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

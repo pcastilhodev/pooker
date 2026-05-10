@@ -64,9 +64,10 @@ jobs:
         working-directory: backend/api-gateway
         run: .\gradlew.bat jacocoTestReport
 
-      - id: setup-sonar
-        name: Setup sonar-scanner
+      - id: sonarqube
+        name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
+        working-directory: backend/api-gateway
         run: |
           $version = "5.0.1.3006"
           $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
@@ -76,13 +77,7 @@ jobs:
             Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
             Remove-Item $zip
           }
-          "$scannerDir\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
-
-      - id: sonarqube
-        name: SonarQube scan + Quality Gate
-        if: vars.SONAR_ENABLED == 'true'
-        working-directory: backend/api-gateway
-        run: sonar-scanner -Dsonar.qualitygate.wait=true
+          & "$scannerDir\bin\sonar-scanner.bat" -Dsonar.qualitygate.wait=true
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -140,9 +135,10 @@ jobs:
         working-directory: backend/auth-service
         run: .\mvnw.cmd jacoco:report
 
-      - id: setup-sonar
-        name: Setup sonar-scanner
+      - id: sonarqube
+        name: SonarQube scan + Quality Gate
         if: vars.SONAR_ENABLED == 'true'
+        working-directory: backend/auth-service
         run: |
           $version = "5.0.1.3006"
           $scannerDir = "$env:USERPROFILE\.sonar\sonar-scanner-$version-windows"
@@ -152,13 +148,7 @@ jobs:
             Expand-Archive -Path $zip -DestinationPath "$env:USERPROFILE\.sonar" -Force
             Remove-Item $zip
           }
-          "$scannerDir\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
-
-      - id: sonarqube
-        name: SonarQube scan + Quality Gate
-        if: vars.SONAR_ENABLED == 'true'
-        working-directory: backend/auth-service
-        run: sonar-scanner -Dsonar.qualitygate.wait=true
+          & "$scannerDir\bin\sonar-scanner.bat" -Dsonar.qualitygate.wait=true
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
