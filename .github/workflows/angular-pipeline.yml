@@ -1,6 +1,7 @@
 name: Angular Pipeline
 
 on:
+  workflow_dispatch:
   push:
     branches: [master, main, develop]
     paths:
