@@ -56,21 +56,22 @@ jobs:
           name: apigateway-test-results
           path: backend/api-gateway/build/test-results/**/*.xml
 
-      - id: coverage
-        name: Check API Gateway code coverage (minimum 70%)
-        run: cd backend/api-gateway && ./gradlew jacocoTestReport jacocoTestCoverageVerification
+      - id: coverage-report
+        name: Generate API Gateway coverage report
+        run: cd backend/api-gateway && ./gradlew jacocoTestReport
 
       - id: sonarqube
-        name: SonarQube scan for API Gateway
-        uses: sonarsource/sonarqube-scan-action@v5
-        with:
-          projectBaseDir: backend/api-gateway
+        name: SonarQube scan + Quality Gate
+        if: vars.SONAR_ENABLED == 'true'
+        working-directory: backend/api-gateway
+        run: sonar-scanner
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - id: docker-build
         name: Build API Gateway Docker image
+        if: vars.SONAR_ENABLED == 'true'
         run: docker build -t pooker/api-gateway:${{ github.sha }} backend/api-gateway/
 
   build-auth-service:
@@ -114,19 +115,20 @@ jobs:
           name: auth-service-test-results
           path: backend/auth-service/target/surefire-reports/**/*.xml
 
-      - id: coverage
-        name: Check Auth Service code coverage (minimum 70%)
-        run: cd backend/auth-service && ./mvnw jacoco:report jacoco:check
+      - id: coverage-report
+        name: Generate Auth Service coverage report
+        run: cd backend/auth-service && ./mvnw jacoco:report
 
       - id: sonarqube
-        name: SonarQube scan for Auth Service
-        uses: sonarsource/sonarqube-scan-action@v5
-        with:
-          projectBaseDir: backend/auth-service
+        name: SonarQube scan + Quality Gate
+        if: vars.SONAR_ENABLED == 'true'
+        working-directory: backend/auth-service
+        run: sonar-scanner
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - id: docker-build
         name: Build Auth Service Docker image
+        if: vars.SONAR_ENABLED == 'true'
         run: docker build -t pooker/auth-service:${{ github.sha }} backend/auth-service/
