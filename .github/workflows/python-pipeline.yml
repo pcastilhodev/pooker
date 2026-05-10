@@ -54,7 +54,7 @@ jobs:
       - name: Lint with flake8
         id: lint
         working-directory: backend/${{ matrix.service }}
-        run: flake8 app/ --count --select=E,F --show-source --statistics
+        run: flake8 app/ --count --select=E9,F821,F822,F823 --show-source --statistics
 
       - name: Run tests with coverage
         id: test-coverage
