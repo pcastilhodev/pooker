@@ -40,6 +40,19 @@ jobs:
         continue-on-error: true
         run: npm run lint
 
+      - name: Patch Angular builder for lcov coverage
+        id: patch-lcov
+        working-directory: frontend
+        run: |
+          $file = "node_modules/@angular/build/src/builders/karma/application_builder.js"
+          $content = Get-Content $file -Raw
+          $content = $content.Replace(
+            "reporters: [{ type: 'html' }, { type: 'text-summary' }],",
+            "reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'lcovonly', file: 'lcov.info' }],"
+          )
+          Set-Content $file $content -Encoding UTF8
+          Write-Host "Patched Angular karma builder to include lcovonly reporter"
+
       - name: Test with coverage
         id: test
         working-directory: frontend
