@@ -4,37 +4,6 @@
   overflow-x: hidden;
 }
 
-/* NAV */
-.film-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 200; padding: 24px 52px;
-  display: flex; align-items: center; justify-content: space-between;
-  transition: background 0.3s;
-}
-
-.nav-back {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(240,238,232,0.35);
-  background: none; border: none; cursor: pointer; transition: color 0.2s;
-}
-
-.nav-back:hover { color: var(--fg); }
-
-.nav-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px; letter-spacing: 0.2em;
-}
-
-.nav-watchlist {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: rgba(240,238,232,0.4);
-  background: none; border: 1px solid rgba(240,238,232,0.12);
-  padding: 8px 20px; cursor: pointer; transition: all 0.2s;
-}
-
-.nav-watchlist:hover { color: var(--fg); border-color: rgba(240,238,232,0.4); }
 
 /* PROGRESS DOTS */
 #progress-line {
