@@ -13,18 +13,24 @@ describe('ScrollRevealSection', () => {
   let fixture: ComponentFixture<HostComponent>;
   let observerCallback: IntersectionObserverCallback;
   let mockObserver: jasmine.SpyObj<IntersectionObserver>;
+  let originalIO: typeof IntersectionObserver;
 
   beforeEach(async () => {
+    originalIO = window.IntersectionObserver;
     mockObserver = jasmine.createSpyObj('IntersectionObserver', ['observe', 'disconnect']);
 
-    spyOn(window, 'IntersectionObserver').and.callFake((cb: IntersectionObserverCallback) => {
+    (window as any).IntersectionObserver = function(cb: IntersectionObserverCallback) {
       observerCallback = cb;
       return mockObserver;
-    });
+    };
 
     await TestBed.configureTestingModule({ imports: [HostComponent] }).compileComponents();
     fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    (window as any).IntersectionObserver = originalIO;
   });
 
   it('should create', () => {
@@ -57,7 +63,7 @@ describe('ScrollRevealSection', () => {
 
     setTimeout(() => {
       expect(child.style.opacity).toBe('1');
-      expect(child.style.transform).toBe('translateY(0)');
+      expect(child.style.transform).toMatch(/translateY\(0(px)?\)/);
       done();
     }, 150);
   });
