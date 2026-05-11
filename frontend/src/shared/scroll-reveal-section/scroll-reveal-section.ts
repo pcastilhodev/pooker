@@ -9,7 +9,7 @@ import { Component, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 export class ScrollRevealSection implements AfterViewInit, OnDestroy {
   private observer: IntersectionObserver | undefined;
 
-  constructor(private el: ElementRef<HTMLElement>) {}
+  constructor(private readonly el: ElementRef<HTMLElement>) {}
 
   ngAfterViewInit() {
     const host = this.el.nativeElement;
