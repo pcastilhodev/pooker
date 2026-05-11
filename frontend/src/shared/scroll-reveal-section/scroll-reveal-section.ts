@@ -1,6 +1,4 @@
-import { Component, ElementRef, NgZone, AfterViewInit, OnDestroy } from '@angular/core';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Component, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-scroll-reveal-section',
@@ -9,28 +7,35 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
   styles: [`:host { display: block; }`]
 })
 export class ScrollRevealSection implements AfterViewInit, OnDestroy {
-  private ctx: gsap.Context | undefined;
+  private observer: IntersectionObserver | undefined;
 
-  constructor(private el: ElementRef<HTMLElement>, private zone: NgZone) {}
+  constructor(private el: ElementRef<HTMLElement>) {}
 
   ngAfterViewInit() {
-    this.zone.runOutsideAngular(() => {
-      const host = this.el.nativeElement;
-      const children = Array.from(host.children) as Element[];
-      if (!children.length) return;
+    const host = this.el.nativeElement;
+    const children = Array.from(host.children) as HTMLElement[];
+    if (!children.length) return;
 
-      this.ctx = gsap.context(() => {
-        gsap.from(children, {
-          scrollTrigger: { trigger: host, start: 'top 85%' },
-          opacity: 0,
-          y: 40,
-          stagger: 0.08,
-          duration: 0.7,
-          ease: 'power3.out'
-        });
-      });
+    children.forEach(child => {
+      child.style.opacity = '0';
+      child.style.transform = 'translateY(40px)';
+      child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
     });
+
+    this.observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        children.forEach((child, i) => {
+          setTimeout(() => {
+            child.style.opacity = '1';
+            child.style.transform = 'translateY(0)';
+          }, i * 80);
+        });
+        this.observer?.disconnect();
+      }
+    }, { threshold: 0.15 });
+
+    this.observer.observe(host);
   }
 
-  ngOnDestroy() { this.ctx?.revert(); }
+  ngOnDestroy() { this.observer?.disconnect(); }
 }

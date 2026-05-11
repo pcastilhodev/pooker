@@ -182,8 +182,14 @@
 }
 
 .director-visual {
-  position: relative; min-height: 560px; overflow: hidden;
+  min-height: 560px; overflow: hidden;
   background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+}
+.director-photo {
+  max-height: 560px; max-width: 100%;
+  width: auto; height: auto;
+  object-fit: contain; display: block;
 }
 
 .director-info-block {
@@ -225,7 +231,8 @@
 
 .cast-card { flex: 0 0 200px; }
 
-.cast-img { width: 200px; aspect-ratio: 2/3; overflow: hidden; margin-bottom: 14px; }
+.cast-img { width: 200px; aspect-ratio: 2/3; overflow: hidden; margin-bottom: 14px; position: relative; }
+.cast-photo { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 
 .cast-name { font-size: 14px; font-weight: 500; color: var(--fg); }
 .cast-char { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; }

@@ -3,7 +3,6 @@
   <nav class="film-nav" id="filmNav">
     <button class="nav-back" (click)="goBack()">← Voltar</button>
     <div class="nav-logo">LOOKER</div>
-    <button class="nav-watchlist">+ Watchlist</button>
   </nav>
 
   <!-- PROGRESS DOTS -->
@@ -43,7 +42,7 @@
       <div class="vignette-lr"></div>
       <div class="hero-content">
         <div class="film-eyebrow">{{ film.genero }} · {{ filmYear }}</div>
-        <h1 class="film-title">{{ film.titulo.toUpperCase() }}</h1>
+        <h1 class="film-title">{{ film.titulo?.toUpperCase() }}</h1>
         <div class="film-bottom-row">
           <span class="film-chip">{{ durationFormatted }}</span>
           <div class="vbar"></div>
@@ -82,15 +81,16 @@
     <!-- ── SEC 4: DIRETOR ── -->
     <div class="director-panel" data-section="director">
       <div class="director-visual">
-        <svg viewBox="0 0 800 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;position:absolute;inset:0">
+        <img *ngIf="film.diretor_foto_url" class="director-photo" [src]="film.diretor_foto_url" [alt]="film.diretor" />
+        <svg *ngIf="!film.diretor_foto_url" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;position:absolute;inset:0">
           <rect width="800" height="560" [attr.fill]="palette.c1"/>
-          <text x="400" y="280" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="11" fill="rgba(255,255,255,0.08)" letter-spacing="2">FOTO · {{ film.diretor.toUpperCase() }}</text>
+          <text x="400" y="280" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="11" fill="rgba(255,255,255,0.08)" letter-spacing="2">FOTO · {{ film.diretor?.toUpperCase() }}</text>
         </svg>
       </div>
       <app-scroll-reveal-section>
         <div class="director-info-block">
           <div class="director-role">Direção</div>
-          <div class="director-name">{{ film.diretor.toUpperCase() }}</div>
+          <div class="director-name">{{ film.diretor?.toUpperCase() }}</div>
           <p class="director-bio">Informações sobre o diretor em breve.</p>
         </div>
       </app-scroll-reveal-section>
@@ -105,15 +105,16 @@
         </div>
       </app-scroll-reveal-section>
       <div class="cast-track" id="castTrack">
-        <div class="cast-card" *ngFor="let p of castMock; let i = index">
+        <div class="cast-card" *ngFor="let p of cast; let i = index">
           <div class="cast-img">
-            <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <img *ngIf="p.foto_url" class="cast-photo" [src]="p.foto_url" [alt]="p.name" />
+            <svg *ngIf="!p.foto_url" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
               <rect width="200" height="300" [attr.fill]="palette.c1"/>
               <text x="100" y="150" text-anchor="middle" dominant-baseline="middle" font-family="Georgia" font-style="italic" font-size="9" fill="rgba(255,255,255,0.12)">{{ p.name.split(' ')[0].toUpperCase() }}</text>
             </svg>
           </div>
           <div class="cast-name">{{ p.name }}</div>
-          <div class="cast-char">{{ p.char }}</div>
+          <div class="cast-char">{{ p.character }}</div>
         </div>
       </div>
     </section>

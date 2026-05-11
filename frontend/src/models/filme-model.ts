@@ -1,3 +1,9 @@
+export interface CastMember {
+  name: string;
+  character: string;
+  foto_url: string | null;
+}
+
 export interface FilmeModel {
   id: number;
   titulo: string;
@@ -11,6 +17,8 @@ export interface FilmeModel {
   data_lancamento: Date;
   total_copias: number;
   diretor: string;
+  diretor_foto_url?: string;
+  elenco?: string;
   copias_disponiveis: number;
 }
 

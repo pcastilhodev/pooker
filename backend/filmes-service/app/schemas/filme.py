@@ -13,6 +13,7 @@ class FilmeBaseSchema(BaseModel):
     duracao_minutos: Optional[int] = None
     elenco: Optional[str] = None
     diretor: Optional[str] = None
+    diretor_foto_url: Optional[str] = None
     classificacao_indicativa: Optional[str] = None
     data_lancamento: Optional[date] = None
 

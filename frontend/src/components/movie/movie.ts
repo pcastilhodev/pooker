@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FilmeModel } from '../../models/filme-model';
+import { FilmeModel, CastMember } from '../../models/filme-model';
 import { MovieService } from '../../services/movie-service';
 import { Rent } from '../../services/rent';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
@@ -62,11 +62,15 @@ export class Movie implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+
     this.route.params.subscribe(params => {
       const id = +params['id'];
       this.movieService.getMovie(id).subscribe((data: any) => {
         this.film = data as FilmeModel;
         this.loadSimilar();
+        setTimeout(() => this.runAnimations(), 0);
       });
     });
   }
@@ -82,6 +86,12 @@ export class Movie implements OnInit, AfterViewInit, OnDestroy {
   get palette()  { return PALETTES[(this.film?.id ?? 0) % 6]; }
   get gradId()   { return 'fg' + (this.film?.id ?? 0); }
   get radId()    { return 'rg' + (this.film?.id ?? 0); }
+
+  get cast(): CastMember[] {
+    if (!this.film?.elenco) return [];
+    try { return JSON.parse(this.film.elenco); }
+    catch { return []; }
+  }
 
   get filmYear(): number {
     const d = this.film?.ano;
@@ -117,7 +127,10 @@ export class Movie implements OnInit, AfterViewInit, OnDestroy {
 
   goBack() { this.router.navigate(['/']); }
 
-  ngAfterViewInit() {
+  ngAfterViewInit() {}
+
+  private runAnimations() {
+    this.ctx?.revert();
     this.zone.runOutsideAngular(() => {
       this.ctx = gsap.context(() => {
         const hero = this.el.nativeElement.querySelector('.hero');
@@ -166,5 +179,9 @@ export class Movie implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() { this.ctx?.revert(); }
+  ngOnDestroy() {
+    this.ctx?.revert();
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
 }
