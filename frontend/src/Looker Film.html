@@ -664,7 +664,7 @@ let isDown = false, sX, sL;
 castTrack.addEventListener('mousedown', e => { isDown=true; sX=e.pageX-castTrack.offsetLeft; sL=castTrack.scrollLeft; });
 castTrack.addEventListener('mouseleave', ()=>isDown=false);
 castTrack.addEventListener('mouseup', ()=>isDown=false);
-castTrack.addEventListener('mousemove', e => { if(!isDown)return; e.preventDefault(); castTrack.scrollLeft = sL-(e.pageX-castTrack.offsetLeft-sX)*1.5; });
+castTrack.addEventListener('mousemove', e => { if(!isDown){ return; } e.preventDefault(); castTrack.scrollLeft = sL-(e.pageX-castTrack.offsetLeft-sX)*1.5; });
 
 // ─── REVIEWS ────────────────────────────────────────────────────
 gsap.to('#revHeader', {
@@ -718,7 +718,7 @@ let sd=false,sdX,sdL;
 simTrack.addEventListener('mousedown', e=>{sd=true;sdX=e.pageX-simTrack.offsetLeft;sdL=simTrack.scrollLeft;});
 simTrack.addEventListener('mouseleave',()=>sd=false);
 simTrack.addEventListener('mouseup',()=>sd=false);
-simTrack.addEventListener('mousemove',e=>{if(!sd)return;e.preventDefault();simTrack.scrollLeft=sdL-(e.pageX-simTrack.offsetLeft-sdX)*1.5;});
+simTrack.addEventListener('mousemove',e=>{ if(!sd){ return; } e.preventDefault();simTrack.scrollLeft=sdL-(e.pageX-simTrack.offsetLeft-sdX)*1.5;});
 
 // ─── TWEAKS ──────────────────────────────────────────────────────
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"grain": 0.07}/*EDITMODE-END*/;

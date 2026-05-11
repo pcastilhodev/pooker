@@ -1,5 +1,5 @@
 import {
-  Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef
+  Component, OnInit, OnDestroy, NgZone, ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -42,7 +42,7 @@ const REVIEWS_MOCK = [
   templateUrl: './movie.html',
   styleUrl: './movie.css'
 })
-export class Movie implements OnInit, AfterViewInit, OnDestroy {
+export class Movie implements OnInit, OnDestroy {
   film:         FilmeModel | undefined;
   similarFilms: FilmeModel[] = [];
   rentLoading   = false;
@@ -126,8 +126,6 @@ export class Movie implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goBack() { this.router.navigate(['/']); }
-
-  ngAfterViewInit() {}
 
   private runAnimations() {
     this.ctx?.revert();
