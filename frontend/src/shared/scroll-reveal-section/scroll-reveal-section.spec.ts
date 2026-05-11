@@ -53,7 +53,7 @@ describe('ScrollRevealSection', () => {
     const child = fixture.nativeElement.querySelector('.child') as HTMLElement;
     const host  = fixture.nativeElement.querySelector('app-scroll-reveal-section') as HTMLElement;
 
-    observerCallback([{ isIntersecting: true, target: host } as IntersectionObserverEntry], mockObserver);
+    observerCallback([{ isIntersecting: true, target: host } as unknown as IntersectionObserverEntry], mockObserver);
 
     setTimeout(() => {
       expect(child.style.opacity).toBe('1');
@@ -66,7 +66,7 @@ describe('ScrollRevealSection', () => {
     const child = fixture.nativeElement.querySelector('.child') as HTMLElement;
     const host  = fixture.nativeElement.querySelector('app-scroll-reveal-section') as HTMLElement;
 
-    observerCallback([{ isIntersecting: false, target: host } as IntersectionObserverEntry], mockObserver);
+    observerCallback([{ isIntersecting: false, target: host } as unknown as IntersectionObserverEntry], mockObserver);
 
     expect(child.style.opacity).toBe('0');
   });
@@ -74,7 +74,7 @@ describe('ScrollRevealSection', () => {
   it('should disconnect observer after revealing', (done) => {
     const host = fixture.nativeElement.querySelector('app-scroll-reveal-section') as HTMLElement;
 
-    observerCallback([{ isIntersecting: true, target: host } as IntersectionObserverEntry], mockObserver);
+    observerCallback([{ isIntersecting: true, target: host } as unknown as IntersectionObserverEntry], mockObserver);
 
     setTimeout(() => {
       expect(mockObserver.disconnect).toHaveBeenCalled();
