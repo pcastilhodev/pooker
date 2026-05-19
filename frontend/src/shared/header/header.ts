@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
+import { of, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Login } from '../../components/login/login';
 import { LoginService } from '../../services/login-service';
@@ -83,7 +83,7 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
       distinctUntilChanged(),
       switchMap(q => {
         const term = q.trim().toLowerCase();
-        if (!term) { this.searchLoading = false; this.searchResults = []; return [] as any; }
+        if (!term) { this.searchLoading = false; this.searchResults = []; return of([] as FilmeModel[]); }
         this.searchLoading = true;
         return this.movies.getAllMovies();
       })
