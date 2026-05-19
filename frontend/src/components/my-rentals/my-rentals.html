@@ -1,0 +1,52 @@
+<section class="rentals-wrap">
+  <header class="rentals-head">
+    <h1>Meus aluguéis</h1>
+    <p>Acompanhe filmes que você alugou e suas datas de devolução.</p>
+  </header>
+
+  <div class="rentals-state" *ngIf="loading">Carregando…</div>
+
+  <div class="rentals-state rentals-state--error" *ngIf="!loading && errorMsg">
+    {{ errorMsg }}
+  </div>
+
+  <div class="rentals-empty" *ngIf="!loading && !errorMsg && rentals.length === 0">
+    <h2>Nada por aqui ainda</h2>
+    <p>Você não alugou nenhum filme. Que tal explorar o catálogo?</p>
+    <button class="btn-primary" (click)="goExplore()">Explorar filmes</button>
+  </div>
+
+  <ul class="rentals-list" *ngIf="!loading && rentals.length > 0">
+    <li class="rentals-item" *ngFor="let r of rentals; trackBy: trackById">
+      <div class="rentals-poster" (click)="openMovie(r.filme_id)">
+        <img *ngIf="r.filme_imagem_url" [src]="r.filme_imagem_url" [alt]="r.filme_titulo || ''" />
+        <div *ngIf="!r.filme_imagem_url" class="rentals-poster-fallback">🎬</div>
+      </div>
+
+      <div class="rentals-body">
+        <div class="rentals-meta">
+          <span class="rentals-id">#{{ r.id }}</span>
+          <span class="rentals-status" [attr.data-status]="r.status">{{ statusLabel(r.status) }}</span>
+        </div>
+        <h3 (click)="openMovie(r.filme_id)">{{ r.filme_titulo || 'Filme #' + r.filme_id }}</h3>
+
+        <div class="rentals-dates">
+          <div>
+            <dt>Alugado em</dt>
+            <dd>{{ formatDate(r.data_aluguel) }}</dd>
+          </div>
+          <div>
+            <dt>Devolver até</dt>
+            <dd>{{ formatDate(r.data_prevista_devolucao) }}</dd>
+          </div>
+          <div *ngIf="r.data_devolucao">
+            <dt>Devolvido em</dt>
+            <dd>{{ formatDate(r.data_devolucao) }}</dd>
+          </div>
+        </div>
+      </div>
+
+      <div class="rentals-price">R$ {{ r.preco | number:'1.2-2' }}</div>
+    </li>
+  </ul>
+</section>

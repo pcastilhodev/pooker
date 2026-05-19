@@ -52,3 +52,35 @@ input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ====== Cinema Clássico (easter egg Konami) ====== */
+html.cinema-classic body {
+  filter: sepia(0.45) contrast(1.1) saturate(0.85);
+}
+
+html.cinema-classic body::before,
+html.cinema-classic body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: #000;
+  z-index: 9500;
+  pointer-events: none;
+  box-shadow: 0 0 60px rgba(0,0,0,0.8);
+}
+
+html.cinema-classic body::before { top: 0;    border-bottom: 1px solid rgba(255,215,0,0.18); }
+html.cinema-classic body::after  { bottom: 0; border-top:    1px solid rgba(255,215,0,0.18); }
+
+html.cinema-classic body::before {
+  background:
+    linear-gradient(180deg, #000, #0c0a06),
+    repeating-linear-gradient(90deg, transparent 0 18px, rgba(255,215,0,0.05) 18px 20px);
+}
+
+html.cinema-classic #grain {
+  opacity: 0.14 !important;
+  mix-blend-mode: multiply !important;
+}

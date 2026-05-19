@@ -13,13 +13,48 @@
     </app-film-snap-section>
   </div>
 
+  <!-- CONTINUE ASSISTINDO -->
+  <section class="recommended-section" *ngIf="recentFilms.length > 0">
+    <div class="browse-sub">Volte de onde parou</div>
+    <div class="browse-title">CONTINUE ASSISTINDO</div>
+    <div class="recent-track">
+      <app-movie-card *ngFor="let film of recentFilms" [film]="film"></app-movie-card>
+    </div>
+  </section>
+
+  <!-- RECOMENDADOS -->
+  <section class="recommended-section" *ngIf="recommended.length > 0">
+    <div class="browse-sub">Selecionados para você</div>
+    <div class="browse-title">RECOMENDADOS</div>
+    <app-scroll-reveal-section>
+      <div class="browse-grid">
+        <app-movie-card *ngFor="let film of recommended" [film]="film"></app-movie-card>
+      </div>
+    </app-scroll-reveal-section>
+  </section>
+
   <!-- BROWSE GRID -->
   <div class="browse-section" id="browseSection">
     <div class="browse-sub">Catálogo completo</div>
     <div class="browse-title">TODOS OS FILMES</div>
+
+    <div class="genre-chips" *ngIf="genres.length > 0">
+      <button class="chip" [class.active]="!activeGenre" (click)="selectGenre(null)">Todos</button>
+      <button
+        *ngFor="let g of genres"
+        class="chip"
+        [class.active]="activeGenre === g"
+        (click)="selectGenre(g)">
+        {{ g }}
+      </button>
+    </div>
+
     <app-scroll-reveal-section>
       <div class="browse-grid">
-        <app-movie-card *ngFor="let film of films" [film]="film"></app-movie-card>
+        <app-movie-card *ngFor="let film of filteredFilms" [film]="film"></app-movie-card>
+      </div>
+      <div class="browse-empty" *ngIf="filteredFilms.length === 0">
+        Nenhum filme encontrado para este filtro.
       </div>
     </app-scroll-reveal-section>
   </div>

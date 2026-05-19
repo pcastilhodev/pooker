@@ -1,0 +1,24 @@
+<section class="watch-wrap">
+  <header class="watch-head">
+    <div>
+      <h1>Watchlist</h1>
+      <p>Filmes que você quer assistir depois — em ordem de quando salvou.</p>
+    </div>
+    <button *ngIf="rows.length > 0" class="btn-clear" (click)="clearAll()">Limpar tudo</button>
+  </header>
+
+  <div class="watch-state" *ngIf="loading">Carregando…</div>
+
+  <div class="watch-empty" *ngIf="!loading && rows.length === 0">
+    <h2>Nenhum filme na watchlist</h2>
+    <p>Toque no ícone <span class="kb">+</span> de qualquer filme para salvar aqui.</p>
+    <button class="btn-primary" (click)="goExplore()">Explorar filmes</button>
+  </div>
+
+  <div class="watch-grid" *ngIf="!loading && rows.length > 0">
+    <div class="watch-cell" *ngFor="let row of rows; trackBy: trackById">
+      <app-movie-card [film]="row.film"></app-movie-card>
+      <div class="watch-meta">Adicionado há {{ daysAgo(row.addedAt) }}</div>
+    </div>
+  </div>
+</section>

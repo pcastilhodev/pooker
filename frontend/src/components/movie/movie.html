@@ -44,9 +44,46 @@
           <div class="vbar"></div>
           <span class="film-chip">{{ film.classificacao_indicativa }}</span>
         </div>
-        <button class="btn-rent" (click)="rentMovie()" [disabled]="rentLoading">
-          {{ rentLoading ? 'Processando…' : 'Alugar — R$ ' + film.preco_aluguel.toFixed(2) }}
-        </button>
+        <div class="film-rating-row">
+          <div class="film-rating-summary">
+            <app-star-rating [value]="ratingStats.average" [readonly]="true" [size]="18"></app-star-rating>
+            <span class="film-rating-meta">
+              {{ ratingStats.count > 0
+                  ? ratingStats.average.toFixed(1) + ' · ' + ratingStats.count + ' avaliações'
+                  : 'Sem avaliações' }}
+            </span>
+          </div>
+          <div class="film-rating-action">
+            <span class="film-rating-label">{{ ratingStats.userStars > 0 ? 'Sua nota' : 'Avaliar' }}</span>
+            <app-star-rating
+              [value]="ratingStats.userStars"
+              [size]="22"
+              (rated)="rate($event)"></app-star-rating>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn-rent" (click)="rentMovie()" [disabled]="rentLoading">
+            {{ rentLoading ? 'Processando…' : 'Alugar — R$ ' + film.preco_aluguel.toFixed(2) }}
+          </button>
+          <button class="btn-share" (click)="shareMovie()" aria-label="Compartilhar filme">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"
+                    fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Compartilhar</span>
+          </button>
+          <button class="btn-fav-large" [class.active]="isFavorite" (click)="toggleFavorite()"
+                  [attr.aria-label]="isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M12 21s-7.5-4.6-9.3-9.6C1.4 7.5 4 4 7.5 4c2 0 3.5 1.1 4.5 2.7C13 5.1 14.5 4 16.5 4 20 4 22.6 7.5 21.3 11.4 19.5 16.4 12 21 12 21z"
+                    [attr.fill]="isFavorite ? '#e11d48' : 'none'"
+                    [attr.stroke]="isFavorite ? '#e11d48' : 'rgba(255,255,255,0.85)'"
+                    stroke-width="1.6"/>
+            </svg>
+            <span>{{ isFavorite ? 'Favoritado' : 'Favoritar' }}</span>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -123,6 +160,48 @@
           <div class="review-score">{{ r.score }}</div>
           <p class="review-text">{{ r.text }}</p>
         </div>
+      </div>
+    </section>
+
+    <!-- ── SEC 6.5: COMENTÁRIOS ── -->
+    <section class="comments-panel" data-section="comments">
+      <app-scroll-reveal-section>
+        <div class="comments-header">
+          <div class="sec-sub">Comunidade</div>
+          <div class="sec-title">Comentários</div>
+        </div>
+      </app-scroll-reveal-section>
+
+      <div class="comments-inner">
+        <form class="comment-form" (submit)="$event.preventDefault(); addComment()">
+          <textarea
+            class="comment-input"
+            placeholder="O que você achou do filme?"
+            rows="3"
+            maxlength="800"
+            [(ngModel)]="newComment"
+            [ngModelOptions]="{standalone: true}"></textarea>
+          <button class="btn-publish" type="submit">Publicar</button>
+        </form>
+
+        <div class="comments-empty" *ngIf="comments.length === 0">
+          Ainda sem comentários. Seja o primeiro a deixar sua opinião.
+        </div>
+
+        <ul class="comments-list" *ngIf="comments.length > 0">
+          <li class="comment" *ngFor="let c of comments">
+            <div class="comment-head">
+              <div class="comment-author">{{ c.author }}</div>
+              <div class="comment-date">{{ c.ts | date:'dd/MM/yyyy HH:mm' }}</div>
+              <button
+                *ngIf="c.email === currentUserEmail"
+                class="comment-delete"
+                (click)="removeComment(c.id)"
+                aria-label="Excluir comentário">&#x2715;</button>
+            </div>
+            <p class="comment-text">{{ c.text }}</p>
+          </li>
+        </ul>
       </div>
     </section>
 

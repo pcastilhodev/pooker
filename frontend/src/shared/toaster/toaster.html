@@ -1,0 +1,13 @@
+<div class="toaster" aria-live="polite" aria-atomic="true">
+  <div
+    *ngFor="let t of toasts; trackBy: trackById"
+    class="toast"
+    [attr.data-kind]="t.kind">
+    <span class="toast-icon">{{ iconFor(t.kind) }}</span>
+    <div class="toast-body">
+      <strong *ngIf="t.title" class="toast-title">{{ t.title }}</strong>
+      <span class="toast-msg">{{ t.message }}</span>
+    </div>
+    <button class="toast-close" (click)="dismiss(t.id)" aria-label="Fechar">&#x2715;</button>
+  </div>
+</div>

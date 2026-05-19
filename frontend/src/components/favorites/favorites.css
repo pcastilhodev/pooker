@@ -1,0 +1,65 @@
+.favs-wrap {
+  min-height: 100vh;
+  padding: 140px 32px 80px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.favs-head h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+}
+
+.favs-head p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 40px;
+}
+
+.favs-state {
+  padding: 48px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px dashed var(--border);
+}
+
+.favs-empty {
+  text-align: center;
+  padding: 80px 24px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.favs-empty h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+}
+
+.favs-empty p {
+  color: var(--muted);
+  margin: 10px 0 24px;
+}
+
+.btn-primary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  background: var(--gradient);
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+}
+
+.favs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 28px 22px;
+}

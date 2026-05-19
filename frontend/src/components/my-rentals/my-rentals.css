@@ -1,0 +1,191 @@
+.rentals-wrap {
+  min-height: 100vh;
+  padding: 140px 32px 80px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.rentals-head h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+}
+
+.rentals-head p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+  margin-bottom: 48px;
+}
+
+.rentals-state {
+  padding: 48px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px dashed var(--border);
+}
+
+.rentals-state--error { color: #f87a8e; border-color: rgba(225,29,72,0.35); }
+
+.rentals-empty {
+  text-align: center;
+  padding: 80px 24px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.rentals-empty h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  color: var(--fg);
+}
+
+.rentals-empty p {
+  color: var(--muted);
+  margin: 10px 0 24px;
+}
+
+.btn-primary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  cursor: pointer;
+  background: var(--gradient);
+  border: 0;
+  color: #fff;
+  transition: filter 0.2s;
+}
+
+.btn-primary:hover { filter: brightness(1.1); }
+
+.rentals-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rentals-item {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 28px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 18px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.rentals-item:hover {
+  border-color: rgba(240,238,232,0.2);
+  transform: translateY(-2px);
+}
+
+.rentals-poster {
+  width: 120px;
+  height: 160px;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(255,255,255,0.04);
+}
+
+.rentals-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.rentals-poster:hover img { transform: scale(1.05); }
+
+.rentals-poster-fallback {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  opacity: 0.4;
+}
+
+.rentals-body { min-width: 0; }
+
+.rentals-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.rentals-id {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rentals-status {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  color: rgba(240,238,232,0.7);
+}
+
+.rentals-status[data-status="ativo"]     { color: #93c5fd; border-color: rgba(59,130,246,0.4); }
+.rentals-status[data-status="devolvido"] { color: #6ee7b7; border-color: rgba(16,185,129,0.4); }
+.rentals-status[data-status="atrasado"]  { color: #fda4af; border-color: rgba(225,29,72,0.4); }
+
+.rentals-body h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  margin: 0 0 14px;
+  cursor: pointer;
+}
+
+.rentals-body h3:hover { color: #c4b5fd; }
+
+.rentals-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 36px;
+}
+
+.rentals-dates dt {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rentals-dates dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fg);
+}
+
+.rentals-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  align-self: flex-start;
+}
+
+@media (max-width: 720px) {
+  .rentals-item {
+    grid-template-columns: 90px 1fr;
+    gap: 18px;
+  }
+  .rentals-poster { width: 90px; height: 120px; }
+  .rentals-price { grid-column: 1 / -1; text-align: right; }
+}

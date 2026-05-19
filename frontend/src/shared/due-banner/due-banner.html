@@ -1,0 +1,22 @@
+<div class="due-banner" *ngIf="visible">
+  <div class="due-banner-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="18" height="18">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M12 7v6l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="due-banner-body">
+    <strong>Devolução próxima</strong>
+    <span *ngIf="dueSoon.length === 1">
+      "{{ dueSoon[0].filme_titulo || 'Filme #' + dueSoon[0].filme_id }}" vence em
+      <b>{{ daysUntil(dueSoon[0].data_prevista_devolucao) }}</b> dia(s).
+    </span>
+    <span *ngIf="dueSoon.length > 1">
+      Você tem <b>{{ dueSoon.length }}</b> aluguéis vencendo em até 3 dias.
+    </span>
+  </div>
+  <div class="due-banner-actions">
+    <button class="due-action" (click)="goToRentals()">Ver aluguéis</button>
+    <button class="due-close" (click)="dismiss()" aria-label="Fechar">&#x2715;</button>
+  </div>
+</div>

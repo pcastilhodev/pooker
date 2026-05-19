@@ -1,0 +1,20 @@
+.stars {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.star {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(255,255,255,0.18);
+  transition: color 0.15s, transform 0.12s;
+  line-height: 0;
+}
+
+.stars.readonly .star { cursor: default; }
+
+.star.filled { color: #fbbf24; }
+
+.star:not(:disabled):hover { transform: scale(1.12); }

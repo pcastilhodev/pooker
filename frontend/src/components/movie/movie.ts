@@ -2,12 +2,21 @@ import {
   Component, OnInit, OnDestroy, NgZone, ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FilmeModel, CastMember } from '../../models/filme-model';
 import { MovieService } from '../../services/movie-service';
 import { Rent } from '../../services/rent';
+import { ToastService } from '../../services/toast-service';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
 import { MovieCard } from '../../shared/movie-card/movie-card';
+import { StarRating } from '../../shared/star-rating/star-rating';
+import { FavoritesService } from '../../services/favorites-service';
+import { RatingsService, RatingStats } from '../../services/ratings-service';
+import { AuthService } from '../../services/auth-service';
+import { RecentService } from '../../services/recent-service';
+import { CommentsService, MovieComment } from '../../services/comments-service';
+import { Subscription } from 'rxjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -38,7 +47,7 @@ const REVIEWS_MOCK = [
 @Component({
   selector: 'app-movie',
   standalone: true,
-  imports: [CommonModule, RouterModule, ScrollRevealSection, MovieCard],
+  imports: [CommonModule, FormsModule, RouterModule, ScrollRevealSection, MovieCard, StarRating],
   templateUrl: './movie.html',
   styleUrl: './movie.css'
 })
@@ -46,11 +55,14 @@ export class Movie implements OnInit, OnDestroy {
   film:         FilmeModel | undefined;
   similarFilms: FilmeModel[] = [];
   rentLoading   = false;
+  isFavorite    = false;
+  ratingStats:  RatingStats = { count: 0, average: 0, userStars: 0 };
 
   readonly castMock    = CAST_MOCK;
   readonly reviewsMock = REVIEWS_MOCK;
 
   private ctx: gsap.Context | undefined;
+  private favSub?: Subscription;
 
   constructor(
     private route:        ActivatedRoute,
@@ -58,8 +70,58 @@ export class Movie implements OnInit, OnDestroy {
     private movieService: MovieService,
     private rentService:  Rent,
     private zone:         NgZone,
-    private el:           ElementRef
+    private el:           ElementRef,
+    private toast:        ToastService,
+    private favorites:    FavoritesService,
+    private ratings:      RatingsService,
+    private auth:         AuthService,
+    private recent:       RecentService,
+    private commentsSvc:  CommentsService
   ) {}
+
+  comments: MovieComment[] = [];
+  newComment = '';
+
+  get currentUserEmail(): string | undefined { return this.auth.user?.email; }
+
+  refreshComments() {
+    if (!this.film) return;
+    this.comments = this.commentsSvc.for(this.film.id);
+  }
+
+  addComment() {
+    if (!this.film) return;
+    if (!this.auth.isLoggedIn) {
+      this.toast.warn('Faça login para comentar.', 'Acesso necessário');
+      return;
+    }
+    const created = this.commentsSvc.add(this.film.id, this.newComment);
+    if (!created) {
+      this.toast.warn('Escreva algo antes de publicar.');
+      return;
+    }
+    this.newComment = '';
+    this.refreshComments();
+    this.toast.success('Comentário publicado.');
+  }
+
+  removeComment(id: number) {
+    this.commentsSvc.remove(id);
+    this.refreshComments();
+  }
+
+  shareMovie() {
+    if (!this.film) return;
+    const url = window.location.href;
+    const data = { title: this.film.titulo, text: `Veja "${this.film.titulo}" no Looker`, url };
+    if (navigator.share) {
+      navigator.share(data).catch(() => { /* user cancelled */ });
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => this.toast.success('Link copiado!'));
+    } else {
+      this.toast.info(url);
+    }
+  }
 
   ngOnInit() {
     document.documentElement.style.overflow = 'auto';
@@ -69,10 +131,42 @@ export class Movie implements OnInit, OnDestroy {
       const id = +params['id'];
       this.movieService.getMovie(id).subscribe((data: any) => {
         this.film = data as FilmeModel;
+        this.recent.track(id);
         this.loadSimilar();
+        this.refreshRating();
+        this.refreshComments();
+        this.favSub?.unsubscribe();
+        this.favSub = this.favorites.favorites$.subscribe(set => {
+          this.isFavorite = !!this.film && set.has(this.film.id);
+        });
         setTimeout(() => this.runAnimations(), 0);
       });
     });
+  }
+
+  toggleFavorite() {
+    if (!this.film) return;
+    if (!this.auth.isLoggedIn) {
+      this.toast.warn('Faça login para salvar nos favoritos.', 'Acesso necessário');
+      return;
+    }
+    const now = this.favorites.toggle(this.film.id);
+    this.toast.info(now ? 'Adicionado aos favoritos' : 'Removido dos favoritos');
+  }
+
+  rate(stars: number) {
+    if (!this.film) return;
+    if (!this.auth.isLoggedIn) {
+      this.toast.warn('Faça login para avaliar este filme.', 'Acesso necessário');
+      return;
+    }
+    this.ratingStats = this.ratings.rate(this.film.id, stars);
+    this.toast.success(`Você avaliou com ${stars} estrela${stars > 1 ? 's' : ''}.`, 'Avaliação registrada');
+  }
+
+  private refreshRating() {
+    if (!this.film) return;
+    this.ratingStats = this.ratings.statsFor(this.film.id);
   }
 
   private loadSimilar() {
@@ -113,13 +207,16 @@ export class Movie implements OnInit, OnDestroy {
     this.rentService.getRents(this.film.id).subscribe({
       next: (data: any) => {
         const iso = data.aluguel.data_prevista_devolucao.replace(/(\.\d{3})\d+/, '$1');
-        alert(`Aluguel realizado! Código: ${data.pagamento.aluguel_id} — R$ ${data.pagamento.amount}`);
-        alert(`Devolução prevista: ${new Date(iso).toLocaleDateString('pt-BR')}`);
+        const devolucao = new Date(iso).toLocaleDateString('pt-BR');
+        this.toast.success(
+          `Código ${data.pagamento.aluguel_id} — R$ ${data.pagamento.amount}. Devolução até ${devolucao}.`,
+          'Aluguel confirmado'
+        );
       },
       error: (err: any) => {
         this.rentLoading = false;
-        if (err.status === 401) { alert('Faça login para alugar.'); return; }
-        alert('Erro ao alugar. Tente novamente.');
+        if (err.status === 401) { this.toast.warn('Faça login para alugar este filme.', 'Acesso necessário'); return; }
+        this.toast.error('Não foi possível concluir o aluguel. Tente novamente.', 'Erro');
       },
       complete: () => { this.rentLoading = false; }
     });
@@ -179,6 +276,7 @@ export class Movie implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.ctx?.revert();
+    this.favSub?.unsubscribe();
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
   }

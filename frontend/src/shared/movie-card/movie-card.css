@@ -47,3 +47,54 @@
   margin-top: 3px;
   letter-spacing: 0.05em;
 }
+
+.poster-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.poster-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(9,8,16,0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(240,238,232,0.85);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s, background 0.2s, border-color 0.2s;
+  padding: 0;
+}
+
+.browse-card:hover .poster-btn,
+.poster-btn.active {
+  opacity: 1;
+}
+
+.poster-btn:hover { transform: scale(1.08); }
+
+.poster-btn--fav:hover,
+.poster-btn--fav.active {
+  background: rgba(225,29,72,0.18);
+  border-color: rgba(225,29,72,0.55);
+}
+
+.poster-btn--watch:hover {
+  background: rgba(124,58,237,0.2);
+  border-color: rgba(196,181,253,0.6);
+}
+
+.poster-btn--watch.active {
+  background: rgba(124,58,237,0.22);
+  border-color: rgba(196,181,253,0.7);
+  color: #c4b5fd;
+}

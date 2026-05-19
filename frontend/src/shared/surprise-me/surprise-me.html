@@ -1,0 +1,34 @@
+<div class="surprise-overlay" (click)="onBackdrop($event)">
+  <div class="surprise-modal">
+    <button class="surprise-close" (click)="close()" aria-label="Fechar">&#x2715;</button>
+
+    <div class="surprise-eyebrow">Looker · Surpreenda-me</div>
+    <h2 class="surprise-title">{{ spinning ? 'Buscando seu próximo filme…' : 'A sorte escolheu' }}</h2>
+
+    <div class="surprise-stage" *ngIf="displayed">
+      <div class="surprise-poster" [class.spinning]="spinning" [class.locked]="finished">
+        <img *ngIf="displayed.imagem_url" [src]="displayed.imagem_url" [alt]="displayed.titulo" />
+        <div *ngIf="!displayed.imagem_url" class="surprise-poster-fallback">🎬</div>
+        <div class="surprise-poster-glow"></div>
+        <div class="surprise-poster-light"></div>
+      </div>
+
+      <div class="surprise-meta">
+        <div class="surprise-genre">{{ displayed.genero }}</div>
+        <div class="surprise-name">{{ displayed.titulo }}</div>
+        <div class="surprise-row" *ngIf="finished">
+          <span>{{ displayed.duracao_minutos }} min</span>
+          <span class="dot">·</span>
+          <span>{{ displayed.diretor }}</span>
+          <span class="dot">·</span>
+          <span class="price">R$ {{ displayed.preco_aluguel.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="surprise-actions" *ngIf="finished">
+      <button class="btn-primary" (click)="watchNow()">Ver detalhes →</button>
+      <button class="btn-ghost" (click)="rerun()">Rodar de novo 🎲</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<div class="sc-backdrop" *ngIf="visible" (click)="close()">
+  <div class="sc-modal" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="sc-title">
+    <header class="sc-head">
+      <span class="sc-eyebrow">Atalhos</span>
+      <h2 id="sc-title">Teclado</h2>
+      <button class="sc-close" (click)="close()" aria-label="Fechar">&#x2715;</button>
+    </header>
+
+    <div class="sc-groups">
+      <section class="sc-group" *ngFor="let g of groups">
+        <div class="sc-group-name">{{ g.name }}</div>
+        <ul class="sc-list">
+          <li *ngFor="let s of g.items">
+            <span class="sc-label">{{ s.label }}</span>
+            <span class="sc-combo">
+              <kbd *ngFor="let k of keys(s.combo)">{{ k }}</kbd>
+            </span>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <footer class="sc-foot">
+      <span>Pressione <kbd>?</kbd> a qualquer momento</span>
+    </footer>
+  </div>
+</div>

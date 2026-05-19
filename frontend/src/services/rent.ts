@@ -1,24 +1,33 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { HttpHeaders } from '@angular/common/http';
+
+export interface RentalItem {
+  id: string | number;
+  filme_id: number;
+  filme_titulo?: string;
+  filme_imagem_url?: string;
+  data_aluguel: string;
+  data_prevista_devolucao: string;
+  data_devolucao?: string | null;
+  status: 'ativo' | 'devolvido' | 'atrasado' | string;
+  preco: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class Rent {
-  http: HttpClient;
-  constructor(http: HttpClient) { 
-    this.http = http;
-  }
+  constructor(private http: HttpClient) {}
 
   getRents(filmeId: number): Observable<any> {
-      console.log('chegou')
-      // @ts-ignore
-      return this.http.post(
-        '/gateway/rent/v1/alugueis/',
-        { filme_id: filmeId }  
-      );
-    }
+    return this.http.post(
+      '/gateway/rent/v1/alugueis/',
+      { filme_id: filmeId }
+    );
+  }
+
+  listMyRents(): Observable<RentalItem[]> {
+    return this.http.get<RentalItem[]>('/gateway/rent/v1/alugueis/me');
+  }
 }
-  

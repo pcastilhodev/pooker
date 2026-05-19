@@ -1,0 +1,18 @@
+<section class="favs-wrap">
+  <header class="favs-head">
+    <h1>Meus favoritos</h1>
+    <p>Filmes que você marcou para assistir depois.</p>
+  </header>
+
+  <div class="favs-state" *ngIf="loading">Carregando…</div>
+
+  <div class="favs-empty" *ngIf="!loading && films.length === 0">
+    <h2>Sua lista está vazia</h2>
+    <p>Toque no coração de qualquer filme para salvar aqui.</p>
+    <button class="btn-primary" (click)="goExplore()">Explorar filmes</button>
+  </div>
+
+  <div class="favs-grid" *ngIf="!loading && films.length > 0">
+    <app-movie-card *ngFor="let f of films; trackBy: trackById" [film]="f"></app-movie-card>
+  </div>
+</section>

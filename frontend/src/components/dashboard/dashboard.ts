@@ -13,6 +13,10 @@ import { FilmSnapSection } from '../../shared/film-snap-section/film-snap-sectio
 import { FilmIntro } from '../../shared/film-intro/film-intro';
 import { MovieCard } from '../../shared/movie-card/movie-card';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
+import { FavoritesService } from '../../services/favorites-service';
+import { Rent, RentalItem } from '../../services/rent';
+import { AuthService } from '../../services/auth-service';
+import { RecentService } from '../../services/recent-service';
 
 const MAX_SNAP = 6;
 
@@ -24,11 +28,16 @@ const MAX_SNAP = 6;
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
-  films: FilmeModel[]       = [];
-  snapFilms: FilmeModel[]   = [];
-  currentIndex              = 0;
-  showIntro                 = true;
-  navVisible                = false;
+  films: FilmeModel[]        = [];
+  filteredFilms: FilmeModel[] = [];
+  snapFilms: FilmeModel[]    = [];
+  recommended: FilmeModel[]  = [];
+  recentFilms: FilmeModel[]  = [];
+  genres: string[]           = [];
+  activeGenre: string | null = null;
+  currentIndex               = 0;
+  showIntro                  = true;
+  navVisible                 = false;
 
   @ViewChild('scrollContainer') scrollContainerRef!: ElementRef<HTMLElement>;
   @ViewChildren(FilmSnapSection) snapSections!: QueryList<FilmSnapSection>;
@@ -41,7 +50,11 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     private movieService: MovieService,
     private router:       Router,
     private route:        ActivatedRoute,
-    private zone:         NgZone
+    private zone:         NgZone,
+    private favorites:    FavoritesService,
+    private rentService:  Rent,
+    private auth:         AuthService,
+    private recentService: RecentService
   ) {}
 
   ngOnInit() {
@@ -69,8 +82,65 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
       this.films = q
         ? data.filter(m => m.titulo.toLowerCase().includes(q.toLowerCase()))
         : data;
+      this.genres = Array.from(new Set(this.films.map(f => f.genero).filter(Boolean))).sort();
+      this.applyGenre();
       this.snapFilms = this.films.slice(0, MAX_SNAP);
+      this.computeRecommendations(data);
+      this.computeRecent(data);
     });
+  }
+
+  private computeRecent(all: FilmeModel[]) {
+    const ids = this.recentService.list;
+    const byId = new Map(all.map(f => [f.id, f] as const));
+    this.recentFilms = ids.map(id => byId.get(id)).filter((f): f is FilmeModel => !!f);
+  }
+
+  selectGenre(genre: string | null) {
+    this.activeGenre = this.activeGenre === genre ? null : genre;
+    this.applyGenre();
+  }
+
+  private applyGenre() {
+    this.filteredFilms = this.activeGenre
+      ? this.films.filter(f => f.genero === this.activeGenre)
+      : this.films;
+  }
+
+  private computeRecommendations(all: FilmeModel[]) {
+    if (!this.auth.isLoggedIn) { this.recommended = []; return; }
+
+    const favIds = new Set(this.favorites.list);
+    const genreScore = new Map<string, number>();
+    const seenIds   = new Set<number>(favIds);
+
+    all.filter(f => favIds.has(f.id)).forEach(f => {
+      if (f.genero) genreScore.set(f.genero, (genreScore.get(f.genero) ?? 0) + 2);
+    });
+
+    this.rentService.listMyRents().subscribe({
+      next: (rentals: RentalItem[]) => {
+        rentals.forEach(r => {
+          seenIds.add(r.filme_id);
+          const film = all.find(f => f.id === r.filme_id);
+          if (film?.genero) genreScore.set(film.genero, (genreScore.get(film.genero) ?? 0) + 3);
+        });
+        this.applyRecommendations(all, genreScore, seenIds);
+      },
+      error: () => this.applyRecommendations(all, genreScore, seenIds)
+    });
+  }
+
+  private applyRecommendations(
+    all: FilmeModel[],
+    scores: Map<string, number>,
+    seen: Set<number>
+  ) {
+    if (scores.size === 0) { this.recommended = []; return; }
+    this.recommended = all
+      .filter(f => !seen.has(f.id) && f.genero && scores.has(f.genero))
+      .sort((a, b) => (scores.get(b.genero!) ?? 0) - (scores.get(a.genero!) ?? 0))
+      .slice(0, 8);
   }
 
   onIntroDismissed() {

@@ -1,3 +1,7 @@
 <canvas id="grain"></canvas>
 <app-header></app-header>
+<app-toaster></app-toaster>
+<app-shortcuts-help></app-shortcuts-help>
+<app-due-banner></app-due-banner>
+<app-surprise-me *ngIf="surpriseOpen" (closed)="closeSurprise()"></app-surprise-me>
 <router-outlet></router-outlet>

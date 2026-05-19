@@ -1,0 +1,16 @@
+<div class="stars" (mouseleave)="onLeave()" [class.readonly]="readonly">
+  <button
+    *ngFor="let n of stars"
+    type="button"
+    class="star"
+    [class.filled]="isFilled(n)"
+    [disabled]="readonly"
+    (mouseenter)="onHover(n)"
+    (click)="select(n)"
+    [attr.aria-label]="n + ' estrela' + (n > 1 ? 's' : '')">
+    <svg [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2.5l2.9 6.4 6.6.6-5 4.7 1.4 6.7L12 17.3l-5.9 3.6 1.4-6.7-5-4.7 6.6-.6z"
+            fill="currentColor"/>
+    </svg>
+  </button>
+</div>

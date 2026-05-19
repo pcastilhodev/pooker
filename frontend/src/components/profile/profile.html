@@ -1,0 +1,96 @@
+<section class="profile-wrap" *ngIf="user as u">
+  <div class="profile-card">
+    <header class="profile-head">
+      <div class="profile-avatar">{{ initials }}</div>
+      <div class="profile-id">
+        <h1>{{ u.nome }}</h1>
+        <p>{{ u.email }}</p>
+        <span class="profile-role" *ngIf="u.role">{{ u.role }}</span>
+      </div>
+    </header>
+
+    <section class="stats-block" aria-label="Suas estatísticas no Looker">
+      <div class="stats-eyebrow">Sua jornada no Looker</div>
+      <div class="stats-grid" [class.loading]="statsLoading">
+        <button class="stat-tile" type="button" (click)="goToRentals()">
+          <div class="stat-num">{{ stats.rentalsTotal }}</div>
+          <div class="stat-lbl">Aluguéis totais</div>
+          <div class="stat-sub" *ngIf="stats.rentalsActive > 0">{{ stats.rentalsActive }} ativos</div>
+        </button>
+
+        <div class="stat-tile">
+          <div class="stat-num">{{ totalSpentFormatted }}</div>
+          <div class="stat-lbl">Total investido</div>
+        </div>
+
+        <button class="stat-tile" type="button" (click)="goToFavorites()">
+          <div class="stat-num">{{ stats.favoritesCount }}</div>
+          <div class="stat-lbl">Favoritos</div>
+        </button>
+
+        <button class="stat-tile" type="button" (click)="goToWatchlist()">
+          <div class="stat-num">{{ stats.watchlistCount }}</div>
+          <div class="stat-lbl">Na watchlist</div>
+        </button>
+
+        <div class="stat-tile">
+          <div class="stat-num">
+            {{ stats.ratingsCount }}
+            <span class="stat-num-suffix" *ngIf="stats.ratingsAverage > 0">· ★ {{ stats.ratingsAverage.toFixed(1) }}</span>
+          </div>
+          <div class="stat-lbl">Avaliações</div>
+        </div>
+
+        <div class="stat-tile stat-tile--accent">
+          <div class="stat-num stat-num-text">{{ stats.topGenre || '—' }}</div>
+          <div class="stat-lbl">Gênero favorito</div>
+        </div>
+      </div>
+    </section>
+
+    <dl class="profile-grid">
+      <div class="profile-row">
+        <dt>Nome</dt>
+        <dd>{{ u.nome }}</dd>
+      </div>
+      <div class="profile-row">
+        <dt>E-mail</dt>
+        <dd>{{ u.email }}</dd>
+      </div>
+      <div class="profile-row">
+        <dt>CPF</dt>
+        <dd>{{ maskedCpf }}</dd>
+      </div>
+      <div class="profile-row">
+        <dt>Telefone</dt>
+        <dd>{{ u.telefone || '—' }}</dd>
+      </div>
+      <div class="profile-row">
+        <dt>Data de nascimento</dt>
+        <dd>{{ birthDateFormatted }}</dd>
+      </div>
+    </dl>
+
+    <section class="achievements-block">
+      <div class="stats-eyebrow">Conquistas</div>
+      <div class="achievements-grid">
+        <div
+          *ngFor="let a of allAchievements"
+          class="achievement"
+          [class.locked]="!hasAchievement(a.id)"
+          [title]="a.description">
+          <span class="achievement-icon">{{ a.icon }}</span>
+          <div class="achievement-meta">
+            <span class="achievement-title">{{ a.title }}</span>
+            <span class="achievement-desc">{{ a.description }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="profile-actions">
+      <button class="btn-primary" (click)="goToRentals()">Ver meus aluguéis</button>
+      <button class="btn-ghost" (click)="logout()">Sair</button>
+    </div>
+  </div>
+</section>
