@@ -1,0 +1,31 @@
+<div class="filter-bar">
+  <button class="filter-toggle" (click)="open = !open">
+    Filtros {{ activeCount > 0 ? '(' + activeCount + ')' : '' }}
+  </button>
+  <button *ngIf="activeCount > 0" class="filter-reset" (click)="reset()">Limpar</button>
+</div>
+
+<div class="filter-panel" *ngIf="open">
+  <div class="filter-group">
+    <div class="filter-label">Gênero</div>
+    <div class="genre-chips">
+      <button *ngFor="let g of genres"
+              class="chip"
+              [class.active]="filters.generos.includes(g)"
+              (click)="toggleGenre(g)">{{ g }}</button>
+    </div>
+  </div>
+
+  <div class="filter-group">
+    <div class="filter-label">Preço máximo — R$ {{ filters.maxPreco | number:'1.0-0' }}</div>
+    <input type="range" [min]="0" [max]="bounds.maxPreco" step="1"
+           [(ngModel)]="filters.maxPreco" (change)="emit()" />
+  </div>
+
+  <div class="filter-group">
+    <label class="filter-check">
+      <input type="checkbox" [(ngModel)]="filters.apenasDisponivel" (change)="emit()" />
+      Apenas disponíveis agora
+    </label>
+  </div>
+</div>

@@ -1,24 +1,32 @@
 <app-film-intro *ngIf="showIntro" (dismissed)="onIntroDismissed()"></app-film-intro>
 
-<div id="scroll-container" #scrollContainer
-     (wheel)="onWheel($event)">
+<div id="scroll-container" #scrollContainer (wheel)="onWheel($event)">
 
   <!-- SNAP SECTIONS -->
   <div id="films-container">
     <app-film-snap-section
       *ngFor="let film of snapFilms; let i = index"
-      [film]="film"
-      [index]="i"
-      scroller="#scroll-container">
+      [film]="film" [index]="i" scroller="#scroll-container">
     </app-film-snap-section>
   </div>
 
   <!-- BROWSE GRID -->
   <div class="browse-section" id="browseSection">
     <div class="browse-sub">Catálogo completo</div>
-    <div class="browse-title">TODOS OS FILMES</div>
+    <div class="browse-title-row">
+      <div class="browse-title">TODOS OS FILMES</div>
+      <div class="view-toggle">
+        <button [class.active]="viewMode.mode === 'grid'" (click)="viewMode.setMode('grid')" title="Grade">⊞</button>
+        <button [class.active]="viewMode.mode === 'list'" (click)="viewMode.setMode('list')" title="Lista">☰</button>
+      </div>
+    </div>
+
+    <app-filter-panel [films]="allFilms" (filtersChange)="onFiltersChange($event)"></app-filter-panel>
+
+    <div *ngIf="films.length === 0" class="browse-empty">Nenhum filme encontrado para esses filtros.</div>
+
     <app-scroll-reveal-section>
-      <div class="browse-grid">
+      <div [class.browse-grid]="viewMode.mode === 'grid'" [class.browse-list]="viewMode.mode === 'list'">
         <app-movie-card *ngFor="let film of films" [film]="film"></app-movie-card>
       </div>
     </app-scroll-reveal-section>
@@ -30,17 +38,12 @@
   <div class="counter-num">{{ counterLabel }}</div>
   <div class="counter-dots">
     <div *ngFor="let f of snapFilms; let i = index"
-         class="counter-dot"
-         [class.active]="i === currentIndex"
-         (click)="snapToSection(i)">
-    </div>
+         class="counter-dot" [class.active]="i === currentIndex"
+         (click)="snapToSection(i)"></div>
   </div>
 </div>
 
-<!-- SCROLL HINT -->
-<div id="scroll-hint"
-     [style.opacity]="navVisible ? '1' : '0'"
-     [class.hidden]="currentIndex > 1">
+<div id="scroll-hint" [style.opacity]="navVisible ? '1' : '0'" [class.hidden]="currentIndex > 1">
   <div class="scroll-line"></div>
   Rolar
 </div>
