@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, switchMap, map, catchError } from 'rxjs';
+import { Observable, of, switchMap, map, catchError, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 
 const BASE = 'https://api.themoviedb.org/3';
@@ -26,7 +26,7 @@ export class TmdbService {
             .pipe(map(v => v.results?.find((r: any) => r.type === 'Trailer' && r.site === 'YouTube')?.key ?? null));
         }),
         catchError(() => of(null)),
-        map(k => { this.cache.set(titulo, k); return k; })
+        tap(k => { if (k !== null) this.cache.set(titulo, k); })
       );
   }
 }
