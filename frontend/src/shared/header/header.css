@@ -63,3 +63,15 @@ nav.hidden { transform: translateY(-100%); }
   color: var(--fg);
   border-color: rgba(240,238,232,0.5);
 }
+
+.nav-theme {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--fg);
+  transition: border-color 0.2s;
+}
+.nav-theme:hover { border-color: var(--primary); }

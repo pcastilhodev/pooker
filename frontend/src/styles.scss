@@ -52,3 +52,13 @@ input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ====== Light theme overrides ====== */
+[data-theme="light"] {
+  --bg:          #f0eff5;
+  --bg-elev:     #e8e7f0;
+  --card:        #ffffff;
+  --border:      rgba(0, 0, 0, 0.08);
+  --fg:          #0d0c1a;
+  --muted:       #6a6880;
+}

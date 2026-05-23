@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Login } from '../../components/login/login';
 import { LoginService } from '../../services/login-service';
+import { ThemeService } from '../../services/theme-service';
 import { RegisterModel } from '../../models/register-model';
 
 @Component({
@@ -22,7 +23,11 @@ export class Header implements AfterViewInit, OnDestroy {
   private readonly HIDE_THRESHOLD   = 80;
   private scrollHandler!: () => void;
 
-  constructor(public router: Router, private loginService: LoginService) {}
+  constructor(
+    public router: Router,
+    private loginService: LoginService,
+    public themeService: ThemeService
+  ) {}
 
   ngAfterViewInit() {
     const sc = document.getElementById('scroll-container');
@@ -34,20 +39,14 @@ export class Header implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     const sc = document.getElementById('scroll-container');
-    if (sc && this.scrollHandler) {
-      sc.removeEventListener('scroll', this.scrollHandler);
-    }
+    if (sc && this.scrollHandler) sc.removeEventListener('scroll', this.scrollHandler);
   }
 
   onScroll(event: { scrollTop: number }) {
     const st = event.scrollTop;
     this.scrolled = st > this.SCROLL_THRESHOLD;
-
-    if (st > this.lastScrollTop && st > this.HIDE_THRESHOLD) {
-      this.hidden = true;
-    } else if (st < this.lastScrollTop) {
-      this.hidden = false;
-    }
+    if (st > this.lastScrollTop && st > this.HIDE_THRESHOLD) this.hidden = true;
+    else if (st < this.lastScrollTop) this.hidden = false;
     this.lastScrollTop = st;
   }
 
@@ -56,10 +55,7 @@ export class Header implements AfterViewInit, OnDestroy {
 
   handleLogin(event: { username: string; password: string; remember: boolean }) {
     this.loginService.authenticate(event.username, event.password).subscribe({
-      next: (res: any) => {
-        localStorage.setItem('jwt', String(res.token));
-        this.closeLogin();
-      },
+      next: (res: any) => { localStorage.setItem('jwt', String(res.token)); this.closeLogin(); },
       error: () => alert('Falha no login, tente novamente.')
     });
   }
