@@ -62,3 +62,7 @@ input:focus-visible {
   --fg:          #0d0c1a;
   --muted:       #6a6880;
 }
+
+[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}

@@ -25,4 +25,12 @@ describe('ThemeService', () => {
     service.toggle();
     expect(service.theme).toBe('dark');
   });
+
+  it('themeObs$ emits current and future values', () => {
+    const emitted: string[] = [];
+    service.themeObs$.subscribe(t => emitted.push(t));
+    service.toggle();
+    service.toggle();
+    expect(emitted).toEqual(['dark', 'light', 'dark']);
+  });
 });
