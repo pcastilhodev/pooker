@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Header } from '../shared/header/header';
+import { CompareBar } from '../shared/compare-bar/compare-bar';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -9,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Header],
+  imports: [RouterOutlet, Header, CompareBar],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

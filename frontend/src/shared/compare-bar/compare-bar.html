@@ -1,0 +1,7 @@
+<div class="compare-bar" *ngIf="compareService.ids.length > 0">
+  <span class="cbar-text">
+    {{ compareService.ids.length === 1 ? 'Selecione outro filme para comparar' : '2 filmes selecionados' }}
+  </span>
+  <button class="cbar-btn" (click)="go()" [disabled]="compareService.ids.length < 2">Comparar</button>
+  <button class="cbar-clear" (click)="clear()">×</button>
+</div>

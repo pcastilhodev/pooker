@@ -1,0 +1,56 @@
+<div class="cmp-page">
+  <div class="cmp-header">
+    <button class="back-btn" (click)="goBack()">← Voltar</button>
+    <h1>Comparação</h1>
+    <button class="cmp-clear" (click)="compareService.clear(); goBack()">Limpar</button>
+  </div>
+
+  <div class="cmp-grid" *ngIf="films.length === 2">
+    <div class="cmp-row cmp-posters">
+      <div class="cmp-cell cmp-label-cell"></div>
+      <div class="cmp-cell" *ngFor="let f of films">
+        <img *ngIf="f.imagem_url" [src]="f.imagem_url" [alt]="f.titulo" class="cmp-poster" />
+      </div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Título</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ f.titulo }}</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Gênero</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ f.genero }}</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Ano</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ filmYear(f) }}</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Duração</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ f.duracao_minutos }} min</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Classificação</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ f.classificacao_indicativa }}</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Diretor</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ f.diretor }}</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Preço</div>
+      <div class="cmp-cell" *ngFor="let f of films">R$ {{ f.preco_aluguel.toFixed(2) }}</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-cell cmp-label">Disponíveis</div>
+      <div class="cmp-cell" *ngFor="let f of films">{{ f.copias_disponiveis }} / {{ f.total_copias }}</div>
+    </div>
+    <div class="cmp-row cmp-rent-row">
+      <div class="cmp-cell cmp-label"></div>
+      <div class="cmp-cell" *ngFor="let f of films">
+        <button class="rent-btn" (click)="rent(f)" [disabled]="rentLoading[f.id] || f.copias_disponiveis === 0">
+          {{ f.copias_disponiveis === 0 ? 'Indisponível' : rentLoading[f.id] ? '…' : 'Alugar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

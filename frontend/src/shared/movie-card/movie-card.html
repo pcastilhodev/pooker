@@ -20,6 +20,9 @@
     <div class="poster-shine"></div>
     <div class="card-actions" *ngIf="showActions" (click)="$event.stopPropagation()">
       <button (click)="addToFirstCollection($event)" title="Adicionar à coleção">+</button>
+      <button (click)="toggleCompare($event)"
+              [class.active]="compareService.isSelected(film.id)"
+              title="Comparar">⚖</button>
     </div>
   </div>
   <div class="card-name">{{ film.titulo }}</div>

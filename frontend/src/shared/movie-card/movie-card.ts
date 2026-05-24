@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FilmeModel } from '../../models/filme-model';
 import { CollectionsService } from '../../services/collections-service';
+import { CompareService } from '../../services/compare-service';
 
 const PALETTES = [
   { c1: '#0e0818', c2: '#1a0e2e' },
@@ -24,7 +25,7 @@ export class MovieCard {
   @Input() film!: FilmeModel;
   showActions = false;
 
-  constructor(private router: Router, public collectionsService: CollectionsService) {}
+  constructor(private router: Router, public collectionsService: CollectionsService, public compareService: CompareService) {}
 
   get palette() { return PALETTES[this.film.id % 6]; }
   navigate() { this.router.navigate([`/movie/${this.film.id}`]); }
@@ -34,5 +35,14 @@ export class MovieCard {
     const cols = this.collectionsService.getAll();
     if (!cols.length) { this.router.navigate(['/colecoes']); return; }
     this.collectionsService.addFilm(cols[0].id, this.film.id);
+  }
+
+  toggleCompare(e: Event) {
+    e.stopPropagation();
+    if (this.compareService.isSelected(this.film.id)) {
+      this.compareService.remove(this.film.id);
+    } else {
+      this.compareService.add(this.film.id);
+    }
   }
 }

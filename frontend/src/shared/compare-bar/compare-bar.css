@@ -1,0 +1,12 @@
+.compare-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+  background: var(--card); border-top: 1px solid var(--border);
+  padding: 14px 52px; display: flex; align-items: center; gap: 16px;
+}
+.cbar-text { flex: 1; font-size: 14px; color: var(--fg); }
+.cbar-btn {
+  background: var(--primary); border: none; color: #fff;
+  padding: 9px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
+}
+.cbar-btn:disabled { opacity: 0.4; cursor: default; }
+.cbar-clear { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 18px; }
