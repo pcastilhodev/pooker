@@ -191,3 +191,16 @@
   0% { left: -100%; }
   100% { left: 100%; }
 }
+
+.browse-title-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
+
+.view-toggle { display: flex; gap: 4px; }
+.view-toggle button {
+  background: none; border: 1px solid var(--border); border-radius: 4px;
+  padding: 6px 10px; cursor: pointer; color: var(--muted); font-size: 16px; transition: all 0.15s;
+}
+.view-toggle button.active { border-color: var(--primary); color: var(--primary); }
+
+.browse-list { display: flex; flex-direction: column; gap: 8px; margin-top: 40px; }
+.browse-list app-movie-card { display: block; }
+.browse-empty { color: var(--muted); font-size: 14px; padding: 40px 0; }

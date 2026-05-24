@@ -84,3 +84,15 @@ html.cinema-classic #grain {
   opacity: 0.14 !important;
   mix-blend-mode: multiply !important;
 }
+
+/* ====== Light theme overrides ====== */
+[data-theme="light"] {
+  --bg:          #f0eff5;
+  --bg-elev:     #e8e7f0;
+  --card:        #ffffff;
+  --border:      rgba(0, 0, 0, 0.08);
+  --fg:          #0d0c1a;
+  --muted:       #6a6880;
+}
+
+[data-theme="light"] *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }

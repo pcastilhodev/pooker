@@ -1,0 +1,24 @@
+<div class="col-page">
+  <div class="col-header">
+    <button class="back-btn" (click)="goBack()">← Voltar</button>
+    <h1>Minhas Coleções</h1>
+  </div>
+
+  <div class="new-col">
+    <input class="col-input" [(ngModel)]="newName" placeholder="Nome da coleção" (keydown.enter)="create()" />
+    <button class="col-btn" (click)="create()">Criar</button>
+  </div>
+
+  <div *ngIf="collections.length === 0" class="col-empty">Nenhuma coleção ainda. Crie sua primeira!</div>
+
+  <div *ngFor="let col of collections" class="col-section">
+    <div class="col-name-row">
+      <div class="col-name">{{ col.name }} <span class="col-count">({{ col.filmIds.length }})</span></div>
+      <button class="col-delete" (click)="collectionsService.delete(col.id)">Excluir</button>
+    </div>
+    <div *ngIf="filmsFor(col).length === 0" class="col-hint">Adicione filmes usando o botão nas cards.</div>
+    <div class="col-grid">
+      <app-movie-card *ngFor="let film of filmsFor(col)" [film]="film"></app-movie-card>
+    </div>
+  </div>
+</div>

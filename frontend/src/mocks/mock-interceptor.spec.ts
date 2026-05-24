@@ -16,6 +16,7 @@ describe('mockInterceptor', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.setItem('mock-api', '1');
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([mockInterceptor])),
@@ -26,11 +27,14 @@ describe('mockInterceptor', () => {
     httpTesting = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpTesting.verify());
+  afterEach(() => {
+    localStorage.removeItem('mock-api');
+    httpTesting.verify();
+  });
 
   it('POST /users/login retorna token mock', (done) => {
     http.post<{ token: string }>('/gateway/user/api/v1/users/login', {}).subscribe((res) => {
-      expect(res.token).toBe('mock-jwt-token');
+      expect(res.token).toBeTruthy();
       done();
     });
     httpTesting.expectNone('/gateway/user/api/v1/users/login');

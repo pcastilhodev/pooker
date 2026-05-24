@@ -5,6 +5,8 @@ import { of } from 'rxjs';
 import { FilmeModel } from '../../models/filme-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 const makeFilm = (id: number): FilmeModel => ({
   id, titulo: `Filme ${id}`, genero: 'Drama', ano: new Date('2024-01-01'),
@@ -26,9 +28,11 @@ describe('Dashboard', () => {
       imports: [Dashboard],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: MovieService, useValue: movieSpy },
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
-        { provide: ActivatedRoute, useValue: { snapshot: { queryParams: {} } } }
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParams: {} }, queryParams: of({}) } }
       ]
     }).compileComponents();
 

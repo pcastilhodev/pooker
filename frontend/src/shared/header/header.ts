@@ -11,6 +11,7 @@ import { MovieService } from '../../services/movie-service';
 import { SearchHistoryService } from '../../services/search-history-service';
 import { ShortcutsService } from '../../services/shortcuts-service';
 import { SurpriseService } from '../../services/surprise-service';
+import { ThemeService } from '../../services/theme-service';
 import { FilmeModel } from '../../models/filme-model';
 import { RegisterModel } from '../../models/register-model';
 
@@ -56,6 +57,7 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
     private history: SearchHistoryService,
     private shortcuts: ShortcutsService,
     private surprise: SurpriseService,
+    public themeService: ThemeService,
   ) {}
 
   @HostListener('document:click', ['$event'])

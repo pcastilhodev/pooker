@@ -4,11 +4,13 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
+import { filter, Observable, Subscription } from 'rxjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FilmeModel } from '../../models/filme-model';
 import { MovieService } from '../../services/movie-service';
+import { ViewModeService, ViewMode } from '../../services/view-mode-service';
+import { FilterService, FilmFilters } from '../../services/filter-service';
 import { FilmSnapSection } from '../../shared/film-snap-section/film-snap-section';
 import { FilmIntro } from '../../shared/film-intro/film-intro';
 import { MovieCard } from '../../shared/movie-card/movie-card';
@@ -17,27 +19,36 @@ import { FavoritesService } from '../../services/favorites-service';
 import { Rent, RentalItem } from '../../services/rent';
 import { AuthService } from '../../services/auth-service';
 import { RecentService } from '../../services/recent-service';
+import { FilterPanel } from '../../shared/filter-panel/filter-panel';
+import { TrendingSection } from '../../shared/trending-section/trending-section';
+import { RecommendationsSection } from '../../shared/recommendations-section/recommendations-section';
+import { TrendingService } from '../../services/trending-service';
+import { RecommendationService } from '../../services/recommendation-service';
 
 const MAX_SNAP = 6;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FilmSnapSection, FilmIntro, MovieCard, ScrollRevealSection],
+  imports: [CommonModule, FilmSnapSection, FilmIntro, MovieCard, ScrollRevealSection, FilterPanel, TrendingSection, RecommendationsSection],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
-  films: FilmeModel[]        = [];
-  filteredFilms: FilmeModel[] = [];
-  snapFilms: FilmeModel[]    = [];
-  recommended: FilmeModel[]  = [];
-  recentFilms: FilmeModel[]  = [];
-  genres: string[]           = [];
-  activeGenre: string | null = null;
-  currentIndex               = 0;
-  showIntro                  = true;
-  navVisible                 = false;
+  allFilms: FilmeModel[]       = [];
+  films: FilmeModel[]          = [];
+  filteredFilms: FilmeModel[]  = [];
+  snapFilms: FilmeModel[]      = [];
+  recommended: FilmeModel[]    = [];
+  recommendations: FilmeModel[] = [];
+  recentFilms: FilmeModel[]    = [];
+  genres: string[]             = [];
+  activeGenre: string | null   = null;
+  currentIndex                 = 0;
+  showIntro                    = true;
+  navVisible                   = false;
+  activeFilters!: FilmFilters;
+  viewMode$!: Observable<ViewMode>;
 
   @ViewChild('scrollContainer') scrollContainerRef!: ElementRef<HTMLElement>;
   @ViewChildren(FilmSnapSection) snapSections!: QueryList<FilmSnapSection>;
@@ -47,15 +58,22 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   private wheelTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
-    private movieService: MovieService,
-    private router:       Router,
-    private route:        ActivatedRoute,
-    private zone:         NgZone,
-    private favorites:    FavoritesService,
-    private rentService:  Rent,
-    private auth:         AuthService,
-    private recentService: RecentService
-  ) {}
+    private movieService:          MovieService,
+    private router:                Router,
+    private route:                 ActivatedRoute,
+    private zone:                  NgZone,
+    private favorites:             FavoritesService,
+    private rentService:           Rent,
+    private auth:                  AuthService,
+    private recentService:         RecentService,
+    public  viewModeService:       ViewModeService,
+    private filterService:         FilterService,
+    private trendingService:       TrendingService,
+    private recommendationService: RecommendationService
+  ) {
+    this.activeFilters = this.filterService.empty();
+    this.viewMode$ = this.viewModeService.modeObs$;
+  }
 
   ngOnInit() {
     this.loadMovies();
@@ -70,24 +88,36 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.zone.runOutsideAngular(() => {
-      this.ctx = gsap.context(() => {
-        ScrollTrigger.refresh();
-      });
+      this.ctx = gsap.context(() => { ScrollTrigger.refresh(); });
     });
   }
 
   loadMovies() {
     this.movieService.getAllMovies().subscribe((data: FilmeModel[]) => {
       const q = this.route.snapshot.queryParams['q'];
-      this.films = q
+      this.allFilms = q
         ? data.filter(m => m.titulo.toLowerCase().includes(q.toLowerCase()))
         : data;
-      this.genres = Array.from(new Set(this.films.map(f => f.genero).filter(Boolean))).sort();
+      this.genres = Array.from(new Set(this.allFilms.map(f => f.genero).filter(Boolean))).sort();
+      this.applyFilters();
       this.applyGenre();
-      this.snapFilms = this.films.slice(0, MAX_SNAP);
+      this.snapFilms = this.allFilms.slice(0, MAX_SNAP);
       this.computeRecommendations(data);
       this.computeRecent(data);
+      const recentIds = this.recommendationService.recentIds();
+      const recentFilms = data.filter(m => recentIds.includes(m.id));
+      this.recommendations = this.recommendationService.recommend(data, recentFilms);
     });
+  }
+
+  onFiltersChange(f: FilmFilters) {
+    this.activeFilters = f;
+    this.applyFilters();
+  }
+
+  private applyFilters() {
+    this.films = this.filterService.apply(this.allFilms, this.activeFilters);
+    this.applyGenre();
   }
 
   private computeRecent(all: FilmeModel[]) {
@@ -146,10 +176,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   onIntroDismissed() {
     this.showIntro  = false;
     this.navVisible = true;
-    setTimeout(() => {
-      const sections = this.snapSections?.toArray();
-      if (sections?.[0]) sections[0].animate();
-    }, 50);
+    setTimeout(() => { this.snapSections?.toArray()?.[0]?.animate(); }, 50);
   }
 
   snapToSection(index: number) {
@@ -157,14 +184,11 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     if (index < 0) index = 0;
     if (index > max) index = max;
     if (index === this.currentIndex) return;
-
     const sections = this.snapSections?.toArray();
     sections?.[this.currentIndex]?.leave();
     this.currentIndex = index;
-
     const sc = this.scrollContainerRef?.nativeElement;
     if (sc) sc.scrollTo({ top: index * window.innerHeight, behavior: 'smooth' });
-
     setTimeout(() => sections?.[index]?.animate(), 300);
   }
 

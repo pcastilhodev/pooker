@@ -7,6 +7,7 @@ import { ShortcutsService } from '../services/shortcuts-service';
 import { DueBanner } from '../shared/due-banner/due-banner';
 import { SurpriseMe } from '../shared/surprise-me/surprise-me';
 import { SurpriseService } from '../services/surprise-service';
+import { CompareBar } from '../shared/compare-bar/compare-bar';
 import { ToastService } from '../services/toast-service';
 import { CommonModule } from '@angular/common';
 import { gsap } from 'gsap';
@@ -19,7 +20,7 @@ const G_LEADER_TIMEOUT = 1200;
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Header, Toaster, ShortcutsHelp, DueBanner, SurpriseMe],
+  imports: [CommonModule, RouterOutlet, Header, Toaster, ShortcutsHelp, DueBanner, SurpriseMe, CompareBar],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

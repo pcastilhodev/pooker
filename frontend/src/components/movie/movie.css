@@ -435,6 +435,17 @@
 
 .similar-track::-webkit-scrollbar { display: none; }
 
+/* ── Trailer ── */
+.trailer-panel { padding: 80px 52px; }
+.trailer-skeleton {
+  width: 100%; max-width: 800px; aspect-ratio: 16/9;
+  background: var(--card); border-radius: 8px;
+  animation: trailerPulse 1.5s ease-in-out infinite;
+}
+@keyframes trailerPulse { 0%, 100% { opacity: .4; } 50% { opacity: .9; } }
+.trailer-embed { width: 100%; max-width: 800px; }
+.trailer-embed iframe { width: 100%; aspect-ratio: 16/9; border-radius: 8px; border: none; }
+
 /* SHARED SECTION TITLES */
 .sec-sub {
   font-size: 10px; font-weight: 600; letter-spacing: 0.18em;

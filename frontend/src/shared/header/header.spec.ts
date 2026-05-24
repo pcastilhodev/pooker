@@ -3,6 +3,8 @@ import { Header } from './header';
 import { Router, provideRouter } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { LoginService } from '../../services/login-service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('Header', () => {
   let component: Header;
@@ -13,6 +15,8 @@ describe('Header', () => {
       imports: [Header],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([]),
         { provide: LoginService, useValue: jasmine.createSpyObj('LoginService', ['authenticate', 'register']) }
       ]

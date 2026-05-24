@@ -16,6 +16,9 @@ import { RatingsService, RatingStats } from '../../services/ratings-service';
 import { AuthService } from '../../services/auth-service';
 import { RecentService } from '../../services/recent-service';
 import { CommentsService, MovieComment } from '../../services/comments-service';
+import { RecommendationService } from '../../services/recommendation-service';
+import { TmdbService } from '../../services/tmdb-service';
+import { SafeUrlPipe } from '../../shared/safe-url.pipe';
 import { Subscription } from 'rxjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -47,7 +50,7 @@ const REVIEWS_MOCK = [
 @Component({
   selector: 'app-movie',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ScrollRevealSection, MovieCard, StarRating],
+  imports: [CommonModule, FormsModule, RouterModule, ScrollRevealSection, MovieCard, StarRating, SafeUrlPipe],
   templateUrl: './movie.html',
   styleUrl: './movie.css'
 })
@@ -57,6 +60,8 @@ export class Movie implements OnInit, OnDestroy {
   rentLoading   = false;
   isFavorite    = false;
   ratingStats:  RatingStats = { count: 0, average: 0, userStars: 0 };
+  trailerKey: string | null = null;
+  trailerLoading = false;
 
   readonly castMock    = CAST_MOCK;
   readonly reviewsMock = REVIEWS_MOCK;
@@ -65,18 +70,20 @@ export class Movie implements OnInit, OnDestroy {
   private favSub?: Subscription;
 
   constructor(
-    private route:        ActivatedRoute,
-    private router:       Router,
-    private movieService: MovieService,
-    private rentService:  Rent,
-    private zone:         NgZone,
-    private el:           ElementRef,
-    private toast:        ToastService,
-    private favorites:    FavoritesService,
-    private ratings:      RatingsService,
-    private auth:         AuthService,
-    private recent:       RecentService,
-    private commentsSvc:  CommentsService
+    private route:                 ActivatedRoute,
+    private router:                Router,
+    private movieService:          MovieService,
+    private rentService:           Rent,
+    private zone:                  NgZone,
+    private el:                    ElementRef,
+    private toast:                 ToastService,
+    private favorites:             FavoritesService,
+    private ratings:               RatingsService,
+    private auth:                  AuthService,
+    private recent:                RecentService,
+    private commentsSvc:           CommentsService,
+    private tmdbService:           TmdbService,
+    private recommendationService: RecommendationService
   ) {}
 
   comments: MovieComment[] = [];
@@ -129,6 +136,7 @@ export class Movie implements OnInit, OnDestroy {
 
     this.route.params.subscribe(params => {
       const id = +params['id'];
+      this.recommendationService.trackView(id);
       this.movieService.getMovie(id).subscribe((data: any) => {
         this.film = data as FilmeModel;
         this.recent.track(id);
@@ -140,6 +148,12 @@ export class Movie implements OnInit, OnDestroy {
           this.isFavorite = !!this.film && set.has(this.film.id);
         });
         setTimeout(() => this.runAnimations(), 0);
+        this.trailerKey = null;
+        this.trailerLoading = true;
+        this.tmdbService.getTrailerKey(this.film.titulo).subscribe(key => {
+          this.trailerKey = key;
+          this.trailerLoading = false;
+        });
       });
     });
   }

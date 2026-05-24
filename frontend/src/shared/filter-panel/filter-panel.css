@@ -1,0 +1,29 @@
+.filter-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+
+.filter-toggle {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  background: none; border: 1px solid var(--border); border-radius: 4px;
+  padding: 6px 14px; color: var(--fg); cursor: pointer; transition: border-color 0.2s;
+}
+.filter-toggle:hover { border-color: var(--primary); }
+
+.filter-reset { font-size: 11px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 4px 8px; }
+.filter-reset:hover { color: var(--primary); }
+
+.filter-panel {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px 24px; margin-bottom: 24px; display: flex; gap: 32px; flex-wrap: wrap;
+}
+.filter-group { display: flex; flex-direction: column; gap: 10px; }
+.filter-label { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+
+.genre-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 11px; padding: 4px 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: none; color: var(--fg); cursor: pointer; transition: all 0.15s;
+}
+.chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+input[type="range"] { width: 180px; accent-color: var(--primary); }
+
+.filter-check { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--fg); }

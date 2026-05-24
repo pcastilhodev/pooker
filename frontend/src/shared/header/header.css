@@ -420,3 +420,10 @@ nav.hidden { transform: translateY(-100%); }
 }
 
 .chip-x:hover { color: #ff6b85; }
+
+.nav-theme {
+  background: none; border: 1px solid rgba(255,255,255,0.12);
+  color: var(--fg); cursor: pointer; padding: 6px 10px;
+  font-size: 14px; border-radius: 6px; transition: border-color 0.2s;
+}
+.nav-theme:hover { border-color: rgba(255,255,255,0.3); }
