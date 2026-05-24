@@ -136,6 +136,10 @@ export class Movie implements OnInit, OnDestroy {
 
     this.route.params.subscribe(params => {
       const id = +params['id'];
+      this.ctx?.revert();
+      this.ctx = undefined;
+      ScrollTrigger.getAll().forEach(t => t.kill());
+      window.scrollTo(0, 0);
       this.recommendationService.trackView(id);
       this.movieService.getMovie(id).subscribe((data: any) => {
         this.film = data as FilmeModel;
@@ -147,7 +151,10 @@ export class Movie implements OnInit, OnDestroy {
         this.favSub = this.favorites.favorites$.subscribe(set => {
           this.isFavorite = !!this.film && set.has(this.film.id);
         });
-        setTimeout(() => this.runAnimations(), 0);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          requestAnimationFrame(() => this.runAnimations());
+        }, 0);
         this.trailerKey = null;
         this.trailerLoading = true;
         this.tmdbService.getTrailerKey(this.film.titulo).subscribe(key => {

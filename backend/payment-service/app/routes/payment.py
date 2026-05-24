@@ -30,7 +30,7 @@ def process_payment(
     }
 
     # Atualizar devolução do aluguel
-    aluguel_api_url = f"http://localhost:8002/v1/alugueis/{payment.aluguel_id}/devolucao"
+    aluguel_api_url = f"http://localhost:8001/v1/alugueis/{payment.aluguel_id}/devolucao"
 
     try:
         aluguel_response = requests.post(

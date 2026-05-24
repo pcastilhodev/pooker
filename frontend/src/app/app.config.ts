@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withRouterConfig } from '@angular/router';
+import { provideRouter, withRouterConfig, withInMemoryScrolling } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -13,12 +13,11 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(
         routes,
-        withRouterConfig(
-            {
-              onSameUrlNavigation: 'reload',
-              paramsInheritanceStrategy: 'always'
-            },
-        )
+        withRouterConfig({
+          onSameUrlNavigation: 'reload',
+          paramsInheritanceStrategy: 'always'
+        }),
+        withInMemoryScrolling({ scrollPositionRestoration: 'top' })
     ),
     provideHttpClient(withInterceptors([mockInterceptor, authInterceptor])),
   ],

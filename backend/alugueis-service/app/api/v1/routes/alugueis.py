@@ -20,7 +20,7 @@ def create_aluguel(
         db_aluguel = aluguel_service.create(
             db=db,
             aluguel=aluguel,
-            usuario_id=current_user.id
+            usuario_id=int(current_user.id)
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao criar aluguel: {e}")
@@ -30,7 +30,7 @@ def create_aluguel(
             "http://localhost:8005/api/v1/payment",
             json={
                 "aluguel_id": db_aluguel.id,
-                "user_id": current_user.id,
+                "user_id": int(current_user.id),
                 "amount": db_aluguel.valor_aluguel
             },
             headers={
@@ -61,8 +61,8 @@ def processar_devolucao(
         if db_aluguel is None:
             raise HTTPException(status_code=404, detail="Aluguel não encontrado.")
 
-        is_admin = current_user.role == "ADMIN"
-        is_owner = db_aluguel.usuario_id == current_user.id
+        is_admin = current_user.role in ("ADMIN", "admin")
+        is_owner = db_aluguel.usuario_id == int(current_user.id)
 
         if not is_admin and not is_owner:
             raise HTTPException(status_code=403, detail="Permissão negada.")
@@ -81,5 +81,4 @@ def processar_devolucao(
 
 @router.get("/", response_model=List[AluguelSchema])
 def get_alugueis_por_usuario(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    alugueis = aluguel_service.get_by_usuario(db=db, usuario_id=current_user.id)
-    return alugueis
+    return aluguel_service.get_by_usuario_enriched(db=db, usuario_id=int(current_user.id))

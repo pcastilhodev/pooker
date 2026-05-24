@@ -1,7 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Rent, RentalItem } from '../../services/rent';
+import { MovieService } from '../../services/movie-service';
+import { FilmeModel } from '../../models/filme-model';
 import { AuthService } from '../../services/auth-service';
 
 @Component({
@@ -18,6 +22,7 @@ export class MyRentals implements OnInit, OnDestroy {
 
   constructor(
     private rentService: Rent,
+    private movieService: MovieService,
     private auth: AuthService,
     private router: Router
   ) {}
@@ -32,9 +37,26 @@ export class MyRentals implements OnInit, OnDestroy {
     }
 
     this.rentService.listMyRents().subscribe({
-      next: data => {
-        this.rentals = Array.isArray(data) ? data : [];
-        this.loading = false;
+      next: rentals => {
+        if (rentals.length === 0) {
+          this.rentals = [];
+          this.loading = false;
+          return;
+        }
+        const filmRequests = rentals.map(r =>
+          this.movieService.getMovie(r.filme_id).pipe(catchError(() => of(null)))
+        );
+        forkJoin(filmRequests).subscribe(films => {
+          const filmMap = new Map<number, FilmeModel>(
+            (films.filter(f => f !== null) as FilmeModel[]).map(f => [f.id, f])
+          );
+          this.rentals = rentals.map(r => ({
+            ...r,
+            filme_titulo:     filmMap.get(r.filme_id)?.titulo     ?? null,
+            filme_imagem_url: filmMap.get(r.filme_id)?.imagem_url ?? null,
+          }));
+          this.loading = false;
+        });
       },
       error: () => {
         this.errorMsg = 'Não foi possível carregar seus aluguéis.';

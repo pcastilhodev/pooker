@@ -10,6 +10,24 @@ class AluguelService:
     def get_by_usuario(self, db: Session, usuario_id: int):
         return db.query(AluguelModel).filter(AluguelModel.usuario_id == usuario_id).all()
 
+    def get_by_usuario_enriched(self, db: Session, usuario_id: int):
+        alugueis = self.get_by_usuario(db, usuario_id)
+        return [
+            {
+                "id": a.id,
+                "filme_id": a.filme_id,
+                "usuario_id": a.usuario_id,
+                "data_aluguel": a.data_aluguel,
+                "data_prevista_devolucao": a.data_prevista_devolucao,
+                "data_devolucao": a.data_devolucao,
+                "valor_aluguel": a.valor_aluguel,
+                "status": a.status,
+                "filme_titulo": None,
+                "filme_imagem_url": None,
+            }
+            for a in alugueis
+        ]
+
     def get_by_id(self, db: Session, aluguel_id: int):
         return db.query(AluguelModel).filter(AluguelModel.id == aluguel_id).first()
 

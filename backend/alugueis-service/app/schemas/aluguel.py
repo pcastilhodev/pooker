@@ -14,6 +14,8 @@ class AluguelSchema(BaseModel):
     data_devolucao: datetime | None = None
     valor_aluguel: float
     status: AluguelStatus
+    filme_titulo: str | None = None
+    filme_imagem_url: str | None = None
 
     class Config:
         from_attributes = True

@@ -109,7 +109,7 @@ export class Profile implements OnInit, OnDestroy {
             ? Math.round((userRatings.reduce((acc, r) => acc + r.stars, 0) / ratingsCount) * 10) / 10
             : 0;
 
-          const totalSpent = rentals.reduce((acc, r) => acc + (Number(r.preco) || 0), 0);
+          const totalSpent = rentals.reduce((acc, r) => acc + (Number(r.valor_aluguel) || 0), 0);
           const rentalsActive = rentals.filter(r => r.status === 'ativo' || r.status === 'atrasado').length;
 
           const genreScore = new Map<string, number>();

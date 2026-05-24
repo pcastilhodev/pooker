@@ -69,29 +69,6 @@ Write-OK "auth-service    ->  http://localhost:8081"
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$gwDir'; .\gradlew.bat bootRun" -WindowStyle Minimized
 Write-OK "api-gateway     ->  http://localhost:8080"
 
-# -- 4. SEED ------------------------------------------------------------------
-Write-Step "4/5  Populando banco com dados de demo"
-Write-Warn "Aguardando servicos Python iniciarem (25s)..."
-Start-Sleep -Seconds 25
-
-# Detecta Python disponivel
-$pyCmd = $null
-foreach ($candidate in @("C:\actions-runner\_work\_tool\Python\3.11.9\x64\python.exe", "py", "python3", "C:\Python311\python.exe", "C:\Python3\python.exe")) {
-    try {
-        $ver = & $candidate --version 2>&1
-        if ($ver -match "Python") { $pyCmd = $candidate; break }
-    } catch {}
-}
-
-if (-not $pyCmd) {
-    Write-Host "  AVISO: Python nao encontrado. Rode manualmente depois:" -ForegroundColor Red
-    Write-Host "    python database\seed.py" -ForegroundColor Yellow
-} else {
-    Write-OK "Python encontrado: $pyCmd"
-    & $pyCmd -m pip install psycopg2-binary passlib bcrypt -q
-    & $pyCmd "$root\database\seed.py"
-}
-
 # -- 5. ANGULAR ---------------------------------------------------------------
 Write-Step "5/5  Frontend Angular"
 $frontDir = "$root\frontend"

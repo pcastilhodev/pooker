@@ -54,6 +54,9 @@ def seed():
     print("   maria@pooker.com  / user123")
 
     # ── FILMES ──────────────────────────────────────────────────────────────────
+    print("→ limpando filmes existentes...")
+    cur.execute("TRUNCATE TABLE filmes RESTART IDENTITY CASCADE")
+
     print("→ inserindo filmes...")
 
     filmes = [
@@ -169,7 +172,6 @@ def seed():
             (titulo, genero, ano, sinopse, imagem_url, duracao_minutos, elenco, diretor,
              classificacao_indicativa, data_lancamento, preco_aluguel, total_copias, copias_disponiveis)
         VALUES %s
-        ON CONFLICT DO NOTHING
     """, filmes)
 
     print(f"   {len(filmes)} filmes inseridos.")

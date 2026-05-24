@@ -11,7 +11,7 @@ export interface RentalItem {
   data_prevista_devolucao: string;
   data_devolucao?: string | null;
   status: 'ativo' | 'devolvido' | 'atrasado' | string;
-  preco: number;
+  valor_aluguel: number;
 }
 
 @Injectable({
@@ -28,6 +28,6 @@ export class Rent {
   }
 
   listMyRents(): Observable<RentalItem[]> {
-    return this.http.get<RentalItem[]>('/gateway/rent/v1/alugueis/me');
+    return this.http.get<RentalItem[]>('/gateway/rent/v1/alugueis/');
   }
 }
