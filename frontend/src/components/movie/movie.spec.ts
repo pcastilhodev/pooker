@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Movie } from './movie';
 import { MovieService } from '../../services/movie-service';
 import { Rent } from '../../services/rent';
+import { TmdbService } from '../../services/tmdb-service';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -20,13 +21,16 @@ describe('Movie', () => {
   let fixture: ComponentFixture<Movie>;
   let movieSpy: jasmine.SpyObj<MovieService>;
   let rentSpy:  jasmine.SpyObj<Rent>;
+  let tmdbSpy:  jasmine.SpyObj<TmdbService>;
 
   beforeEach(async () => {
     movieSpy = jasmine.createSpyObj('MovieService', ['getMovie', 'getAllMovies']);
     rentSpy  = jasmine.createSpyObj('Rent', ['getRents']);
+    tmdbSpy  = jasmine.createSpyObj('TmdbService', ['getTrailerKey']);
 
     movieSpy.getMovie.and.returnValue(of(makeFilm(1)));
     movieSpy.getAllMovies.and.returnValue(of([makeFilm(1), makeFilm(2), makeFilm(3, 'Comédia')]));
+    tmdbSpy.getTrailerKey.and.returnValue(of(null));
 
     await TestBed.configureTestingModule({
       imports: [Movie],
@@ -34,6 +38,7 @@ describe('Movie', () => {
       providers: [
         { provide: MovieService, useValue: movieSpy },
         { provide: Rent, useValue: rentSpy },
+        { provide: TmdbService, useValue: tmdbSpy },
         { provide: ActivatedRoute, useValue: { params: of({ id: '1' }) } }
       ]
     }).compileComponents();

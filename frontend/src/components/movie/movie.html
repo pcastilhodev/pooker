@@ -8,6 +8,7 @@
     <div class="prog-dot" title="Elenco"></div>
     <div class="prog-dot" title="Críticas"></div>
     <div class="prog-dot" title="Similares"></div>
+    <div class="prog-dot" title="Trailer"></div>
   </div>
 
   <div *ngIf="film">
@@ -58,6 +59,20 @@
           <p class="synopsis-text">{{ film.sinopse || 'Sinopse não disponível.' }}</p>
         </div>
       </app-scroll-reveal-section>
+    </section>
+
+    <!-- ── TRAILER ── -->
+    <section class="trailer-panel" data-section="trailer" *ngIf="trailerKey || trailerLoading">
+      <div class="panel-label">Trailer</div>
+      <div *ngIf="trailerLoading" class="trailer-skeleton"></div>
+      <div *ngIf="trailerKey && !trailerLoading" class="trailer-embed">
+        <iframe
+          [src]="'https://www.youtube.com/embed/' + trailerKey + '?rel=0' | safeUrl"
+          frameborder="0"
+          allowfullscreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+      </div>
     </section>
 
     <!-- ── SEC 3: STATS ── -->
