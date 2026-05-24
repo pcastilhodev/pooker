@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MovieCard } from './movie-card';
 import { FilmeModel } from '../../models/filme-model';
 import { Router } from '@angular/router';
+import { CollectionsService } from '../../services/collections-service';
+import { BehaviorSubject } from 'rxjs';
 
 const mockFilm: FilmeModel = {
   id: 1, titulo: 'The Brutalist', genero: 'Drama', ano: new Date('2024-01-01'),
@@ -14,12 +16,20 @@ describe('MovieCard', () => {
   let component: MovieCard;
   let fixture: ComponentFixture<MovieCard>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let collectionsSpy: jasmine.SpyObj<CollectionsService>;
 
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    collectionsSpy = jasmine.createSpyObj('CollectionsService', ['getAll', 'addFilm'], {
+      collections$: new BehaviorSubject([]).asObservable()
+    });
+    collectionsSpy.getAll.and.returnValue([]);
     await TestBed.configureTestingModule({
       imports: [MovieCard],
-      providers: [{ provide: Router, useValue: routerSpy }]
+      providers: [
+        { provide: Router, useValue: routerSpy },
+        { provide: CollectionsService, useValue: collectionsSpy }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MovieCard);

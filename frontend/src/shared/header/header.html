@@ -2,6 +2,7 @@
   <div class="nav-logo" (click)="router.navigate([''])">LOOKER</div>
   <div class="nav-right">
     <a routerLink="/" class="nav-link">Filmes</a>
+    <a routerLink="/colecoes" class="nav-link">Coleções</a>
     <button class="nav-theme" (click)="themeService.toggle()" [title]="themeService.theme === 'dark' ? 'Modo claro' : 'Modo escuro'">
       {{ themeService.theme === 'dark' ? '☀️' : '🌙' }}
     </button>

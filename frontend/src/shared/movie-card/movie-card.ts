@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FilmeModel } from '../../models/filme-model';
+import { CollectionsService } from '../../services/collections-service';
 
 const PALETTES = [
   { c1: '#0e0818', c2: '#1a0e2e' },
@@ -21,10 +22,17 @@ const PALETTES = [
 })
 export class MovieCard {
   @Input() film!: FilmeModel;
+  showActions = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, public collectionsService: CollectionsService) {}
 
   get palette() { return PALETTES[this.film.id % 6]; }
-
   navigate() { this.router.navigate([`/movie/${this.film.id}`]); }
+
+  addToFirstCollection(e: Event) {
+    e.stopPropagation();
+    const cols = this.collectionsService.getAll();
+    if (!cols.length) { this.router.navigate(['/colecoes']); return; }
+    this.collectionsService.addFilm(cols[0].id, this.film.id);
+  }
 }

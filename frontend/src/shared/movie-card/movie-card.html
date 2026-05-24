@@ -1,4 +1,4 @@
-<div class="browse-card" (click)="navigate()">
+<div class="browse-card" (mouseenter)="showActions=true" (mouseleave)="showActions=false" (click)="navigate()">
   <div class="browse-poster">
     <img *ngIf="film.imagem_url" [src]="film.imagem_url" [alt]="film.titulo" />
     <svg *ngIf="!film.imagem_url"
@@ -9,12 +9,8 @@
           <stop offset="0%" [attr.stop-color]="palette.c1"/>
           <stop offset="100%" [attr.stop-color]="palette.c2"/>
         </linearGradient>
-        <pattern [id]="'pat'+film.id" patternUnits="userSpaceOnUse" width="4" height="4">
-          <line x1="0" y1="4" x2="4" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-        </pattern>
       </defs>
       <rect width="160" height="240" [attr.fill]="'url(#bg'+film.id+')'"/>
-      <rect width="160" height="240" [attr.fill]="'url(#pat'+film.id+')'"/>
       <text x="80" y="120" text-anchor="middle" dominant-baseline="middle"
             font-family="Georgia" font-style="italic" font-size="9"
             fill="rgba(255,255,255,0.15)" letter-spacing="1">
@@ -22,6 +18,9 @@
       </text>
     </svg>
     <div class="poster-shine"></div>
+    <div class="card-actions" *ngIf="showActions" (click)="$event.stopPropagation()">
+      <button (click)="addToFirstCollection($event)" title="Adicionar à coleção">+</button>
+    </div>
   </div>
   <div class="card-name">{{ film.titulo }}</div>
   <div class="card-genre">{{ film.genero }}</div>
