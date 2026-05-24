@@ -19,6 +19,7 @@ export class FilterPanel implements OnChanges {
   filters!: FilmFilters;
   bounds = { minAno: 2000, maxAno: 2025, maxPreco: 50, maxDuracao: 240 };
   open = false;
+  private initialized = false;
 
   constructor(private filterService: FilterService) {
     this.filters = this.filterService.empty();
@@ -28,7 +29,8 @@ export class FilterPanel implements OnChanges {
     if (!this.films.length) return;
     this.genres = this.filterService.extractGenres(this.films);
     this.bounds = this.filterService.bounds(this.films);
-    if (!this.filters.maxAno || this.filters.maxAno === 9999) {
+    if (!this.initialized) {
+      this.initialized = true;
       this.filters = {
         ...this.filterService.empty(),
         maxAno: this.bounds.maxAno,

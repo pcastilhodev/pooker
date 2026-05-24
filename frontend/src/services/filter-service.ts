@@ -40,6 +40,7 @@ export class FilterService {
   }
 
   bounds(films: FilmeModel[]): { minAno: number; maxAno: number; maxPreco: number; maxDuracao: number } {
+    if (!films.length) return { minAno: 2000, maxAno: 2025, maxPreco: 50, maxDuracao: 240 };
     const anos = films.map(m => m.ano instanceof Date ? m.ano.getFullYear() : new Date(m.ano).getFullYear());
     return {
       minAno: Math.min(...anos),

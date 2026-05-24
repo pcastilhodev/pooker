@@ -48,4 +48,14 @@ describe('FilterService', () => {
     expect(b.maxPreco).toBe(20);
     expect(b.maxDuracao).toBe(150);
   });
+
+  it('bounds returns safe defaults for empty array', () => {
+    const b = service.bounds([]);
+    expect(isFinite(b.minAno)).toBeTrue();
+    expect(isFinite(b.maxAno)).toBeTrue();
+    expect(isFinite(b.maxPreco)).toBeTrue();
+    expect(isFinite(b.maxDuracao)).toBeTrue();
+    expect(b.minAno).toBeGreaterThan(0);
+    expect(b.maxAno).toBeGreaterThan(b.minAno);
+  });
 });
