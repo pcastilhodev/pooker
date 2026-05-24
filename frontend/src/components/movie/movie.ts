@@ -6,8 +6,11 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FilmeModel, CastMember } from '../../models/filme-model';
 import { MovieService } from '../../services/movie-service';
 import { Rent } from '../../services/rent';
+import { RecommendationService } from '../../services/recommendation-service';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
 import { MovieCard } from '../../shared/movie-card/movie-card';
+import { TmdbService } from '../../services/tmdb-service';
+import { SafeUrlPipe } from '../../shared/safe-url.pipe';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -38,7 +41,7 @@ const REVIEWS_MOCK = [
 @Component({
   selector: 'app-movie',
   standalone: true,
-  imports: [CommonModule, RouterModule, ScrollRevealSection, MovieCard],
+  imports: [CommonModule, RouterModule, ScrollRevealSection, MovieCard, SafeUrlPipe],
   templateUrl: './movie.html',
   styleUrl: './movie.css'
 })
@@ -46,6 +49,8 @@ export class Movie implements OnInit, OnDestroy {
   film:         FilmeModel | undefined;
   similarFilms: FilmeModel[] = [];
   rentLoading   = false;
+  trailerKey: string | null = null;
+  trailerLoading = false;
 
   readonly castMock    = CAST_MOCK;
   readonly reviewsMock = REVIEWS_MOCK;
@@ -53,12 +58,14 @@ export class Movie implements OnInit, OnDestroy {
   private ctx: gsap.Context | undefined;
 
   constructor(
-    private route:        ActivatedRoute,
-    private router:       Router,
-    private movieService: MovieService,
-    private rentService:  Rent,
-    private zone:         NgZone,
-    private el:           ElementRef
+    private route:                 ActivatedRoute,
+    private router:                Router,
+    private movieService:          MovieService,
+    private rentService:           Rent,
+    private zone:                  NgZone,
+    private el:                    ElementRef,
+    private tmdbService:           TmdbService,
+    private recommendationService: RecommendationService
   ) {}
 
   ngOnInit() {
@@ -67,10 +74,17 @@ export class Movie implements OnInit, OnDestroy {
 
     this.route.params.subscribe(params => {
       const id = +params['id'];
+      this.recommendationService.trackView(id);
       this.movieService.getMovie(id).subscribe((data: any) => {
         this.film = data as FilmeModel;
         this.loadSimilar();
         setTimeout(() => this.runAnimations(), 0);
+        this.trailerKey = null;
+        this.trailerLoading = true;
+        this.tmdbService.getTrailerKey(this.film.titulo).subscribe(key => {
+          this.trailerKey = key;
+          this.trailerLoading = false;
+        });
       });
     });
   }

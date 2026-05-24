@@ -1,0 +1,22 @@
+<div class="trending-wrap" *ngIf="items.length">
+  <div class="ts-header">
+    <div class="ts-title">EM ALTA</div>
+    <div class="ts-tabs">
+      <button [class.active]="activeTab === 'rate'"     (click)="setTab('rate')">Mais Alugados</button>
+      <button [class.active]="activeTab === 'price'"    (click)="setTab('price')">Premium</button>
+      <button [class.active]="activeTab === 'duration'" (click)="setTab('duration')">Mais Longos</button>
+    </div>
+  </div>
+  <div class="ts-row">
+    <div class="ts-card" *ngFor="let film of items; let i = index" (click)="go(film.id)">
+      <div class="ts-rank">{{ i + 1 }}</div>
+      <div class="ts-poster">
+        <img *ngIf="film.imagem_url" [src]="film.imagem_url" [alt]="film.titulo" />
+      </div>
+      <div class="ts-info">
+        <div class="ts-name">{{ film.titulo }}</div>
+        <div class="ts-meta">{{ film.genero }} · R$ {{ film.preco_aluguel.toFixed(2) }}</div>
+      </div>
+    </div>
+  </div>
+</div>

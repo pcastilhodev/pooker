@@ -16,13 +16,17 @@ import { FilmIntro } from '../../shared/film-intro/film-intro';
 import { MovieCard } from '../../shared/movie-card/movie-card';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
 import { FilterPanel } from '../../shared/filter-panel/filter-panel';
+import { TrendingSection } from '../../shared/trending-section/trending-section';
+import { RecommendationsSection } from '../../shared/recommendations-section/recommendations-section';
+import { TrendingService } from '../../services/trending-service';
+import { RecommendationService } from '../../services/recommendation-service';
 
 const MAX_SNAP = 6;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FilmSnapSection, FilmIntro, MovieCard, ScrollRevealSection, FilterPanel],
+  imports: [CommonModule, FilmSnapSection, FilmIntro, MovieCard, ScrollRevealSection, FilterPanel, TrendingSection, RecommendationsSection],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -30,6 +34,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   allFilms: FilmeModel[]    = [];
   films: FilmeModel[]       = [];
   snapFilms: FilmeModel[]   = [];
+  recommendations: FilmeModel[] = [];
   currentIndex              = 0;
   showIntro                 = true;
   navVisible                = false;
@@ -43,12 +48,14 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   private wheelTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
-    private movieService:   MovieService,
-    private router:         Router,
-    private route:          ActivatedRoute,
-    private zone:           NgZone,
-    public  viewMode:       ViewModeService,
-    private filterService:  FilterService
+    private movieService:          MovieService,
+    private router:                Router,
+    private route:                 ActivatedRoute,
+    private zone:                  NgZone,
+    public  viewMode:              ViewModeService,
+    private filterService:         FilterService,
+    private trendingService:       TrendingService,
+    private recommendationService: RecommendationService
   ) {
     this.activeFilters = this.filterService.empty();
   }
@@ -78,6 +85,9 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         : data;
       this.applyFilters();
       this.snapFilms = this.allFilms.slice(0, MAX_SNAP);
+      const recentIds = this.recommendationService.recentIds();
+      const recentFilms = data.filter(m => recentIds.includes(m.id));
+      this.recommendations = this.recommendationService.recommend(data, recentFilms);
     });
   }
 
