@@ -52,8 +52,8 @@ export class MyRentals implements OnInit, OnDestroy {
           );
           this.rentals = rentals.map(r => ({
             ...r,
-            filme_titulo:     filmMap.get(r.filme_id)?.titulo     ?? null,
-            filme_imagem_url: filmMap.get(r.filme_id)?.imagem_url ?? null,
+            filme_titulo:     filmMap.get(r.filme_id)?.titulo,
+            filme_imagem_url: filmMap.get(r.filme_id)?.imagem_url,
           }));
           this.loading = false;
         });
