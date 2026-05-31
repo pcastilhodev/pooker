@@ -8,8 +8,10 @@
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:sonarjs/recommended-legacy"
       ],
+      "plugins": ["sonarjs"],
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
@@ -18,7 +20,9 @@
         "@angular-eslint/component-selector": [
           "error",
           { "type": "element", "prefix": "app", "style": "kebab-case" }
-        ]
+        ],
+        "complexity": ["error", 10],
+        "@typescript-eslint/no-explicit-any": "error"
       }
     },
     {
