@@ -1,0 +1,6 @@
+# Ferramentas de análise estática — instalar no ambiente de dev (não no container)
+ruff==0.15.15
+mypy==2.1.0
+radon==6.0.1
+vulture==2.16
+pre-commit==4.6.0
