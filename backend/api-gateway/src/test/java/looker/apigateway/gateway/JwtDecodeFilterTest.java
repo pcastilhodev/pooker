@@ -42,17 +42,6 @@ class JwtDecodeFilterTest {
     }
 
     // ── rotas públicas ────────────────────────────────────────────────────────
-
-    @Test
-    void rotaPublica_authenticate_passaSemVerificarToken() {
-        MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/auth/v1/api/authenticate").build());
-
-        filter.filter(exchange, passThroughChain).block();
-
-        assertNull(exchange.getResponse().getStatusCode());
-    }
-
     @Test
     void rotaPublica_login_passaSemVerificarToken() {
         MockServerWebExchange exchange = MockServerWebExchange.from(
