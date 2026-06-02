@@ -1,9 +1,13 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
 from app.models.aluguel import AluguelStatus
+
 
 class AluguelCreateSchema(BaseModel):
     filme_id: int
+
 
 class AluguelSchema(BaseModel):
     id: int

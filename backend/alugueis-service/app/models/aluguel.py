@@ -1,12 +1,16 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Enum
-from sqlalchemy.sql import func
-from app.core.database import Base
 import enum
+
+from sqlalchemy import Column, DateTime, Enum, Float, Integer
+from sqlalchemy.sql import func
+
+from app.core.database import Base
+
 
 class AluguelStatus(str, enum.Enum):
     ATIVO = "ativo"
     DEVOLVIDO = "devolvido"
     ATRASADO = "atrasado"
+
 
 class Aluguel(Base):
     __tablename__ = "alugueis"

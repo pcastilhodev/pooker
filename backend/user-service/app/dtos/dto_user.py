@@ -1,6 +1,9 @@
-from pydantic import BaseModel, validator
-from app.schemas.schemas_user import UserCreate
 from datetime import date
+
+from pydantic import BaseModel, validator
+
+from app.schemas.schemas_user import UserCreate
+
 
 class UserDTO(BaseModel):
     nome: str
@@ -22,8 +25,7 @@ class UserDTO(BaseModel):
         if not value.isdigit() or len(value) != 11:
             raise ValueError("CPF inválido. Deve conter 11 dígitos.")
         return value
-    
+
     @classmethod
     def from_schema(cls, schema: UserCreate):
         return cls(**schema.dict())
-

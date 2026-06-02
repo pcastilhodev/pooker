@@ -1,5 +1,7 @@
-from pydantic import BaseModel, EmailStr
 from datetime import date
+
+from pydantic import BaseModel, EmailStr
+
 from app.models.models_user import RoleEnum
 
 
@@ -34,5 +36,3 @@ class UserLogin(BaseModel):
 class UserForAuth(BaseModel):
     email: EmailStr
     role: str
-    
-    

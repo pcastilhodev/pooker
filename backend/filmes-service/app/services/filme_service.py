@@ -1,5 +1,6 @@
 # filmes-service/app/services/filme_service.py
 from sqlalchemy.orm import Session
+
 from app.models.filme import Filme as FilmeModel
 from app.schemas.filme import FilmeCreateSchema, FilmeUpdateSchema
 
@@ -12,10 +13,7 @@ class FilmeService:
         return db.query(FilmeModel).filter(FilmeModel.id == filme_id).first()
 
     def create(self, db: Session, filme: FilmeCreateSchema):
-        db_filme = FilmeModel(
-            **filme.dict(),
-            copias_disponiveis=filme.total_copias
-        )
+        db_filme = FilmeModel(**filme.dict(), copias_disponiveis=filme.total_copias)
         db.add(db_filme)
         db.commit()
         db.refresh(db_filme)
@@ -67,7 +65,9 @@ class FilmeService:
             if db_filme.copias_disponiveis < db_filme.total_copias:
                 db_filme.copias_disponiveis += 1
             else:
-                raise ValueError("Inventário já está completo, não é possível devolver.")
+                raise ValueError(
+                    "Inventário já está completo, não é possível devolver."
+                )
         else:
             raise ValueError("Ação inválida. Use 'alugar' ou 'devolver'.")
 

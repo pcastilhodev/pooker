@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models.models_user import User
-from app.schemas.schemas_user import UserCreate
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
 from app.dtos.dto_user import UserDTO
 from app.factorie.factorie_user import UserFactory
-
+from app.models.models_user import User
+from app.schemas.schemas_user import UserCreate
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -62,6 +62,7 @@ def delete_user(db: Session, user_id: int):
     db.delete(user)
     db.commit()
     return user
+
 
 def get_user_by_email(db: Session, email: str):
     user = db.query(User).filter(User.email == email).first()

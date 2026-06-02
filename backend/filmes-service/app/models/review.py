@@ -1,5 +1,14 @@
-from sqlalchemy import Column, Integer, Text, ForeignKey, DateTime, func, CheckConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Text,
+    func,
+)
 from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 
 
@@ -11,7 +20,9 @@ class Review(Base):
     filme_id = Column(Integer, ForeignKey("filmes.id"), nullable=False, index=True)
     rating = Column(Integer, nullable=False)
     review = Column(Text, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     __table_args__ = (

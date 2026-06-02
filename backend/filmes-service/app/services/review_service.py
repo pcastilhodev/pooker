@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
+
 from app.models.review import Review as ReviewModel
 from app.schemas.review import ReviewCreateSchema, ReviewUpdateSchema
+
 
 class ReviewService:
     def get_reviews_for_filme(self, db: Session, filme_id: int):
@@ -10,10 +12,7 @@ class ReviewService:
         return db.query(ReviewModel).filter(ReviewModel.id == review_id).first()
 
     def create(self, db: Session, review: ReviewCreateSchema, usuario_id: int):
-        db_review = ReviewModel(
-            **review.dict(),
-            usuario_id=usuario_id
-        )
+        db_review = ReviewModel(**review.dict(), usuario_id=usuario_id)
         db.add(db_review)
         db.commit()
         db.refresh(db_review)

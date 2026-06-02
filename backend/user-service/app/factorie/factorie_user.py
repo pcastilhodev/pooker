@@ -1,8 +1,10 @@
-from app.models.models_user import User
-from app.dtos.dto_user import UserDTO
 from passlib.context import CryptContext
 
+from app.dtos.dto_user import UserDTO
+from app.models.models_user import User
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class UserFactory:
     @staticmethod
@@ -14,5 +16,5 @@ class UserFactory:
             senha=pwd_context.hash(dto.senha),
             telefone=dto.telefone,
             data_nascimento=dto.data_nascimento,
-            role=dto.role
+            role=dto.role,
         )

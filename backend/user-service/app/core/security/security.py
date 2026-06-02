@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 SECRET_KEY = ""
 ALGORITHM = "HS256"
@@ -18,4 +18,3 @@ def decode_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) ->
             detail="Token inválido ou expirado",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        
