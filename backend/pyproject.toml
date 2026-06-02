@@ -26,6 +26,21 @@ ignore = [
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
+[tool.ruff.lint.flake8-bugbear]
+# Chamadas idiomáticas do FastAPI em argumentos default (Depends/Header/Query/etc.)
+# não são mutáveis-compartilhadas; B008 é falso-positivo para esse padrão.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Header",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Cookie",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Body",
+    "fastapi.Security",
+]
+
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101", "ANN"]  # allow assert and unannotated in tests
 "**/alembic/**" = ["ALL"]        # ignore generated migration code
