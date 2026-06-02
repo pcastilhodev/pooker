@@ -38,13 +38,17 @@ indent-style = "space"
 python_version = "3.11"
 strict = true
 ignore_missing_imports = true
+# Cada serviço roda `cd backend/<svc> && mypy app/`. Sem isto, o mypy descobre
+# o mesmo arquivo sob dois nomes de módulo (ex.: "payment" e "app.routes.payment").
+explicit_package_bases = true
+namespace_packages = true
 exclude = [
     ".*alembic.*",
     ".*__pycache__.*",
 ]
 plugins = ["pydantic.mypy"]
 
-[tool.mypy-pydantic]
+[tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
