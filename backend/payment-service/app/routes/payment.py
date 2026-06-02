@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
@@ -17,7 +19,7 @@ def process_payment(
     payment: PaymentRequest,
     x_user_id: str = Header(..., alias="X-User-Id"),
     x_user_role: str = Header(..., alias="X-User-Role"),
-):
+) -> dict[str, Any]:
     # Validação mínima
     if payment.amount <= 0:
         raise HTTPException(status_code=400, detail="Valor inválido para pagamento")
@@ -40,6 +42,7 @@ def process_payment(
         aluguel_response = requests.post(
             aluguel_api_url,
             headers={"X-User-Id": x_user_id, "X-User-Role": x_user_role},
+            timeout=10,
         )
         if aluguel_response.status_code != 200:
             response["warning"] = (
