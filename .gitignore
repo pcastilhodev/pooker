@@ -29,6 +29,8 @@ coverage/
 Thumbs.db
 
 # Dev tooling
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/sensors.sh
 .superpowers/
 .worktrees/
