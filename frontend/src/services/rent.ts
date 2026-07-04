@@ -2,6 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
+export interface RentResponse {
+  aluguel: { data_prevista_devolucao: string };
+  pagamento: { aluguel_id: string; amount: number };
+}
+
 export interface RentalItem {
   id: string | number;
   filme_id: number;
@@ -21,8 +26,8 @@ export class Rent {
   private http = inject(HttpClient);
 
 
-  getRents(filmeId: number): Observable<RentalItem> {
-    return this.http.post<RentalItem>(
+  getRents(filmeId: number): Observable<RentResponse> {
+    return this.http.post<RentResponse>(
       '/gateway/rent/v1/alugueis/',
       { filme_id: filmeId }
     );

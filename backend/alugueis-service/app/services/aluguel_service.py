@@ -93,9 +93,7 @@ class AluguelService:
         db.refresh(db_aluguel)
         return db_aluguel
 
-    def processar_devolucao(
-        self, db: Session, aluguel_id: int
-    ) -> AluguelModel | None:
+    def processar_devolucao(self, db: Session, aluguel_id: int) -> AluguelModel | None:
         db_aluguel = (
             db.query(AluguelModel).filter(AluguelModel.id == aluguel_id).first()
         )

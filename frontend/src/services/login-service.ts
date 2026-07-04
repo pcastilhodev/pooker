@@ -10,7 +10,7 @@ export class LoginService {
 
 
   authenticate(username: string, password: string) {
-    return this.http.post('/gateway/user/api/v1/users/login', { email: username, senha: password })
+    return this.http.post<{ token: string }>('/gateway/user/api/v1/users/login', { email: username, senha: password })
   }
 
   register(data: RegisterModel) {

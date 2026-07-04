@@ -3,12 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CompareService } from '../../services/compare-service';
 import { MovieService } from '../../services/movie-service';
-import { Rent } from '../../services/rent';
+import { Rent, RentResponse } from '../../services/rent';
 import { FilmeModel } from '../../models/filme-model';
 
-interface RentResponse {
-  pagamento?: { amount: number };
-}
 
 @Component({
   selector: 'app-compare',

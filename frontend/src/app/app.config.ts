@@ -6,7 +6,6 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../security/http-interceptor';
 import { mockInterceptor } from '../mocks/mock-interceptor';
 
-// @ts-expect-error -- no type declaration for this third-party integration
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

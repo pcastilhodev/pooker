@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FilmeModel, CastMember } from '../../models/filme-model';
 import { MovieService } from '../../services/movie-service';
-import { Rent } from '../../services/rent';
+import { Rent, RentResponse } from '../../services/rent';
 import { ToastService } from '../../services/toast-service';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
 import { MovieCard } from '../../shared/movie-card/movie-card';
@@ -24,10 +24,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface RentResponse {
-  aluguel: { data_prevista_devolucao: string };
-  pagamento: { aluguel_id: string; amount: number };
-}
 
 const PALETTES = [
   { c1: '#0e0818', c2: '#1a0e2e', c3: '#2a1240', accent: 'rgba(120,80,200,0.28)' },
