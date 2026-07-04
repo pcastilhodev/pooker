@@ -1,7 +1,6 @@
+from app.routes.payment import router as payment_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.routes.payment import router as payment_router
 
 app = FastAPI()
 

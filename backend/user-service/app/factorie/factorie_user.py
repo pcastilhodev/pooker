@@ -1,7 +1,6 @@
-from passlib.context import CryptContext
-
 from app.dtos.dto_user import UserDTO
 from app.models.models_user import User
+from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

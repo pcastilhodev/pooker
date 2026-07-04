@@ -1,5 +1,6 @@
 import os
 import sys
+from collections.abc import Iterator
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 # Detecta se está rodando como exe
 if getattr(sys, "frozen", False):
-    base_path = sys._MEIPASS
+    base_path = sys._MEIPASS  # type: ignore[attr-defined]  # atributo PyInstaller em runtime
 else:
     base_path = os.path.dirname(__file__)
 
@@ -30,7 +31,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def get_db() -> Iterator[Session]:
     db: Session = SessionLocal()
     try:
         yield db

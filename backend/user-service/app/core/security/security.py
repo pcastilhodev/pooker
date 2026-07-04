@@ -17,4 +17,4 @@ def decode_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) ->
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None

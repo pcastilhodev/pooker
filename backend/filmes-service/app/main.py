@@ -29,5 +29,5 @@ app.include_router(reviews.router, prefix="/v1/reviews", tags=["reviews"])
 
 
 @app.get("/")
-def health_check():
+def health_check() -> dict[str, str]:
     return {"status": "ok, filmes-service"}

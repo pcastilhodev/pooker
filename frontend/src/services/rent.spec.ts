@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { Rent } from './rent';
 
@@ -44,7 +44,7 @@ describe('Rent', () => {
   it('getRents deve retornar resposta da API', () => {
     const respostaMock = { id: 10, filme_id: 5, usuario_id: 1 };
 
-    let resultado: any;
+    let resultado: unknown;
     service.getRents(5).subscribe(r => (resultado = r));
 
     httpMock.expectOne('/gateway/rent/v1/alugueis/').flush(respostaMock);
@@ -52,7 +52,7 @@ describe('Rent', () => {
   });
 
   it('getRents deve propagar erro 401 quando não autenticado', () => {
-    let erroCapturado: any;
+    let erroCapturado!: HttpErrorResponse;
     service.getRents(1).subscribe({ error: e => (erroCapturado = e) });
 
     httpMock.expectOne('/gateway/rent/v1/alugueis/').flush(

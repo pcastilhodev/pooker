@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription, combineLatest, of } from 'rxjs';
@@ -44,23 +44,21 @@ const EMPTY_STATS: ProfileStats = {
   styleUrl: './profile.css'
 })
 export class Profile implements OnInit, OnDestroy {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private favorites = inject(FavoritesService);
+  private watchlist = inject(WatchlistService);
+  private ratings = inject(RatingsService);
+  private movies = inject(MovieService);
+  private rent = inject(Rent);
+  private achievementsService = inject(AchievementsService);
+  private commentsService = inject(CommentsService);
+  private recentService = inject(RecentService);
+
   user: AuthUser | null = null;
   stats: ProfileStats = { ...EMPTY_STATS };
   statsLoading = true;
   private subs = new Subscription();
-
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-    private favorites: FavoritesService,
-    private watchlist: WatchlistService,
-    private ratings: RatingsService,
-    private movies: MovieService,
-    private rent: Rent,
-    private achievementsService: AchievementsService,
-    private commentsService: CommentsService,
-    private recentService: RecentService,
-  ) {}
 
   allAchievements: Achievement[] = ACHIEVEMENTS;
   unlockedIds = new Set<string>();

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilmeModel } from '../../models/filme-model';
@@ -12,6 +12,8 @@ import { FilterService, FilmFilters } from '../../services/filter-service';
   styleUrl: './filter-panel.css'
 })
 export class FilterPanel implements OnChanges {
+  private filterService = inject(FilterService);
+
   @Input() films: FilmeModel[] = [];
   @Output() filtersChange = new EventEmitter<FilmFilters>();
 
@@ -21,7 +23,7 @@ export class FilterPanel implements OnChanges {
   open = false;
   private initialized = false;
 
-  constructor(private filterService: FilterService) {
+  constructor() {
     this.filters = this.filterService.empty();
   }
 

@@ -1,4 +1,5 @@
 import enum
+from typing import Any
 
 from sqlalchemy import Column, DateTime, Enum, Float, Integer
 from sqlalchemy.sql import func
@@ -6,13 +7,13 @@ from sqlalchemy.sql import func
 from app.core.database import Base
 
 
-class AluguelStatus(str, enum.Enum):
+class AluguelStatus(enum.StrEnum):
     ATIVO = "ativo"
     DEVOLVIDO = "devolvido"
     ATRASADO = "atrasado"
 
 
-class Aluguel(Base):
+class Aluguel(Base):  # type: ignore[misc]  # Base declarativo do SQLAlchemy é Any
     __tablename__ = "alugueis"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -24,4 +25,4 @@ class Aluguel(Base):
     data_devolucao = Column(DateTime(timezone=True), nullable=True)
 
     valor_aluguel = Column(Float, nullable=False)
-    status = Column(Enum(AluguelStatus), default=AluguelStatus.ATIVO)
+    status: "Column[Any]" = Column(Enum(AluguelStatus), default=AluguelStatus.ATIVO)

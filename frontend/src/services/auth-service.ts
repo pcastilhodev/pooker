@@ -14,6 +14,21 @@ export interface AuthUser {
   exp?: number;
 }
 
+export interface JwtPayload {
+  exp?: number;
+  sub?: string;
+  email?: string;
+  nome?: string;
+  name?: string;
+  role?: string;
+  roles?: string;
+  cpf?: string;
+  telefone?: string;
+  phone?: string;
+  data_nascimento?: string;
+  birthDate?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private currentUser$ = new BehaviorSubject<AuthUser | null>(this.readUser());
@@ -51,12 +66,18 @@ export class AuthService {
     if (!token) return null;
     const payload = decodeJwt(token);
     if (!payload) return null;
-
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
+    if (this.isTokenExpired(payload.exp)) {
       localStorage.removeItem(TOKEN_KEY);
       return null;
     }
+    return this.buildUser(payload);
+  }
 
+  private isTokenExpired(exp: number | undefined): boolean {
+    return !!exp && exp * 1000 < Date.now();
+  }
+
+  private buildUser(payload: JwtPayload): AuthUser {
     return {
       nome:             payload.nome ?? payload.name ?? deriveNameFromEmail(payload.email ?? payload.sub),
       email:            payload.email ?? payload.sub ?? '',
@@ -70,7 +91,7 @@ export class AuthService {
   }
 }
 
-export function decodeJwt(token: string): any | null {
+export function decodeJwt(token: string): JwtPayload | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;

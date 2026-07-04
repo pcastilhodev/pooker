@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
@@ -18,10 +18,11 @@ export interface RentalItem {
   providedIn: 'root'
 })
 export class Rent {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  getRents(filmeId: number): Observable<any> {
-    return this.http.post(
+
+  getRents(filmeId: number): Observable<RentalItem> {
+    return this.http.post<RentalItem>(
       '/gateway/rent/v1/alugueis/',
       { filme_id: filmeId }
     );

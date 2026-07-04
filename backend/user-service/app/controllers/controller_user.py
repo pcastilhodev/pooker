@@ -1,11 +1,10 @@
-from fastapi import HTTPException
-from passlib.context import CryptContext
-from sqlalchemy.orm import Session
-
 from app.dtos.dto_user import UserDTO
 from app.factorie.factorie_user import UserFactory
 from app.models.models_user import User
 from app.schemas.schemas_user import UserCreate
+from fastapi import HTTPException
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -14,7 +13,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_user(db: Session, data: UserCreate):
+def create_user(db: Session, data: UserCreate) -> User:
     existing_user = db.query(User).filter(User.email == data.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado")
@@ -26,15 +25,15 @@ def create_user(db: Session, data: UserCreate):
     return new_user
 
 
-def list_users(db: Session):
+def list_users(db: Session) -> list[User]:
     return db.query(User).all()
 
 
-def obter_user(db: Session, user_id: int):
+def obter_user(db: Session, user_id: int) -> User | None:
     return db.query(User).filter(User.id == user_id).first()
 
 
-def update_user(db: Session, user_id: int, data: UserCreate):
+def update_user(db: Session, user_id: int, data: UserCreate) -> User | None:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None
@@ -54,7 +53,7 @@ def update_user(db: Session, user_id: int, data: UserCreate):
     return user
 
 
-def delete_user(db: Session, user_id: int):
+def delete_user(db: Session, user_id: int) -> User | None:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None
@@ -64,7 +63,7 @@ def delete_user(db: Session, user_id: int):
     return user
 
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> User | None:
     user = db.query(User).filter(User.email == email).first()
     if not user:
         return None

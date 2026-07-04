@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CompareService } from '../../services/compare-service';
@@ -11,7 +11,9 @@ import { CompareService } from '../../services/compare-service';
   styleUrl: './compare-bar.css'
 })
 export class CompareBar {
-  constructor(public compareService: CompareService, private router: Router) {}
+  compareService = inject(CompareService);
+  private router = inject(Router);
+
 
   go() { this.router.navigate(['/comparar']); }
   clear() { this.compareService.clear(); }

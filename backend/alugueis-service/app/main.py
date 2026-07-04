@@ -26,5 +26,5 @@ app.include_router(alugueis.router, prefix="/v1/alugueis", tags=["alugueis"])
 
 
 @app.get("/")
-def health_check():
+def health_check() -> dict[str, str]:
     return {"status": "ok, alugueis-service"}

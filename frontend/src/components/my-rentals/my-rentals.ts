@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
@@ -16,16 +16,14 @@ import { AuthService } from '../../services/auth-service';
   styleUrl: './my-rentals.css'
 })
 export class MyRentals implements OnInit, OnDestroy {
+  private rentService = inject(Rent);
+  private movieService = inject(MovieService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
   rentals: RentalItem[] = [];
   loading = true;
   errorMsg = '';
-
-  constructor(
-    private rentService: Rent,
-    private movieService: MovieService,
-    private auth: AuthService,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     document.documentElement.style.overflow = 'auto';

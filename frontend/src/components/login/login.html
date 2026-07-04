@@ -1,4 +1,4 @@
-<div class="modal-overlay" (click)="onOverlayClick($event)">
+<div class="modal-overlay" tabindex="0" (click)="onOverlayClick($event)" (keydown.enter)="onOverlayClick($event)">
   <div class="modal">
     <div class="modal-shine"></div>
 
@@ -11,12 +11,12 @@
     <!-- LOGIN FORM -->
     <form *ngIf="activeTab === 'login'" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" class="modal-form">
       <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input class="form-input" type="email" formControlName="username" placeholder="seu@email.com" autocomplete="email" />
+        <label class="form-label" for="login-username">E-mail</label>
+        <input id="login-username" class="form-input" type="email" formControlName="username" placeholder="seu@email.com" autocomplete="email" />
       </div>
       <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input class="form-input" type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+        <label class="form-label" for="login-password">Senha</label>
+        <input id="login-password" class="form-input" type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
       </div>
       <div class="form-group form-group--checkbox">
         <label class="checkbox-label">
@@ -30,28 +30,28 @@
     <!-- REGISTER FORM -->
     <form *ngIf="activeTab === 'register'" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" class="modal-form">
       <div class="form-group">
-        <label class="form-label">Nome completo</label>
-        <input class="form-input" type="text" formControlName="username" placeholder="Seu nome" />
+        <label class="form-label" for="register-username">Nome completo</label>
+        <input id="register-username" class="form-input" type="text" formControlName="username" placeholder="Seu nome" />
       </div>
       <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input class="form-input" type="email" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+        <label class="form-label" for="register-email">E-mail</label>
+        <input id="register-email" class="form-input" type="email" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
       </div>
       <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input class="form-input" type="password" formControlName="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+        <label class="form-label" for="register-password">Senha</label>
+        <input id="register-password" class="form-input" type="password" formControlName="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
       </div>
       <div class="form-group">
-        <label class="form-label">CPF</label>
-        <input class="form-input" type="text" formControlName="cpf" placeholder="00000000000" maxlength="11" />
+        <label class="form-label" for="register-cpf">CPF</label>
+        <input id="register-cpf" class="form-input" type="text" formControlName="cpf" placeholder="00000000000" maxlength="11" />
       </div>
       <div class="form-group">
-        <label class="form-label">Telefone</label>
-        <input class="form-input" type="tel" formControlName="phone" placeholder="00000000000" />
+        <label class="form-label" for="register-phone">Telefone</label>
+        <input id="register-phone" class="form-input" type="tel" formControlName="phone" placeholder="00000000000" />
       </div>
       <div class="form-group">
-        <label class="form-label">Data de nascimento</label>
-        <input class="form-input" type="date" formControlName="dateOfBirth" />
+        <label class="form-label" for="register-dateOfBirth">Data de nascimento</label>
+        <input id="register-dateOfBirth" class="form-input" type="date" formControlName="dateOfBirth" />
       </div>
       <button class="btn-submit" type="submit">Criar conta</button>
     </form>

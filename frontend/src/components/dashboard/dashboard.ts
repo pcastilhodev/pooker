@@ -1,7 +1,4 @@
-import {
-  Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChildren, QueryList, ElementRef, NgZone, ViewChild
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef, NgZone, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, Observable, Subscription } from 'rxjs';
@@ -35,6 +32,19 @@ const MAX_SNAP = 6;
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
+  private movieService = inject(MovieService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private zone = inject(NgZone);
+  private favorites = inject(FavoritesService);
+  private rentService = inject(Rent);
+  private auth = inject(AuthService);
+  private recentService = inject(RecentService);
+  viewModeService = inject(ViewModeService);
+  private filterService = inject(FilterService);
+  private trendingService = inject(TrendingService);
+  private recommendationService = inject(RecommendationService);
+
   allFilms: FilmeModel[]       = [];
   films: FilmeModel[]          = [];
   filteredFilms: FilmeModel[]  = [];
@@ -57,20 +67,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   private ctx:         gsap.Context | undefined;
   private wheelTimer: ReturnType<typeof setTimeout> | undefined;
 
-  constructor(
-    private movieService:          MovieService,
-    private router:                Router,
-    private route:                 ActivatedRoute,
-    private zone:                  NgZone,
-    private favorites:             FavoritesService,
-    private rentService:           Rent,
-    private auth:                  AuthService,
-    private recentService:         RecentService,
-    public  viewModeService:       ViewModeService,
-    private filterService:         FilterService,
-    private trendingService:       TrendingService,
-    private recommendationService: RecommendationService
-  ) {
+  constructor() {
     this.activeFilters = this.filterService.empty();
     this.viewMode$ = this.viewModeService.modeObs$;
   }

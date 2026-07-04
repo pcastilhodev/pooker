@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PreferenceStore } from './preference-store';
 
@@ -7,9 +7,11 @@ const KEY = 'looker:view-mode';
 
 @Injectable({ providedIn: 'root' })
 export class ViewModeService {
+  private store = inject(PreferenceStore);
+
   private mode$: BehaviorSubject<ViewMode>;
 
-  constructor(private store: PreferenceStore) {
+  constructor() {
     this.mode$ = new BehaviorSubject<ViewMode>(this.store.get<ViewMode>(KEY, 'grid'));
   }
 

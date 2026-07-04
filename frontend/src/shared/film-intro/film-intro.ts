@@ -1,6 +1,4 @@
-import {
-  Component, Output, EventEmitter, AfterViewInit, OnDestroy, NgZone, HostListener
-} from '@angular/core';
+import { Component, Output, EventEmitter, AfterViewInit, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
 import { gsap } from 'gsap';
 
 @Component({
@@ -10,13 +8,13 @@ import { gsap } from 'gsap';
   styleUrl: './film-intro.css'
 })
 export class FilmIntro implements AfterViewInit, OnDestroy {
+  private zone = inject(NgZone);
+
   @Output() dismissed = new EventEmitter<void>();
 
   private tl: gsap.core.Timeline | undefined;
   private exitTl: gsap.core.Tween | undefined;
   private isDismissed = false;
-
-  constructor(private zone: NgZone) {}
 
   ngAfterViewInit() {
     this.zone.runOutsideAngular(() => this.play());

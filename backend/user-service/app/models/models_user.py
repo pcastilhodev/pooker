@@ -1,12 +1,11 @@
-from enum import Enum
+from enum import StrEnum
 
+from app.core.db_usuario import Base
 from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy import Enum as PgEnum
 
-from app.core.db_usuario import Base
 
-
-class RoleEnum(str, Enum):
+class RoleEnum(StrEnum):
     admin = "admin"
     user = "user"
 

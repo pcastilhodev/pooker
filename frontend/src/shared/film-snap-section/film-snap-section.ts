@@ -1,11 +1,8 @@
-import {
-  Component, Input, AfterViewInit, OnDestroy, ElementRef, NgZone, ViewChild
-} from '@angular/core';
+import { Component, Input, AfterViewInit, OnDestroy, ElementRef, NgZone, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FilmeModel } from '../../models/filme-model';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const PALETTES = [
   { c1: '#0e0818', c2: '#1a0e2e', c3: '#2a1240', accent: 'rgba(120,80,200,0.28)' },
@@ -24,6 +21,9 @@ const PALETTES = [
   styleUrl: './film-snap-section.css'
 })
 export class FilmSnapSection implements AfterViewInit, OnDestroy {
+  private router = inject(Router);
+  private zone = inject(NgZone);
+
   @Input() film!: FilmeModel;
   @Input() index = 0;
   @Input() scroller = '#scroll-container';
@@ -36,8 +36,6 @@ export class FilmSnapSection implements AfterViewInit, OnDestroy {
   @ViewChild('section') sectionEl!: ElementRef;
 
   private ctx: gsap.Context | undefined;
-
-  constructor(private router: Router, private zone: NgZone) {}
 
   get palette() { return PALETTES[this.film.id % 6]; }
   get gradId()  { return 'fg' + this.film.id; }

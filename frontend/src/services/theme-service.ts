@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PreferenceStore } from './preference-store';
 
@@ -7,9 +7,11 @@ const KEY = 'looker:theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
+  private store = inject(PreferenceStore);
+
   private theme$: BehaviorSubject<Theme>;
 
-  constructor(private store: PreferenceStore) {
+  constructor() {
     this.theme$ = new BehaviorSubject<Theme>(this.store.get<Theme>(KEY, 'dark'));
     this.apply(this.theme$.value);
   }

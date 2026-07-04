@@ -1,8 +1,29 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { of } from 'rxjs';
 import { MOCK_FILMES } from './mock-data';
 
-const MOCK_RENTALS: any[] = [];
+interface MockRental {
+  id: string;
+  filme_id: number;
+  filme_titulo: string;
+  filme_imagem_url: string;
+  data_aluguel: string;
+  data_prevista_devolucao: string;
+  data_devolucao: string | null;
+  status: string;
+  preco: number;
+}
+
+interface LoginBody {
+  email?: string;
+}
+
+interface RentalBody {
+  filme_id?: number;
+}
+
+const MOCK_RENTALS: MockRental[] = [];
 
 function buildMockJwt(payload: Record<string, unknown>): string {
   const header = base64UrlEncode(JSON.stringify({ alg: 'none', typ: 'JWT' }));
@@ -16,7 +37,7 @@ function buildMockJwt(payload: Record<string, unknown>): string {
 
 function base64UrlEncode(value: string): string {
   const utf8 = unescape(encodeURIComponent(value));
-  return btoa(utf8).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return btoa(utf8).replace(/={1,2}$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
 export function isMockApiEnabled(): boolean {
@@ -27,70 +48,77 @@ export function isMockApiEnabled(): boolean {
   }
 }
 
+function handleLoginPost(body: unknown): Observable<HttpResponse<unknown>> {
+  const email = (body as LoginBody)?.email ?? 'visitante@looker.com';
+  const token = buildMockJwt({
+    sub:   email,
+    email,
+    nome:  deriveName(email),
+    role:  'user',
+    cpf:   '12345678901',
+    telefone: '11999998888',
+    data_nascimento: '1995-04-12',
+  });
+  return of(new HttpResponse({ status: 200, body: { token } }));
+}
+
+function handleFilmesGet(url: string): Observable<HttpResponse<unknown>> {
+  const idMatch = url.match(/\/filmes\/(\d+)/);
+  if (idMatch) {
+    const filme = MOCK_FILMES.find(f => f.id === +idMatch[1]) ?? MOCK_FILMES[0];
+    return of(new HttpResponse({ status: 200, body: filme }));
+  }
+  return of(new HttpResponse({ status: 200, body: MOCK_FILMES }));
+}
+
+function handleAlugueisPost(body: unknown): Observable<HttpResponse<unknown>> {
+  const filmeId = (body as RentalBody)?.filme_id;
+  const filme = MOCK_FILMES.find(f => f.id === filmeId) ?? MOCK_FILMES[0];
+  const now = new Date();
+  const devolucao = new Date();
+  devolucao.setDate(devolucao.getDate() + 7);
+  const id = `MOCK-${String(MOCK_RENTALS.length + 1).padStart(3, '0')}`;
+
+  MOCK_RENTALS.unshift({
+    id,
+    filme_id: filme.id,
+    filme_titulo: filme.titulo,
+    filme_imagem_url: filme.imagem_url,
+    data_aluguel: now.toISOString(),
+    data_prevista_devolucao: devolucao.toISOString(),
+    data_devolucao: null,
+    status: 'ativo',
+    preco: filme.preco_aluguel,
+  });
+
+  return of(new HttpResponse({
+    status: 200,
+    body: {
+      aluguel: { data_prevista_devolucao: devolucao.toISOString() },
+      pagamento: { aluguel_id: id, amount: filme.preco_aluguel },
+    },
+  }));
+}
+
+function handlePost(url: string, body: unknown): Observable<HttpResponse<unknown>> | null {
+  if (url.includes('/users/login')) return handleLoginPost(body);
+  if (url.includes('/users/'))     return of(new HttpResponse({ status: 200, body: {} }));
+  if (url.includes('/alugueis/'))  return handleAlugueisPost(body);
+  return null;
+}
+
+function handleGet(url: string): Observable<HttpResponse<unknown>> | null {
+  if (url.includes('/filmes/'))     return handleFilmesGet(url);
+  if (url.endsWith('/alugueis/me')) return of(new HttpResponse({ status: 200, body: MOCK_RENTALS }));
+  return null;
+}
+
 export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (!isMockApiEnabled()) return next(req);
-  const url = req.url;
-
-  if (req.method === 'POST' && url.includes('/users/login')) {
-    const email = (req.body as any)?.email ?? 'visitante@looker.com';
-    const token = buildMockJwt({
-      sub:   email,
-      email,
-      nome:  deriveName(email),
-      role:  'user',
-      cpf:   '12345678901',
-      telefone: '11999998888',
-      data_nascimento: '1995-04-12',
-    });
-    return of(new HttpResponse({ status: 200, body: { token } }));
-  }
-
-  if (req.method === 'POST' && url.includes('/users/'))
-    return of(new HttpResponse({ status: 200, body: {} }));
-
-  if (req.method === 'GET' && url.includes('/filmes/')) {
-    const idMatch = url.match(/\/filmes\/(\d+)/);
-    if (idMatch) {
-      const filme = MOCK_FILMES.find(f => f.id === +idMatch[1]) ?? MOCK_FILMES[0];
-      return of(new HttpResponse({ status: 200, body: filme }));
-    }
-    return of(new HttpResponse({ status: 200, body: MOCK_FILMES }));
-  }
-
-  if (req.method === 'GET' && url.endsWith('/alugueis/me')) {
-    return of(new HttpResponse({ status: 200, body: MOCK_RENTALS }));
-  }
-
-  if (req.method === 'POST' && url.includes('/alugueis/')) {
-    const filmeId = (req.body as any)?.filme_id;
-    const filme = MOCK_FILMES.find(f => f.id === filmeId) ?? MOCK_FILMES[0];
-    const now = new Date();
-    const devolucao = new Date();
-    devolucao.setDate(devolucao.getDate() + 7);
-    const id = `MOCK-${String(MOCK_RENTALS.length + 1).padStart(3, '0')}`;
-
-    MOCK_RENTALS.unshift({
-      id,
-      filme_id: filme.id,
-      filme_titulo: filme.titulo,
-      filme_imagem_url: filme.imagem_url,
-      data_aluguel: now.toISOString(),
-      data_prevista_devolucao: devolucao.toISOString(),
-      data_devolucao: null,
-      status: 'ativo',
-      preco: filme.preco_aluguel,
-    });
-
-    return of(new HttpResponse({
-      status: 200,
-      body: {
-        aluguel: { data_prevista_devolucao: devolucao.toISOString() },
-        pagamento: { aluguel_id: id, amount: filme.preco_aluguel },
-      },
-    }));
-  }
-
-  return next(req);
+  let result: Observable<HttpResponse<unknown>> | null = null;
+  if (req.method === 'POST')      result = handlePost(req.url, req.body);
+  else if (req.method === 'GET')  result = handleGet(req.url);
+  return result ?? next(req);
 };
 
 function deriveName(email: string): string {

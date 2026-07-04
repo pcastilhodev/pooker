@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth-service';
 
@@ -8,11 +8,13 @@ export interface WatchlistEntry { id: number; addedAt: number; }
 
 @Injectable({ providedIn: 'root' })
 export class WatchlistService {
+  private auth = inject(AuthService);
+
   private entries$ = new BehaviorSubject<WatchlistEntry[]>([]);
 
   watchlist$: Observable<WatchlistEntry[]> = this.entries$.asObservable();
 
-  constructor(private auth: AuthService) {
+  constructor() {
     this.reload();
     this.auth.user$.subscribe(() => this.reload());
   }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ShortcutsService, ShortcutDef } from '../../services/shortcuts-service';
@@ -13,11 +13,11 @@ interface Group { name: string; items: ShortcutDef[]; }
   styleUrl: './shortcuts-help.css'
 })
 export class ShortcutsHelp implements OnInit, OnDestroy {
+  private shortcuts = inject(ShortcutsService);
+
   visible = false;
   groups: Group[] = [];
   private sub?: Subscription;
-
-  constructor(private shortcuts: ShortcutsService) {}
 
   ngOnInit() {
     this.groups = this.buildGroups();

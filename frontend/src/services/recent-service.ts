@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth-service';
 
@@ -7,11 +7,13 @@ const MAX = 12;
 
 @Injectable({ providedIn: 'root' })
 export class RecentService {
+  private auth = inject(AuthService);
+
   private list$ = new BehaviorSubject<number[]>([]);
 
   recent$: Observable<number[]> = this.list$.asObservable();
 
-  constructor(private auth: AuthService) {
+  constructor() {
     this.reload();
     this.auth.user$.subscribe(() => this.reload());
   }

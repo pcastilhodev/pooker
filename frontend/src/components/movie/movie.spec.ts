@@ -78,7 +78,7 @@ describe('Movie', () => {
   });
 
   it('filmYear should return 0 when ano is falsy', () => {
-    component.film = makeFilm(1, 'Drama', { ano: undefined as any });
+    component.film = makeFilm(1, 'Drama', { ano: undefined as unknown as Date });
     expect(component.filmYear).toBe(0);
   });
 

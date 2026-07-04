@@ -40,11 +40,10 @@ describe('TmdbService', () => {
   });
 
   it('getTrailerKey returns cached result without HTTP call', () => {
-    let result1: string | null = undefined!;
     let result2: string | null = undefined!;
 
     // First call — populates cache
-    service.getTrailerKey('Inception').subscribe(k => (result1 = k));
+    service.getTrailerKey('Inception').subscribe();
     httpMock.expectOne(r => r.url.includes('search/movie')).flush({ results: [{ id: 27205 }] });
     httpMock.expectOne(r => r.url.includes('27205/videos')).flush({ results: [{ type: 'Trailer', site: 'YouTube', key: 'xyz' }] });
 

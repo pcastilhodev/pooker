@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth-service';
 import { ToastService } from './toast-service';
@@ -27,11 +27,14 @@ export const ACHIEVEMENTS: Achievement[] = [
 
 @Injectable({ providedIn: 'root' })
 export class AchievementsService {
+  private auth = inject(AuthService);
+  private toast = inject(ToastService);
+
   private unlocked$ = new BehaviorSubject<Set<string>>(new Set());
 
   achievements$: Observable<Set<string>> = this.unlocked$.asObservable();
 
-  constructor(private auth: AuthService, private toast: ToastService) {
+  constructor() {
     this.reload();
     this.auth.user$.subscribe(() => this.reload());
   }
@@ -61,11 +64,23 @@ export class AchievementsService {
     moviesVisited?: number;
   }) {
     if (this.auth.isLoggedIn) this.unlock('first-login');
+    this.evaluateRentalAchievements(ctx);
+    this.evaluateFavoritesAndSpend(ctx);
+    this.evaluateSocialAchievements(ctx);
+  }
+
+  private evaluateRentalAchievements(ctx: { rentalsCount?: number }): void {
     if ((ctx.rentalsCount ?? 0) >= 1)  this.unlock('first-rent');
     if ((ctx.rentalsCount ?? 0) >= 5)  this.unlock('movie-buff');
     if ((ctx.rentalsCount ?? 0) >= 10) this.unlock('marathoner');
+  }
+
+  private evaluateFavoritesAndSpend(ctx: { favoritesCount?: number; totalSpent?: number }): void {
     if ((ctx.favoritesCount ?? 0) >= 5) this.unlock('fav-collector');
     if ((ctx.totalSpent ?? 0) >= 100)   this.unlock('big-spender');
+  }
+
+  private evaluateSocialAchievements(ctx: { ratingsCount?: number; commentsCount?: number; moviesVisited?: number }): void {
     if ((ctx.ratingsCount ?? 0) >= 3)   this.unlock('critic');
     if ((ctx.commentsCount ?? 0) >= 1)  this.unlock('community');
     if ((ctx.moviesVisited ?? 0) >= 10) this.unlock('explorer');
