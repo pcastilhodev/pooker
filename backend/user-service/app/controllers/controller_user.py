@@ -10,7 +10,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return str(pwd_context.hash(password))
 
 
 def create_user(db: Session, data: UserCreate) -> User:
@@ -40,13 +40,13 @@ def update_user(db: Session, user_id: int, data: UserCreate) -> User | None:
 
     dto = UserDTO.from_schema(data)
 
-    user.nome = dto.nome
-    user.cpf = dto.cpf
-    user.email = dto.email
-    user.senha = get_password_hash(dto.senha)
-    user.telefone = dto.telefone
-    user.data_nascimento = dto.data_nascimento
-    user.role = dto.role
+    user.nome = dto.nome  # type: ignore[assignment]
+    user.cpf = dto.cpf  # type: ignore[assignment]
+    user.email = dto.email  # type: ignore[assignment]
+    user.senha = get_password_hash(dto.senha)  # type: ignore[assignment]
+    user.telefone = dto.telefone  # type: ignore[assignment]
+    user.data_nascimento = dto.data_nascimento  # type: ignore[assignment]
+    user.role = dto.role  # type: ignore[assignment]
 
     db.commit()
     db.refresh(user)

@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class Filme(Base):
+class Filme(Base):  # type: ignore[misc]
     __tablename__ = "filmes"
 
     id = Column(Integer, primary_key=True, index=True)

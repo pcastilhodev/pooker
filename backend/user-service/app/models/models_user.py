@@ -10,7 +10,7 @@ class RoleEnum(StrEnum):
     user = "user"
 
 
-class User(Base):
+class User(Base):  # type: ignore[misc]
     __tablename__ = "tb_usuarios"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -20,6 +20,6 @@ class User(Base):
     senha = Column(String(255), nullable=False)
     telefone = Column(String(20))
     data_nascimento = Column(Date)
-    role = Column(
+    role: Column[RoleEnum] = Column(
         PgEnum(RoleEnum, name="role_enum"), default=RoleEnum.user, nullable=False
     )

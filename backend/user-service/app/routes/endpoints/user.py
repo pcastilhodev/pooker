@@ -26,12 +26,13 @@ def list_users(db: Session = Depends(get_db)) -> list[User]:
 
 @router.get("/{user_id}", response_model=UserOut)
 def get_user(
-    user_id: int, db: Session = Depends(get_db), response: Response = None
+    user_id: int, db: Session = Depends(get_db), response: Response | None = None
 ) -> User:
     user = controller_user.obter_user(db, user_id)
 
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    assert response is not None  # FastAPI always injects Response
     response.headers["X-User-Role"] = user.role.value
     return user
 

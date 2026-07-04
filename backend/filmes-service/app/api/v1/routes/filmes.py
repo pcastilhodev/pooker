@@ -1,5 +1,6 @@
 from app.core.database import get_db
 from app.core.security import RoleChecker
+from app.models.filme import Filme
 from app.schemas.filme import (
     FilmeCreateSchema,
     FilmeSchema,
@@ -16,7 +17,7 @@ filme_service = FilmeService()
 
 
 @router.get("/", response_model=list[FilmeSchema])
-def get_all_filmes(db: Session = Depends(get_db)) -> list[FilmeSchema]:
+def get_all_filmes(db: Session = Depends(get_db)) -> list[Filme]:
     return filme_service.get_all(db)
 
 
@@ -70,7 +71,7 @@ def delete_filme(filme_id: int, db: Session = Depends(get_db)) -> Response:
 @router.get("/search/", response_model=list[FilmeSchema])
 def search_filmes(
     titulo: str | None = None, genero: str | None = None, db: Session = Depends(get_db)
-) -> list[FilmeSchema]:
+) -> list[Filme]:
     filmes = filme_service.search(db=db, titulo=titulo, genero=genero)
     if not filmes:
         raise HTTPException(

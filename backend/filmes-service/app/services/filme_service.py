@@ -62,13 +62,13 @@ class FilmeService:
             return None
         if acao == "alugar":
             if db_filme.copias_disponiveis > 0:
-                db_filme.copias_disponiveis -= 1
+                db_filme.copias_disponiveis -= 1  # type: ignore[assignment]
             else:
                 raise ValueError("Não há cópias disponíveis para alugar.")
 
         elif acao == "devolver":
             if db_filme.copias_disponiveis < db_filme.total_copias:
-                db_filme.copias_disponiveis += 1
+                db_filme.copias_disponiveis += 1  # type: ignore[assignment]
             else:
                 raise ValueError(
                     "Inventário já está completo, não é possível devolver."

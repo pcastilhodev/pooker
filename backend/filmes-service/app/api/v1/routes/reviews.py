@@ -1,5 +1,6 @@
 from app.core.database import get_db
 from app.core.security import User, get_current_user
+from app.models.review import Review
 from app.schemas.review import ReviewCreateSchema, ReviewSchema, ReviewUpdateSchema
 from app.services.filme_service import FilmeService
 from app.services.review_service import ReviewService
@@ -29,7 +30,7 @@ def create_review(
 @router.get("/filme/{filme_id}", response_model=list[ReviewSchema])
 def get_reviews_by_filme(
     filme_id: int, db: Session = Depends(get_db)
-) -> list[ReviewSchema]:
+) -> list[Review]:
     reviews = review_service.get_reviews_for_filme(db=db, filme_id=filme_id)
     return reviews
 
@@ -40,7 +41,7 @@ def update_review(
     review_update: ReviewUpdateSchema,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> ReviewSchema:
+) -> Review | None:
     db_review = review_service.get(db, review_id=review_id)
     if db_review is None:
         raise HTTPException(status_code=404, detail="Review não encontrado.")

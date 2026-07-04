@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class Review(Base):
+class Review(Base):  # type: ignore[misc]
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
