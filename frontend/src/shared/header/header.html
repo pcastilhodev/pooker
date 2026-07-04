@@ -1,5 +1,5 @@
 <nav [class.scrolled]="scrolled" [class.hidden]="hidden">
-  <div class="nav-logo" role="button" tabindex="0" (click)="router.navigate([''])" (keydown.enter)="router.navigate([''])">LOOKER</div>
+  <button type="button" class="nav-logo" (click)="router.navigate([''])">LOOKER</button>
   <div class="nav-right">
     <a routerLink="/" class="nav-link">Filmes</a>
     <a routerLink="/colecoes" class="nav-link">Coleções</a>
@@ -46,18 +46,19 @@
           <button type="button" class="search-history-clear" (click)="clearHistory($event)">Limpar</button>
         </div>
         <div class="search-history-list">
-          <button
-            type="button"
-            class="search-chip"
-            *ngFor="let term of searchHistory"
-            (click)="pickHistory(term)">
-            <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
-              <path d="M12 8v5l3 2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>
-            </svg>
-            <span>{{ term }}</span>
-            <span class="chip-x" role="button" tabindex="0" (click)="removeHistory(term, $event)" (keydown.enter)="removeHistory(term, $event)" aria-label="Remover">&#x2715;</span>
-          </button>
+          <div class="search-chip-wrap" *ngFor="let term of searchHistory">
+            <button
+              type="button"
+              class="search-chip"
+              (click)="pickHistory(term)">
+              <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                <path d="M12 8v5l3 2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>
+              </svg>
+              <span>{{ term }}</span>
+            </button>
+            <button type="button" class="chip-x" (click)="removeHistory(term, $event)" aria-label="Remover">&#x2715;</button>
+          </div>
         </div>
       </div>
 

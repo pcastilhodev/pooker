@@ -1,6 +1,7 @@
 #intro {
   position: fixed;
   inset: 0;
+  width: 100%;
   background: var(--bg);
   z-index: 8000;
   display: flex;
@@ -8,6 +9,9 @@
   justify-content: center;
   flex-direction: column;
   cursor: pointer;
+  border: none;
+  padding: 0;
+  font: inherit;
 }
 
 #intro-line-wrap {

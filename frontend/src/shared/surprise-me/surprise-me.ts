@@ -71,10 +71,6 @@ export class SurpriseMe implements OnDestroy {
   @HostListener('document:keydown.escape')
   onEsc() { this.close(); }
 
-  onBackdrop(e: Event) {
-    if (e.target === e.currentTarget) this.close();
-  }
-
   ngOnDestroy() {
     if (this.tickHandle) clearInterval(this.tickHandle);
   }

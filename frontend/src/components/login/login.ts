@@ -46,10 +46,6 @@ export class Login {
     this.closed.emit();
   }
 
-  onOverlayClick(e: Event) {
-    if (e.target === e.currentTarget) this.closeModal();
-  }
-
   @HostListener('document:keydown.escape')
   onEscape() { this.closeModal(); }
 

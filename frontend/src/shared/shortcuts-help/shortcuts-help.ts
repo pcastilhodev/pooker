@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ShortcutsService, ShortcutDef } from '../../services/shortcuts-service';
@@ -27,6 +27,9 @@ export class ShortcutsHelp implements OnInit, OnDestroy {
   ngOnDestroy() { this.sub?.unsubscribe(); }
 
   close() { this.shortcuts.closeHelp(); }
+
+  @HostListener('document:keydown.escape')
+  onEscape() { if (this.visible) this.close(); }
 
   private buildGroups(): Group[] {
     const order: Group['name'][] = ['Navegação', 'Busca', 'Geral'];

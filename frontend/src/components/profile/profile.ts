@@ -168,7 +168,7 @@ export class Profile implements OnInit, OnDestroy {
   get maskedCpf(): string {
     const cpf = this.user?.cpf;
     if (!cpf) return '—';
-    const digits = cpf.replace(/\D/g, '').padStart(11, '*');
+    const digits = cpf.replaceAll(/\D/g, '').padStart(11, '*');
     return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
   }
 

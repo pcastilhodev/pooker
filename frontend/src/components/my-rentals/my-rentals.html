@@ -18,17 +18,17 @@
 
   <ul class="rentals-list" *ngIf="!loading && rentals.length > 0">
     <li class="rentals-item" *ngFor="let r of rentals; trackBy: trackById">
-      <div class="rentals-poster" role="button" tabindex="0" (click)="openMovie(r.filme_id)" (keydown.enter)="openMovie(r.filme_id)">
+      <button type="button" class="rentals-poster" (click)="openMovie(r.filme_id)" [attr.aria-label]="r.filme_titulo || ('Filme #' + r.filme_id)">
         <img *ngIf="r.filme_imagem_url" [src]="r.filme_imagem_url" [alt]="r.filme_titulo || ''" />
         <div *ngIf="!r.filme_imagem_url" class="rentals-poster-fallback">🎬</div>
-      </div>
+      </button>
 
       <div class="rentals-body">
         <div class="rentals-meta">
           <span class="rentals-id">#{{ r.id }}</span>
           <span class="rentals-status" [attr.data-status]="r.status">{{ statusLabel(r.status) }}</span>
         </div>
-        <h3 role="button" tabindex="0" (click)="openMovie(r.filme_id)" (keydown.enter)="openMovie(r.filme_id)">{{ r.filme_titulo || 'Filme #' + r.filme_id }}</h3>
+        <h3><button type="button" class="rentals-title-btn" (click)="openMovie(r.filme_id)">{{ r.filme_titulo || 'Filme #' + r.filme_id }}</button></h3>
 
         <div class="rentals-dates">
           <dl>

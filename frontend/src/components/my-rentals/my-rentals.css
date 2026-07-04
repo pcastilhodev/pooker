@@ -89,11 +89,14 @@
 }
 
 .rentals-poster {
+  display: block;
   width: 120px;
   height: 160px;
   overflow: hidden;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
+  border: none;
+  padding: 0;
 }
 
 .rentals-poster img {
@@ -144,15 +147,22 @@
 .rentals-status[data-status="atrasado"]  { color: #fda4af; border-color: rgba(225,29,72,0.4); }
 
 .rentals-body h3 {
+  margin: 0 0 14px;
+}
+
+.rentals-title-btn {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 24px;
   letter-spacing: 0.04em;
   color: var(--fg);
-  margin: 0 0 14px;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
 }
 
-.rentals-body h3:hover { color: #c4b5fd; }
+.rentals-title-btn:hover { color: #c4b5fd; }
 
 .rentals-dates {
   display: flex;

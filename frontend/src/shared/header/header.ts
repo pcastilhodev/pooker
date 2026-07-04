@@ -30,7 +30,7 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
   router = inject(Router);
   private readonly loginService = inject(LoginService);
   private readonly auth = inject(AuthService);
-  private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(ToastService);
   private readonly movies = inject(MovieService);
   private readonly history = inject(SearchHistoryService);
@@ -97,9 +97,9 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
       })
     ).subscribe((all: FilmeModel[]) => {
       const term = this.searchTerm.trim().toLowerCase();
-      this.searchResults = !term ? [] : all
+      this.searchResults = term ? all
         .filter(m => m.titulo.toLowerCase().includes(term) || m.genero?.toLowerCase().includes(term))
-        .slice(0, 6);
+        .slice(0, 6) : [];
       this.searchLoading = false;
     });
   }

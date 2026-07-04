@@ -1,4 +1,5 @@
-<div class="browse-card" role="button" tabindex="0" (mouseenter)="showActions=true" (mouseleave)="showActions=false" (click)="navigate()" (keydown.enter)="navigate()">
+<div class="browse-card" (mouseenter)="showActions=true" (mouseleave)="showActions=false">
+  <button type="button" class="browse-card-hit" (click)="navigate()" [attr.aria-label]="film.titulo"></button>
   <div class="browse-poster">
     <img *ngIf="film.imagem_url" [src]="film.imagem_url" [alt]="film.titulo" />
     <svg *ngIf="!film.imagem_url"
@@ -18,7 +19,7 @@
       </text>
     </svg>
     <div class="poster-shine"></div>
-    <div class="card-actions" *ngIf="showActions" role="button" tabindex="0" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
+    <div class="card-actions" *ngIf="showActions">
       <button (click)="addToFirstCollection($event)" title="Adicionar à coleção">+</button>
       <button (click)="toggleCompare($event)"
               [class.active]="compareService.isSelected(film.id)"
