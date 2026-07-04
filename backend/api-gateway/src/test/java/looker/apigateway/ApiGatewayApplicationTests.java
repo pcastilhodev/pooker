@@ -6,9 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class ApiGatewayApplicationTests {
 
-	@Test
-	void contextLoads() {
-		// Verifies the Spring application context starts up without errors.
-	}
+  @Test
+  void contextLoads() {
+    // Verifies the Spring application context starts up without errors.
+  }
 
 }
