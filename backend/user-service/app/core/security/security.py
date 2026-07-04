@@ -14,7 +14,9 @@ def decode_jwt(
 ) -> dict[str, Any]:
     token = credentials.credentials
     try:
-        payload = cast(dict[str, Any], jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]))
+        payload = cast(
+            dict[str, Any], jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        )
         return payload
     except JWTError:
         raise HTTPException(

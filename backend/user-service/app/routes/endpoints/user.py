@@ -32,8 +32,8 @@ def get_user(
 
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    assert response is not None  # FastAPI always injects Response
-    response.headers["X-User-Role"] = user.role.value
+    if response is not None:
+        response.headers["X-User-Role"] = user.role.value
     return user
 
 

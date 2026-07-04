@@ -28,9 +28,7 @@ def create_review(
 
 
 @router.get("/filme/{filme_id}", response_model=list[ReviewSchema])
-def get_reviews_by_filme(
-    filme_id: int, db: Session = Depends(get_db)
-) -> list[Review]:
+def get_reviews_by_filme(filme_id: int, db: Session = Depends(get_db)) -> list[Review]:
     reviews = review_service.get_reviews_for_filme(db=db, filme_id=filme_id)
     return reviews
 
