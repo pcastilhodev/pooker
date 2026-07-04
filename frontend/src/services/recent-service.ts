@@ -7,9 +7,9 @@ const MAX = 12;
 
 @Injectable({ providedIn: 'root' })
 export class RecentService {
-  private auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
-  private list$ = new BehaviorSubject<number[]>([]);
+  private readonly list$ = new BehaviorSubject<number[]>([]);
 
   recent$: Observable<number[]> = this.list$.asObservable();
 

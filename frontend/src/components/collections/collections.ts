@@ -16,8 +16,8 @@ import { MovieCard } from '../../shared/movie-card/movie-card';
 })
 export class Collections implements OnInit {
   collectionsService = inject(CollectionsService);
-  private movieService = inject(MovieService);
-  private router = inject(Router);
+  private readonly movieService = inject(MovieService);
+  private readonly router = inject(Router);
 
   collections: Collection[] = [];
   allFilms: FilmeModel[] = [];

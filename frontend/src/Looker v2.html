@@ -826,7 +826,7 @@ sc.addEventListener('wheel', e => {
   clearTimeout(wheelTimer);
   wheelTimer = setTimeout(() => {
     const dir = e.deltaY > 0 ? 1 : -1;
-    const browseTop = document.getElementById('browseSection').getBoundingClientRect().top;
+
 
     // If we're in film sections
     if (currentSection < totalSections - 1 || (dir < 0 && currentSection === totalSections - 1)) {
@@ -907,7 +907,7 @@ function playIntro() {
   tl.to('#intro-line-fill', { width: '100%', duration: 0.7, ease: 'power2.inOut' }, 0.3);
 
   // logo wipe reveal
-  tl.to('#intro-logo', { clipPath: 'inset(0 0% 0 0)', duration: 1.0, ease: 'power4.out' }, 0.55);
+  tl.to('#intro-logo', { clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power4.out' }, 0.55);
 
   // tagline fades
   tl.to('#intro-tagline', { color: 'rgba(240,238,232,0.4)', duration: 0.7, ease: 'power2.out' }, 1.3);

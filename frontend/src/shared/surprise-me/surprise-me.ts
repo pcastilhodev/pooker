@@ -16,9 +16,9 @@ const SPIN_MS = 1800;
   styleUrl: './surprise-me.css'
 })
 export class SurpriseMe implements OnDestroy {
-  private movies = inject(MovieService);
-  private router = inject(Router);
-  private achievements = inject(AchievementsService);
+  private readonly movies = inject(MovieService);
+  private readonly router = inject(Router);
+  private readonly achievements = inject(AchievementsService);
 
   @Output() closed = new EventEmitter<void>();
 

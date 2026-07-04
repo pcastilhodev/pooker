@@ -25,11 +25,11 @@ const G_LEADER_TIMEOUT = 1200;
   styleUrl: './app.css'
 })
 export class App implements AfterViewInit, OnDestroy {
-  private zone = inject(NgZone);
-  private router = inject(Router);
-  private shortcuts = inject(ShortcutsService);
-  private surprise = inject(SurpriseService);
-  private toast = inject(ToastService);
+  private readonly zone = inject(NgZone);
+  private readonly router = inject(Router);
+  private readonly shortcuts = inject(ShortcutsService);
+  private readonly surprise = inject(SurpriseService);
+  private readonly toast = inject(ToastService);
 
   private resizeHandler!: () => void;
   private rafHandle = 0;
@@ -38,7 +38,7 @@ export class App implements AfterViewInit, OnDestroy {
 
   surpriseOpen = false;
   cinemaMode = false;
-  private konamiSeq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  private readonly konamiSeq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   private konamiIdx = 0;
 
   constructor() {
@@ -58,7 +58,7 @@ export class App implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       gsap.defaults({ duration: 0 });
     }
     this.zone.runOutsideAngular(() => this.startGrain());

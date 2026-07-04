@@ -15,7 +15,7 @@ export interface RentalItem {
   data_aluguel: string;
   data_prevista_devolucao: string;
   data_devolucao?: string | null;
-  status: 'ativo' | 'devolvido' | 'atrasado' | string;
+  status: string;
   valor_aluguel: number;
 }
 
@@ -23,7 +23,7 @@ export interface RentalItem {
   providedIn: 'root'
 })
 export class Rent {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
 
   getRents(filmeId: number): Observable<RentResponse> {

@@ -46,7 +46,7 @@ export class FilterService {
   }
 
   extractGenres(films: FilmeModel[]): string[] {
-    return [...new Set(films.map(m => m.genero))].sort();
+    return [...new Set(films.map(m => m.genero))].sort((a, b) => a.localeCompare(b));
   }
 
   bounds(films: FilmeModel[]): { minAno: number; maxAno: number; maxPreco: number; maxDuracao: number } {

@@ -1,5 +1,5 @@
-<div class="sc-backdrop" *ngIf="visible" tabindex="0" (click)="close()" (keydown.enter)="close()">
-  <div class="sc-modal" tabindex="0" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" role="dialog" aria-labelledby="sc-title">
+<div class="sc-backdrop" *ngIf="visible" role="button" tabindex="0" (click)="close()" (keydown.enter)="close()">
+  <dialog class="sc-modal" tabindex="0" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" aria-labelledby="sc-title">
     <header class="sc-head">
       <span class="sc-eyebrow">Atalhos</span>
       <h2 id="sc-title">Teclado</h2>
@@ -23,5 +23,5 @@
     <footer class="sc-foot">
       <span>Pressione <kbd>?</kbd> a qualquer momento</span>
     </footer>
-  </div>
+  </dialog>
 </div>

@@ -11,7 +11,7 @@ import { FilmeModel } from '../../models/filme-model';
   styleUrl: './recommendations-section.css'
 })
 export class RecommendationsSection {
-  private router = inject(Router);
+  private readonly router = inject(Router);
 
   @Input() films: FilmeModel[] = [];
   go(id: number) { this.router.navigate(['/movie', id]); }

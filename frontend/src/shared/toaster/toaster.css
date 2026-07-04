@@ -49,10 +49,10 @@
   margin-top: 2px;
 }
 
-.toast[data-kind="success"] .toast-icon { background: rgba(16,185,129,0.18); color: #6ee7b7; }
-.toast[data-kind="error"]   .toast-icon { background: rgba(225,29,72,0.18);  color: #fda4af; }
-.toast[data-kind="warn"]    .toast-icon { background: rgba(245,158,11,0.18); color: #fcd34d; }
-.toast[data-kind="info"]    .toast-icon { background: rgba(124,58,237,0.18); color: #c4b5fd; }
+.toast[data-kind="success"] .toast-icon { background: #064e3b; color: #6ee7b7; }
+.toast[data-kind="error"]   .toast-icon { background: #4c0519; color: #fda4af; }
+.toast[data-kind="warn"]    .toast-icon { background: #431407; color: #fcd34d; }
+.toast[data-kind="info"]    .toast-icon { background: #2e1065; color: #c4b5fd; }
 
 .toast-body {
   display: flex;

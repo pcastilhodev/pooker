@@ -7,9 +7,9 @@ const KEY = 'looker:theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private store = inject(PreferenceStore);
+  private readonly store = inject(PreferenceStore);
 
-  private theme$: BehaviorSubject<Theme>;
+  private readonly theme$: BehaviorSubject<Theme>;
 
   constructor() {
     this.theme$ = new BehaviorSubject<Theme>(this.store.get<Theme>(KEY, 'dark'));
@@ -27,6 +27,6 @@ export class ThemeService {
   }
 
   private apply(t: Theme): void {
-    document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.dataset['theme'] = t;
   }
 }

@@ -16,10 +16,10 @@ import { AuthService } from '../../services/auth-service';
   styleUrl: './my-rentals.css'
 })
 export class MyRentals implements OnInit, OnDestroy {
-  private rentService = inject(Rent);
-  private movieService = inject(MovieService);
-  private auth = inject(AuthService);
-  private router = inject(Router);
+  private readonly rentService = inject(Rent);
+  private readonly movieService = inject(MovieService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   rentals: RentalItem[] = [];
   loading = true;
@@ -75,7 +75,7 @@ export class MyRentals implements OnInit, OnDestroy {
   formatDate(value: string | null | undefined): string {
     if (!value) return '—';
     const d = new Date(value);
-    if (isNaN(d.getTime())) return '—';
+    if (Number.isNaN(d.getTime())) return '—';
     return d.toLocaleDateString('pt-BR');
   }
 

@@ -26,9 +26,9 @@ interface TmdbVideosResponse {
 
 @Injectable({ providedIn: 'root' })
 export class TmdbService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  private cache = new Map<string, string | null>();
+  private readonly cache = new Map<string, string | null>();
 
   getTrailerKey(titulo: string): Observable<string | null> {
     if (this.cache.has(titulo)) return of(this.cache.get(titulo)!);

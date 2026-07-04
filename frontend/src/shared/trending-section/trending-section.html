@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="ts-row">
-    <div class="ts-card" *ngFor="let film of items; let i = index" tabindex="0" (click)="go(film.id)" (keydown.enter)="go(film.id)">
+    <div class="ts-card" *ngFor="let film of items; let i = index" role="button" tabindex="0" (click)="go(film.id)" (keydown.enter)="go(film.id)">
       <div class="ts-rank">{{ i + 1 }}</div>
       <div class="ts-poster">
         <img *ngIf="film.imagem_url" [src]="film.imagem_url" [alt]="film.titulo" />

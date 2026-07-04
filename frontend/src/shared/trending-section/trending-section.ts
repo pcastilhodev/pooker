@@ -14,8 +14,8 @@ type TrendTab = 'rate' | 'price' | 'duration';
   styleUrl: './trending-section.css'
 })
 export class TrendingSection {
-  private trending = inject(TrendingService);
-  private router = inject(Router);
+  private readonly trending = inject(TrendingService);
+  private readonly router = inject(Router);
 
   @Input() set films(val: FilmeModel[]) { this._films = val; this.refresh(); }
   private _films: FilmeModel[] = [];

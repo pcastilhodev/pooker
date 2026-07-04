@@ -6,9 +6,9 @@ const KEY_PREFIX = 'looker:favorites:';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
-  private auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
-  private ids$ = new BehaviorSubject<Set<number>>(new Set());
+  private readonly ids$ = new BehaviorSubject<Set<number>>(new Set());
 
   favorites$: Observable<Set<number>> = this.ids$.asObservable();
 

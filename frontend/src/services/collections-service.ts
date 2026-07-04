@@ -12,7 +12,7 @@ const KEY = 'looker:collections';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionsService {
-  private data$ = new BehaviorSubject<Collection[]>(this.load());
+  private readonly data$ = new BehaviorSubject<Collection[]>(this.load());
   collections$ = this.data$.asObservable();
 
   getAll(): Collection[] { return this.data$.value; }

@@ -12,7 +12,7 @@ import { CompareService } from '../../services/compare-service';
 })
 export class CompareBar {
   compareService = inject(CompareService);
-  private router = inject(Router);
+  private readonly router = inject(Router);
 
 
   go() { this.router.navigate(['/comparar']); }

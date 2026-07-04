@@ -12,7 +12,7 @@ import { FilterService, FilmFilters } from '../../services/filter-service';
   styleUrl: './filter-panel.css'
 })
 export class FilterPanel implements OnChanges {
-  private filterService = inject(FilterService);
+  private readonly filterService = inject(FilterService);
 
   @Input() films: FilmeModel[] = [];
   @Output() filtersChange = new EventEmitter<FilmFilters>();

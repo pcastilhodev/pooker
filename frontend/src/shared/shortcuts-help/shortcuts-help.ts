@@ -13,7 +13,7 @@ interface Group { name: string; items: ShortcutDef[]; }
   styleUrl: './shortcuts-help.css'
 })
 export class ShortcutsHelp implements OnInit, OnDestroy {
-  private shortcuts = inject(ShortcutsService);
+  private readonly shortcuts = inject(ShortcutsService);
 
   visible = false;
   groups: Group[] = [];

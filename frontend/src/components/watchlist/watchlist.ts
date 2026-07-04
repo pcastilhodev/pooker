@@ -19,11 +19,11 @@ interface WatchRow { film: FilmeModel; addedAt: number; }
   styleUrl: './watchlist.css'
 })
 export class Watchlist implements OnInit, OnDestroy {
-  private movies = inject(MovieService);
-  private watchlist = inject(WatchlistService);
-  private auth = inject(AuthService);
-  private toast = inject(ToastService);
-  private router = inject(Router);
+  private readonly movies = inject(MovieService);
+  private readonly watchlist = inject(WatchlistService);
+  private readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
   rows: WatchRow[] = [];
   loading = true;

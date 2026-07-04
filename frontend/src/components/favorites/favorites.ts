@@ -16,10 +16,10 @@ import { MovieCard } from '../../shared/movie-card/movie-card';
   styleUrl: './favorites.css'
 })
 export class Favorites implements OnInit, OnDestroy {
-  private movies = inject(MovieService);
-  private favorites = inject(FavoritesService);
-  private auth = inject(AuthService);
-  private router = inject(Router);
+  private readonly movies = inject(MovieService);
+  private readonly favorites = inject(FavoritesService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   films: FilmeModel[] = [];
   loading = true;

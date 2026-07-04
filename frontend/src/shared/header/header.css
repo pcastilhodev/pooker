@@ -84,7 +84,7 @@ nav.hidden { transform: translateY(-100%); }
 .nav-dice:hover {
   color: #c4b5fd;
   border-color: rgba(196,181,253,0.7);
-  background: rgba(124,58,237,0.12);
+  background: #2e1065;
   transform: translateY(-1px);
 }
 
@@ -201,7 +201,7 @@ nav.hidden { transform: translateY(-100%); }
 
 .user-dropdown-item--danger { color: #f87a8e; }
 .user-dropdown-item--danger:hover {
-  background: rgba(225,29,72,0.12);
+  background: #4c0519;
   color: #ff6b85;
 }
 

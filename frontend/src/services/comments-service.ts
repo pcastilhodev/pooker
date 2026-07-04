@@ -15,9 +15,9 @@ export interface MovieComment {
 
 @Injectable({ providedIn: 'root' })
 export class CommentsService {
-  private auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
-  private all$ = new BehaviorSubject<MovieComment[]>(this.read());
+  private readonly all$ = new BehaviorSubject<MovieComment[]>(this.read());
   private nextId = (this.all$.value.reduce((m, c) => Math.max(m, c.id), 0)) + 1;
 
   comments$: Observable<MovieComment[]> = this.all$.asObservable();

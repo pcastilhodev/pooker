@@ -55,20 +55,20 @@ const REVIEWS_MOCK = [
   styleUrl: './movie.css'
 })
 export class Movie implements OnInit, OnDestroy {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private movieService = inject(MovieService);
-  private rentService = inject(Rent);
-  private zone = inject(NgZone);
-  private el = inject(ElementRef);
-  private toast = inject(ToastService);
-  private favorites = inject(FavoritesService);
-  private ratings = inject(RatingsService);
-  private auth = inject(AuthService);
-  private recent = inject(RecentService);
-  private commentsSvc = inject(CommentsService);
-  private tmdbService = inject(TmdbService);
-  private recommendationService = inject(RecommendationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly movieService = inject(MovieService);
+  private readonly rentService = inject(Rent);
+  private readonly zone = inject(NgZone);
+  private readonly el = inject(ElementRef);
+  private readonly toast = inject(ToastService);
+  private readonly favorites = inject(FavoritesService);
+  private readonly ratings = inject(RatingsService);
+  private readonly auth = inject(AuthService);
+  private readonly recent = inject(RecentService);
+  private readonly commentsSvc = inject(CommentsService);
+  private readonly tmdbService = inject(TmdbService);
+  private readonly recommendationService = inject(RecommendationService);
 
   film:         FilmeModel | undefined;
   similarFilms: FilmeModel[] = [];
@@ -117,7 +117,7 @@ export class Movie implements OnInit, OnDestroy {
 
   shareMovie() {
     if (!this.film) return;
-    const url = window.location.href;
+    const url = globalThis.location.href;
     const data = { title: this.film.titulo, text: `Veja "${this.film.titulo}" no Looker`, url };
     if (navigator.share) {
       navigator.share(data).catch(() => { /* user cancelled */ });

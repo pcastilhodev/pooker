@@ -44,11 +44,11 @@
 
 .browse-empty {
   margin-top: 40px;
-  padding: 32px;
+  padding: 40px 0;
   text-align: center;
   border: 1px dashed var(--border);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -203,4 +203,3 @@
 
 .browse-list { display: flex; flex-direction: column; gap: 8px; margin-top: 40px; }
 .browse-list app-movie-card { display: block; }
-.browse-empty { color: var(--muted); font-size: 14px; padding: 40px 0; }

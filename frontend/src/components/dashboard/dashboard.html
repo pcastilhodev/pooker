@@ -78,7 +78,7 @@
   <div class="counter-dots">
     <div *ngFor="let f of snapFilms; let i = index"
          class="counter-dot" [class.active]="i === currentIndex"
-         tabindex="0"
+         role="button" tabindex="0"
          (click)="snapToSection(i)"
          (keydown.enter)="snapToSection(i)"></div>
   </div>

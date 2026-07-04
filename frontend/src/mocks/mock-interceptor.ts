@@ -1,6 +1,5 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { MOCK_FILMES } from './mock-data';
 
 interface MockRental {
@@ -36,8 +35,8 @@ function buildMockJwt(payload: Record<string, unknown>): string {
 }
 
 function base64UrlEncode(value: string): string {
-  const utf8 = unescape(encodeURIComponent(value));
-  return btoa(utf8).replace(/={1,2}$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const utf8 = decodeURIComponent(encodeURIComponent(value));
+  return btoa(utf8).replace(/={1,2}$/, '').replaceAll('+', '-').replaceAll('/', '_');
 }
 
 export function isMockApiEnabled(): boolean {
@@ -63,7 +62,7 @@ function handleLoginPost(body: unknown): Observable<HttpResponse<unknown>> {
 }
 
 function handleFilmesGet(url: string): Observable<HttpResponse<unknown>> {
-  const idMatch = url.match(/\/filmes\/(\d+)/);
+  const idMatch = /\/filmes\/(\d+)/.exec(url);
   if (idMatch) {
     const filme = MOCK_FILMES.find(f => f.id === +idMatch[1]) ?? MOCK_FILMES[0];
     return of(new HttpResponse({ status: 200, body: filme }));
@@ -124,6 +123,6 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
 function deriveName(email: string): string {
   const local = email.split('@')[0] ?? 'Usuário';
   return local
-    .replace(/[._-]+/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+    .replaceAll(/[._-]+/g, ' ')
+    .replaceAll(/\b\w/g, c => c.toUpperCase());
 }

@@ -11,7 +11,7 @@ import { Toast, ToastService } from '../../services/toast-service';
   styleUrl: './toaster.css'
 })
 export class Toaster implements OnInit, OnDestroy {
-  private toastService = inject(ToastService);
+  private readonly toastService = inject(ToastService);
 
   toasts: Toast[] = [];
   private sub?: Subscription;

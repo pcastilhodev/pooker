@@ -14,7 +14,7 @@ export interface Toast {
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   private nextId = 1;
-  private toasts$ = new BehaviorSubject<Toast[]>([]);
+  private readonly toasts$ = new BehaviorSubject<Toast[]>([]);
 
   stream: Observable<Toast[]> = this.toasts$.asObservable();
 

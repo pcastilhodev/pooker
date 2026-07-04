@@ -16,9 +16,9 @@ const DISMISS_KEY = 'looker:due-banner-dismissed';
   styleUrl: './due-banner.css'
 })
 export class DueBanner implements OnInit, OnDestroy {
-  private auth = inject(AuthService);
-  private rentService = inject(Rent);
-  private router = inject(Router);
+  private readonly auth = inject(AuthService);
+  private readonly rentService = inject(Rent);
+  private readonly router = inject(Router);
 
   dueSoon: RentalItem[] = [];
   visible = false;
