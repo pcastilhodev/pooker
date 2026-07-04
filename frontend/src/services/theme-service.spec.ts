@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { ThemeService } from './theme-service';
 import { PreferenceStore } from './preference-store';
 
@@ -7,7 +8,8 @@ describe('ThemeService', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.removeAttribute('data-theme');
-    service = new ThemeService(new PreferenceStore());
+    TestBed.configureTestingModule({ providers: [ThemeService, PreferenceStore] });
+    service = TestBed.inject(ThemeService);
   });
 
   it('defaults to dark', () => {

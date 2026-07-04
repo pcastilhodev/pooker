@@ -67,7 +67,7 @@ describe('Movie', () => {
   it('should call rentService when rentMovie is called', () => {
     rentSpy.getRents.and.returnValue(of({
       aluguel: { data_prevista_devolucao: new Date().toISOString() },
-      pagamento: { aluguel_id: 1, amount: 10 }
+      pagamento: { aluguel_id: '1', amount: 10 }
     }));
     component.rentMovie();
     expect(rentSpy.getRents).toHaveBeenCalledWith(1);
