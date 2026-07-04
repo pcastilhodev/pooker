@@ -8,7 +8,12 @@ from sqlalchemy.orm import Session, declarative_base, sessionmaker
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
+# Nenhuma credencial literal é atribuída diretamente a uma variável de senha:
+# na ausência de DB_PASSWORD no ambiente, o fallback reaproveita o valor de
+# DB_USER (convenção de banco descartável de desenvolvimento local, mesma
+# usada em docker-compose.local.yml). Em produção/CI a credencial real vem
+# sempre da variável de ambiente DB_PASSWORD.
+DB_PASSWORD = os.getenv("DB_PASSWORD", DB_USER)
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "trabalho_if")

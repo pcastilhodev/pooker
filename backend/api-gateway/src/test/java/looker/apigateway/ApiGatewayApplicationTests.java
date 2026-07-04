@@ -8,6 +8,7 @@ class ApiGatewayApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// Verifies the Spring application context starts up without errors.
 	}
 
 }

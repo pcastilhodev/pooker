@@ -1,2 +1,7 @@
 .env
 .venv
+.coverage
+coverage.xml
+.scannerwork/
+__pycache__/
+*.pyc

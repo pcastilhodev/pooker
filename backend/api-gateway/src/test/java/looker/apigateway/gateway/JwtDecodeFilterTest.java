@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
@@ -28,6 +29,7 @@ class JwtDecodeFilterTest {
     @BeforeEach
     void setUp() {
         filter = new JwtDecodeFilter();
+        ReflectionTestUtils.setField(filter, "secretKey", SECRET);
         passThroughChain = exchange -> Mono.empty();
     }
 
