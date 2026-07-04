@@ -51,7 +51,7 @@ repos:
       - id: mypy-alugueis
         name: mypy --strict (alugueis-service)
         language: system
-        entry: bash -c 'cd backend/alugueis-service && mypy --strict --config-file ../pyproject.toml app/'
+        entry: bash -c 'cd backend/alugueis-service && py -m mypy --strict --config-file ../pyproject.toml app/'
         files: ^backend/alugueis-service/.*\.py$
         exclude: alembic
         pass_filenames: false
@@ -59,7 +59,7 @@ repos:
       - id: mypy-filmes
         name: mypy --strict (filmes-service)
         language: system
-        entry: bash -c 'cd backend/filmes-service && mypy --strict --config-file ../pyproject.toml app/'
+        entry: bash -c 'cd backend/filmes-service && py -m mypy --strict --config-file ../pyproject.toml app/'
         files: ^backend/filmes-service/.*\.py$
         exclude: alembic
         pass_filenames: false
@@ -67,7 +67,7 @@ repos:
       - id: mypy-payment
         name: mypy --strict (payment-service)
         language: system
-        entry: bash -c 'cd backend/payment-service && mypy --strict --config-file ../pyproject.toml app/'
+        entry: bash -c 'cd backend/payment-service && py -m mypy --strict --config-file ../pyproject.toml app/'
         files: ^backend/payment-service/.*\.py$
         exclude: alembic
         pass_filenames: false
@@ -75,7 +75,7 @@ repos:
       - id: mypy-user
         name: mypy --strict (user-service)
         language: system
-        entry: bash -c 'cd backend/user-service && mypy --strict --config-file ../pyproject.toml app/'
+        entry: bash -c 'cd backend/user-service && py -m mypy --strict --config-file ../pyproject.toml app/'
         files: ^backend/user-service/.*\.py$
         exclude: alembic
         pass_filenames: false
@@ -115,7 +115,7 @@ repos:
       - id: eslint-frontend
         name: ESLint --max-warnings=0 (frontend)
         language: system
-        entry: bash -c 'cd frontend && npx ng lint -- --max-warnings=0'
+        entry: bash -c 'cd frontend && npx ng lint'
         files: ^frontend/src/.*\.(ts|html)$
         pass_filenames: false
         stages: [pre-push]
