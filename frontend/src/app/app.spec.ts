@@ -46,6 +46,14 @@ describe('App', () => {
   let surpriseSubject: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
+    // app.html renders a real <canvas id="grain">. TestBed.createComponent
+    // inserts the fixture's root element into the live document immediately
+    // (even without detectChanges()), so every test in this file leaves a
+    // real canvas behind unless it's cleaned up — and duplicates from
+    // earlier tests would otherwise shadow the current test's own element
+    // via getElementById. Sweep all matches, not just the first.
+    document.querySelectorAll('#grain').forEach(el => el.remove());
+
     surpriseSubject = new BehaviorSubject<boolean>(false);
 
     shortcutsSpy = jasmine.createSpyObj('ShortcutsService', ['toggleHelp', 'openHelp', 'closeHelp', 'requestSearchFocus']);
@@ -72,6 +80,7 @@ describe('App', () => {
 
   afterEach(() => {
     document.documentElement.classList.remove('cinema-classic');
+    document.querySelectorAll('#grain').forEach(el => el.remove());
   });
 
   it('should create the app', () => {
@@ -305,11 +314,11 @@ describe('App', () => {
       // the live document as soon as the fixture is created, even without
       // detectChanges(). Remove it so each test starts from a clean slate and
       // any canvas it manually creates/appends is the only '#grain' match.
-      document.getElementById('grain')?.remove();
+      document.querySelectorAll('#grain').forEach(el => el.remove());
     });
 
     afterEach(() => {
-      document.getElementById('grain')?.remove();
+      document.querySelectorAll('#grain').forEach(el => el.remove());
     });
 
     it('should zero-out gsap default duration when prefers-reduced-motion matches', () => {
@@ -421,7 +430,7 @@ describe('App', () => {
 
   describe('ngOnDestroy', () => {
     afterEach(() => {
-      document.getElementById('grain')?.remove();
+      document.querySelectorAll('#grain').forEach(el => el.remove());
     });
 
     it('should not throw when called without a prior ngAfterViewInit', () => {
