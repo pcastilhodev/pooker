@@ -1,15 +1,15 @@
-import pytest
-from pydantic import ValidationError
 from datetime import date
 
+import pytest
 from app.dtos.dto_user import UserDTO
-from app.schemas.schemas_user import UserCreate
 from app.models.models_user import RoleEnum
-
+from app.schemas.schemas_user import UserCreate
+from pydantic import ValidationError
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _valid_data(**overrides) -> dict:
     base = dict(
@@ -26,6 +26,7 @@ def _valid_data(**overrides) -> dict:
 # ---------------------------------------------------------------------------
 # Validação de senha
 # ---------------------------------------------------------------------------
+
 
 def test_senha_minima_8_chars_aceita():
     dto = UserDTO(**_valid_data(senha="12345678"))
@@ -45,6 +46,7 @@ def test_senha_exatamente_8_chars_aceita():
 # ---------------------------------------------------------------------------
 # Validação de CPF
 # ---------------------------------------------------------------------------
+
 
 def test_cpf_11_digitos_valido():
     dto = UserDTO(**_valid_data(cpf="98765432100"))
@@ -69,6 +71,7 @@ def test_cpf_com_mais_de_11_digitos_levanta_erro():
 # ---------------------------------------------------------------------------
 # from_schema
 # ---------------------------------------------------------------------------
+
 
 def test_from_schema_cria_dto_corretamente():
     schema = UserCreate(

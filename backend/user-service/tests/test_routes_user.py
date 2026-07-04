@@ -2,12 +2,11 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-
 from app.core.db_usuario import get_db
 from app.models.models_user import RoleEnum
 from app.routes.routes import api_router
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 FAKE_HASH = "$2b$12$fakehashfortesting"
 
@@ -66,9 +65,7 @@ def test_create_user_sucesso(client: TestClient, db_mock: MagicMock) -> None:
     # como o db é um mock, simulamos esse comportamento aqui.
     db_mock.refresh.side_effect = lambda obj: setattr(obj, "id", 1)
 
-    with patch(
-        "app.factorie.factorie_user.pwd_context.hash", return_value=FAKE_HASH
-    ):
+    with patch("app.factorie.factorie_user.pwd_context.hash", return_value=FAKE_HASH):
         resp = client.post("/api/v1/users/", json=_valid_payload())
 
     assert resp.status_code == 200
@@ -158,9 +155,7 @@ def test_login_email_nao_encontrado(client: TestClient, db_mock: MagicMock) -> N
 def test_login_senha_invalida(client: TestClient, db_mock: MagicMock) -> None:
     db_mock.query.return_value.filter.return_value.first.return_value = _user_obj()
 
-    with patch(
-        "app.routes.endpoints.user.pwd_context.verify", return_value=False
-    ):
+    with patch("app.routes.endpoints.user.pwd_context.verify", return_value=False):
         resp = client.post(
             "/api/v1/users/login",
             json={"email": "joao@example.com", "senha": "errada"},
@@ -178,10 +173,9 @@ def test_login_auth_service_recusa_com_detail(
     fake_response.ok = False
     fake_response.json.return_value = {"detail": "Credenciais inválidas no Auth"}
 
-    with patch(
-        "app.routes.endpoints.user.pwd_context.verify", return_value=True
-    ), patch(
-        "app.routes.endpoints.user.requests.post", return_value=fake_response
+    with (
+        patch("app.routes.endpoints.user.pwd_context.verify", return_value=True),
+        patch("app.routes.endpoints.user.requests.post", return_value=fake_response),
     ):
         resp = client.post(
             "/api/v1/users/login",
@@ -200,10 +194,9 @@ def test_login_auth_service_recusa_sem_detail_json(
     fake_response.ok = False
     fake_response.json.side_effect = ValueError("invalid json")
 
-    with patch(
-        "app.routes.endpoints.user.pwd_context.verify", return_value=True
-    ), patch(
-        "app.routes.endpoints.user.requests.post", return_value=fake_response
+    with (
+        patch("app.routes.endpoints.user.pwd_context.verify", return_value=True),
+        patch("app.routes.endpoints.user.requests.post", return_value=fake_response),
     ):
         resp = client.post(
             "/api/v1/users/login",
@@ -219,11 +212,12 @@ def test_login_auth_service_indisponivel(
 ) -> None:
     db_mock.query.return_value.filter.return_value.first.return_value = _user_obj()
 
-    with patch(
-        "app.routes.endpoints.user.pwd_context.verify", return_value=True
-    ), patch(
-        "app.routes.endpoints.user.requests.post",
-        side_effect=ConnectionError("boom"),
+    with (
+        patch("app.routes.endpoints.user.pwd_context.verify", return_value=True),
+        patch(
+            "app.routes.endpoints.user.requests.post",
+            side_effect=ConnectionError("boom"),
+        ),
     ):
         resp = client.post(
             "/api/v1/users/login",
@@ -240,10 +234,9 @@ def test_login_sucesso(client: TestClient, db_mock: MagicMock) -> None:
     fake_response.ok = True
     fake_response.json.return_value = {"token": "jwt-fake-token"}
 
-    with patch(
-        "app.routes.endpoints.user.pwd_context.verify", return_value=True
-    ), patch(
-        "app.routes.endpoints.user.requests.post", return_value=fake_response
+    with (
+        patch("app.routes.endpoints.user.pwd_context.verify", return_value=True),
+        patch("app.routes.endpoints.user.requests.post", return_value=fake_response),
     ):
         resp = client.post(
             "/api/v1/users/login",
@@ -252,7 +245,7 @@ def test_login_sucesso(client: TestClient, db_mock: MagicMock) -> None:
 
     assert resp.status_code == 200
     body = resp.json()
-    assert body["token"] == "jwt-fake-token"
+    assert body["token"] == "jwt-fake-token"  # noqa: S105 -- test fixture literal, not a real credential
     assert body["user"]["email"] == "joao@example.com"
 
 

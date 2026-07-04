@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-from app.factorie.factorie_user import UserFactory
 from app.dtos.dto_user import UserDTO
+from app.factorie.factorie_user import UserFactory
 from app.models.models_user import User
 
 FAKE_HASH = "$2b$12$fakehashfortesting"
@@ -23,6 +23,7 @@ def _valid_dto(**overrides) -> UserDTO:
 # UserFactory.create
 # ---------------------------------------------------------------------------
 
+
 def test_create_retorna_instancia_user():
     with patch("app.factorie.factorie_user.pwd_context.hash", return_value=FAKE_HASH):
         result = UserFactory.create(_valid_dto())
@@ -43,7 +44,9 @@ def test_create_copia_campos_do_dto():
 
 
 def test_create_senha_e_hasheada():
-    with patch("app.factorie.factorie_user.pwd_context.hash", return_value=FAKE_HASH) as mock_hash:
+    with patch(
+        "app.factorie.factorie_user.pwd_context.hash", return_value=FAKE_HASH
+    ) as mock_hash:
         result = UserFactory.create(_valid_dto(senha="senha_original"))
 
     mock_hash.assert_called_once_with("senha_original")
