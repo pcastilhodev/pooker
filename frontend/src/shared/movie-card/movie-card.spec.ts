@@ -66,4 +66,48 @@ describe('MovieCard', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('img')).not.toBeNull();
   });
+
+  it('palette cycles based on the film id', () => {
+    component.film = { ...mockFilm, id: 7 };
+    expect(component.palette).toEqual({ c1: '#0d1520', c2: '#153050' });
+  });
+
+  it('addToFirstCollection stops propagation and adds to the first collection', () => {
+    collectionsSpy.getAll.and.returnValue([{ id: 'c1', name: 'X', filmIds: [], createdAt: '' }]);
+    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
+
+    component.addToFirstCollection(evt);
+
+    expect(evt.stopPropagation).toHaveBeenCalled();
+    expect(collectionsSpy.addFilm).toHaveBeenCalledWith('c1', 1);
+  });
+
+  it('addToFirstCollection navigates to collections page when there are none', () => {
+    collectionsSpy.getAll.and.returnValue([]);
+    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
+
+    component.addToFirstCollection(evt);
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/colecoes']);
+    expect(collectionsSpy.addFilm).not.toHaveBeenCalled();
+  });
+
+  it('toggleCompare adds the film when not selected', () => {
+    compareSpy.isSelected.and.returnValue(false);
+    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
+
+    component.toggleCompare(evt);
+
+    expect(evt.stopPropagation).toHaveBeenCalled();
+    expect(compareSpy.add).toHaveBeenCalledWith(1);
+  });
+
+  it('toggleCompare removes the film when already selected', () => {
+    compareSpy.isSelected.and.returnValue(true);
+    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
+
+    component.toggleCompare(evt);
+
+    expect(compareSpy.remove).toHaveBeenCalledWith(1);
+  });
 });
