@@ -27,10 +27,10 @@ export const ACHIEVEMENTS: Achievement[] = [
 
 @Injectable({ providedIn: 'root' })
 export class AchievementsService {
-  private auth = inject(AuthService);
-  private toast = inject(ToastService);
+  private readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
-  private unlocked$ = new BehaviorSubject<Set<string>>(new Set());
+  private readonly unlocked$ = new BehaviorSubject<Set<string>>(new Set());
 
   achievements$: Observable<Set<string>> = this.unlocked$.asObservable();
 

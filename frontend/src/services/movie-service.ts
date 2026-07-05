@@ -6,7 +6,7 @@ import { FilmeModel } from '../models/filme-model';
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   private allMovies$: Observable<FilmeModel[]> | null = null;
 
@@ -15,11 +15,9 @@ export class MovieService {
   }
 
   getAllMovies(): Observable<FilmeModel[]> {
-    if (!this.allMovies$) {
-      this.allMovies$ = this.http
-        .get<FilmeModel[]>('/gateway/movie/v1/filmes/')
-        .pipe(shareReplay(1));
-    }
+    this.allMovies$ ??= this.http
+      .get<FilmeModel[]>('/gateway/movie/v1/filmes/')
+      .pipe(shareReplay(1));
     return this.allMovies$;
   }
 }

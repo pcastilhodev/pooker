@@ -22,7 +22,7 @@ const PALETTES = [
   styleUrl: './movie-card.css'
 })
 export class MovieCard {
-  private router = inject(Router);
+  private readonly router = inject(Router);
   collectionsService = inject(CollectionsService);
   compareService = inject(CompareService);
 

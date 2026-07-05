@@ -15,10 +15,10 @@ import { FilmeModel } from '../../models/filme-model';
   styleUrl: './compare.css'
 })
 export class Compare implements OnInit {
-  compareService = inject(CompareService);
-  private movieService = inject(MovieService);
-  private rentService = inject(Rent);
-  private router = inject(Router);
+  readonly compareService = inject(CompareService);
+  private readonly movieService = inject(MovieService);
+  private readonly rentService = inject(Rent);
+  private readonly router = inject(Router);
 
   films: FilmeModel[] = [];
   rentLoading: Record<number, boolean> = {};

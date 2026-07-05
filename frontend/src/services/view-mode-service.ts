@@ -7,9 +7,9 @@ const KEY = 'looker:view-mode';
 
 @Injectable({ providedIn: 'root' })
 export class ViewModeService {
-  private store = inject(PreferenceStore);
+  private readonly store = inject(PreferenceStore);
 
-  private mode$: BehaviorSubject<ViewMode>;
+  private readonly mode$: BehaviorSubject<ViewMode>;
 
   constructor() {
     this.mode$ = new BehaviorSubject<ViewMode>(this.store.get<ViewMode>(KEY, 'grid'));

@@ -16,9 +16,9 @@ const SPIN_MS = 1800;
   styleUrl: './surprise-me.css'
 })
 export class SurpriseMe implements OnDestroy {
-  private movies = inject(MovieService);
-  private router = inject(Router);
-  private achievements = inject(AchievementsService);
+  private readonly movies = inject(MovieService);
+  private readonly router = inject(Router);
+  private readonly achievements = inject(AchievementsService);
 
   @Output() closed = new EventEmitter<void>();
 
@@ -70,10 +70,6 @@ export class SurpriseMe implements OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEsc() { this.close(); }
-
-  onBackdrop(e: Event) {
-    if (e.target === e.currentTarget) this.close();
-  }
 
   ngOnDestroy() {
     if (this.tickHandle) clearInterval(this.tickHandle);

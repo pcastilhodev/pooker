@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
 import { CompareBar } from './compare-bar';
 import { CompareService } from '../../services/compare-service';
 
@@ -12,17 +11,14 @@ describe('CompareBar', () => {
 
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    compareSpy = jasmine.createSpyObj('CompareService', ['clear'], {
-      idsObs$: new BehaviorSubject<number[]>([1, 2]).asObservable(),
-      ids: [1, 2],
-    });
+    compareSpy = jasmine.createSpyObj('CompareService', ['clear'], { ids: [1, 2] });
 
     await TestBed.configureTestingModule({
       imports: [CompareBar],
       providers: [
         { provide: Router, useValue: routerSpy },
-        { provide: CompareService, useValue: compareSpy },
-      ],
+        { provide: CompareService, useValue: compareSpy }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(CompareBar);
@@ -30,15 +26,41 @@ describe('CompareBar', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => { expect(component).toBeTruthy(); });
-
-  it('go navigates to the compare page', () => {
-    component.go();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/comparar']);
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('clear delegates to CompareService', () => {
-    component.clear();
-    expect(compareSpy.clear).toHaveBeenCalled();
+  describe('go', () => {
+    it('should navigate to /comparar', () => {
+      component.go();
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/comparar']);
+    });
+  });
+
+  describe('clear', () => {
+    it('should delegate to compareService.clear()', () => {
+      component.clear();
+      expect(compareSpy.clear).toHaveBeenCalled();
+    });
+  });
+
+  describe('template interactions', () => {
+    it('should render the bar when there are selected ids', () => {
+      expect(fixture.nativeElement.querySelector('.compare-bar')).not.toBeNull();
+    });
+
+    it('should call go() when the compare button is clicked', () => {
+      spyOn(component, 'go');
+      const btn: HTMLButtonElement = fixture.nativeElement.querySelector('.cbar-btn');
+      btn.click();
+      expect(component.go).toHaveBeenCalled();
+    });
+
+    it('should call clear() when the clear button is clicked', () => {
+      spyOn(component, 'clear');
+      const btn: HTMLButtonElement = fixture.nativeElement.querySelector('.cbar-clear');
+      btn.click();
+      expect(component.clear).toHaveBeenCalled();
+    });
   });
 });

@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { ViewModeService } from './view-mode-service';
+import { PreferenceStore } from './preference-store';
 
 describe('ViewModeService', () => {
   let service: ViewModeService;
 
   beforeEach(() => {
     localStorage.clear();
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({ providers: [ViewModeService, PreferenceStore] });
     service = TestBed.inject(ViewModeService);
   });
 
@@ -21,7 +22,9 @@ describe('ViewModeService', () => {
 
   it('setMode persists preference', () => {
     service.setMode('list');
-    const service2 = TestBed.runInInjectionContext(() => new ViewModeService());
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [ViewModeService, PreferenceStore] });
+    const service2 = TestBed.inject(ViewModeService);
     expect(service2.mode).toBe('list');
   });
 

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException
@@ -14,11 +14,19 @@ router = APIRouter()
 aluguel_service = AluguelService()
 
 
-@router.post("/", response_model=AluguelSchemaPayment, status_code=201)
+@router.post(
+    "/",
+    response_model=AluguelSchemaPayment,
+    status_code=201,
+    responses={
+        500: {"description": "Erro ao criar aluguel"},
+        503: {"description": "Erro ao comunicar com o serviço de pagamento"},
+    },
+)
 def create_aluguel(
     aluguel: AluguelCreateSchema,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> dict[str, Any]:
     try:
         db_aluguel = aluguel_service.create(
@@ -54,11 +62,21 @@ def create_aluguel(
     return {"aluguel": db_aluguel, "pagamento": pagamento_data}
 
 
-@router.post("/{aluguel_id}/devolucao", response_model=AluguelSchema)
+@router.post(
+    "/{aluguel_id}/devolucao",
+    response_model=AluguelSchema,
+    responses={
+        400: {"description": "Aluguel já devolvido ou dados inválidos"},
+        403: {"description": "Permissão negada"},
+        404: {"description": "Aluguel não encontrado"},
+        500: {"description": "Erro inesperado ao processar a devolução"},
+        503: {"description": "Falha de conexão ao processar a devolução"},
+    },
+)
 def processar_devolucao(
     aluguel_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> AluguelModel | None:
     try:
         db_aluguel = aluguel_service.get_by_id(db=db, aluguel_id=aluguel_id)
@@ -89,7 +107,8 @@ def processar_devolucao(
 
 @router.get("/", response_model=list[AluguelSchema])
 def get_alugueis_por_usuario(
-    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> list[dict[str, Any]]:
     return aluguel_service.get_by_usuario_enriched(
         db=db, usuario_id=int(current_user.id)

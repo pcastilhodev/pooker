@@ -21,8 +21,8 @@ const PALETTES = [
   styleUrl: './film-snap-section.css'
 })
 export class FilmSnapSection implements AfterViewInit, OnDestroy {
-  private router = inject(Router);
-  private zone = inject(NgZone);
+  private readonly router = inject(Router);
+  private readonly zone = inject(NgZone);
 
   @Input() film!: FilmeModel;
   @Input() index = 0;

@@ -76,11 +76,11 @@
 <div id="counter" [style.opacity]="navVisible ? '1' : '0'">
   <div class="counter-num">{{ counterLabel }}</div>
   <div class="counter-dots">
-    <div *ngFor="let f of snapFilms; let i = index"
-         class="counter-dot" [class.active]="i === currentIndex"
-         tabindex="0"
-         (click)="snapToSection(i)"
-         (keydown.enter)="snapToSection(i)"></div>
+    <button *ngFor="let f of snapFilms; let i = index"
+            type="button"
+            class="counter-dot" [class.active]="i === currentIndex"
+            [attr.aria-label]="'Ir para seção ' + (i + 1)"
+            (click)="snapToSection(i)"></button>
   </div>
 </div>
 

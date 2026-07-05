@@ -1,18 +1,18 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from fastapi import HTTPException
 
+import pytest
 from app.controllers.controller_user import (
     create_user,
+    delete_user,
+    get_password_hash,
+    get_user_by_email,
     list_users,
     obter_user,
     update_user,
-    delete_user,
-    get_user_by_email,
-    get_password_hash,
 )
+from app.models.models_user import RoleEnum, User
 from app.schemas.schemas_user import UserCreate
-from app.models.models_user import User, RoleEnum
+from fastapi import HTTPException
 
 FAKE_HASH = "$2b$12$fakehashfortesting"
 
@@ -20,6 +20,7 @@ FAKE_HASH = "$2b$12$fakehashfortesting"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _valid_schema(**overrides) -> UserCreate:
     base = dict(
@@ -46,8 +47,11 @@ def _make_user(id: int = 1, email: str = "joao@example.com") -> MagicMock:
 # get_password_hash
 # ---------------------------------------------------------------------------
 
+
 def test_get_password_hash_delega_ao_contexto():
-    with patch("app.controllers.controller_user.pwd_context.hash", return_value=FAKE_HASH) as mock_hash:
+    with patch(
+        "app.controllers.controller_user.pwd_context.hash", return_value=FAKE_HASH
+    ) as mock_hash:
         result = get_password_hash("minha_senha")
 
     mock_hash.assert_called_once_with("minha_senha")
@@ -55,7 +59,9 @@ def test_get_password_hash_delega_ao_contexto():
 
 
 def test_get_password_hash_retorna_string_nao_vazia():
-    with patch("app.controllers.controller_user.pwd_context.hash", return_value=FAKE_HASH):
+    with patch(
+        "app.controllers.controller_user.pwd_context.hash", return_value=FAKE_HASH
+    ):
         result = get_password_hash("qualquer_senha")
 
     assert isinstance(result, str)
@@ -65,6 +71,7 @@ def test_get_password_hash_retorna_string_nao_vazia():
 # ---------------------------------------------------------------------------
 # create_user
 # ---------------------------------------------------------------------------
+
 
 def test_create_user_email_novo(mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = None
@@ -92,6 +99,7 @@ def test_create_user_email_duplicado_levanta_http_400(mock_db):
 # list_users
 # ---------------------------------------------------------------------------
 
+
 def test_list_users_retorna_todos(mock_db):
     expected = [_make_user(), _make_user(id=2, email="outro@example.com")]
     mock_db.query.return_value.all.return_value = expected
@@ -112,6 +120,7 @@ def test_list_users_vazio(mock_db):
 # ---------------------------------------------------------------------------
 # obter_user
 # ---------------------------------------------------------------------------
+
 
 def test_obter_user_existente(mock_db):
     expected = _make_user()
@@ -134,12 +143,15 @@ def test_obter_user_inexistente(mock_db):
 # update_user
 # ---------------------------------------------------------------------------
 
+
 def test_update_user_existente(mock_db):
     existing = _make_user()
     mock_db.query.return_value.filter.return_value.first.return_value = existing
     schema = _valid_schema(nome="Novo Nome", email="novo@example.com")
 
-    with patch("app.controllers.controller_user.pwd_context.hash", return_value=FAKE_HASH):
+    with patch(
+        "app.controllers.controller_user.pwd_context.hash", return_value=FAKE_HASH
+    ):
         result = update_user(mock_db, user_id=1, data=schema)
 
     assert result is existing
@@ -161,6 +173,7 @@ def test_update_user_inexistente(mock_db):
 # ---------------------------------------------------------------------------
 # delete_user
 # ---------------------------------------------------------------------------
+
 
 def test_delete_user_existente(mock_db):
     existing = _make_user()
@@ -185,6 +198,7 @@ def test_delete_user_inexistente(mock_db):
 # ---------------------------------------------------------------------------
 # get_user_by_email
 # ---------------------------------------------------------------------------
+
 
 def test_get_user_by_email_existente(mock_db):
     expected = _make_user(email="found@example.com")

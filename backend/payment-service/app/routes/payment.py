@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 import requests
 from fastapi import APIRouter, Header, HTTPException
@@ -14,11 +14,14 @@ class PaymentRequest(BaseModel):
     amount: float
 
 
-@router.post("/payment")
+@router.post(
+    "/payment",
+    responses={400: {"description": "Valor inválido para pagamento"}},
+)
 def process_payment(
     payment: PaymentRequest,
-    x_user_id: str = Header(..., alias="X-User-Id"),
-    x_user_role: str = Header(..., alias="X-User-Role"),
+    x_user_id: Annotated[str, Header(..., alias="X-User-Id")],
+    x_user_role: Annotated[str, Header(..., alias="X-User-Role")],
 ) -> dict[str, Any]:
     # Validação mínima
     if payment.amount <= 0:

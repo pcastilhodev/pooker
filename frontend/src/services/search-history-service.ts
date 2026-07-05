@@ -6,7 +6,7 @@ const MAX_ENTRIES = 6;
 
 @Injectable({ providedIn: 'root' })
 export class SearchHistoryService {
-  private entries$ = new BehaviorSubject<string[]>(this.read());
+  private readonly entries$ = new BehaviorSubject<string[]>(this.read());
 
   history$: Observable<string[]> = this.entries$.asObservable();
 

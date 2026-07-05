@@ -8,7 +8,7 @@ import { gsap } from 'gsap';
   styleUrl: './film-intro.css'
 })
 export class FilmIntro implements AfterViewInit, OnDestroy {
-  private zone = inject(NgZone);
+  private readonly zone = inject(NgZone);
 
   @Output() dismissed = new EventEmitter<void>();
 
@@ -24,7 +24,7 @@ export class FilmIntro implements AfterViewInit, OnDestroy {
     this.tl = gsap.timeline({ onComplete: () => this.dismiss() });
 
     this.tl.to('#intro-line-fill', { width: '100%', duration: 0.7, ease: 'power2.inOut' }, 0.3);
-    this.tl.to('#intro-logo', { clipPath: 'inset(0 0% 0 0)', duration: 1.0, ease: 'power4.out' }, 0.55);
+    this.tl.to('#intro-logo', { clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power4.out' }, 0.55);
     this.tl.to('#intro-tagline', { opacity: 1, duration: 0.7, ease: 'power2.out' }, 1.3);
     this.tl.to('#intro-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 1.75);
     this.tl.add(() => {}, '+=1.2');

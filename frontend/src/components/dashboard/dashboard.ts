@@ -32,18 +32,18 @@ const MAX_SNAP = 6;
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
-  private movieService = inject(MovieService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private zone = inject(NgZone);
-  private favorites = inject(FavoritesService);
-  private rentService = inject(Rent);
-  private auth = inject(AuthService);
-  private recentService = inject(RecentService);
+  private readonly movieService = inject(MovieService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly zone = inject(NgZone);
+  private readonly favorites = inject(FavoritesService);
+  private readonly rentService = inject(Rent);
+  private readonly auth = inject(AuthService);
+  private readonly recentService = inject(RecentService);
   viewModeService = inject(ViewModeService);
-  private filterService = inject(FilterService);
-  private trendingService = inject(TrendingService);
-  private recommendationService = inject(RecommendationService);
+  private readonly filterService = inject(FilterService);
+  private readonly trendingService = inject(TrendingService);
+  private readonly recommendationService = inject(RecommendationService);
 
   allFilms: FilmeModel[]       = [];
   films: FilmeModel[]          = [];
@@ -63,7 +63,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer') scrollContainerRef!: ElementRef<HTMLElement>;
   @ViewChildren(FilmSnapSection) snapSections!: QueryList<FilmSnapSection>;
 
-  private subs       = new Subscription();
+  private readonly subs       = new Subscription();
   private ctx:         gsap.Context | undefined;
   private wheelTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -95,7 +95,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
       this.allFilms = q
         ? data.filter(m => m.titulo.toLowerCase().includes(q.toLowerCase()))
         : data;
-      this.genres = Array.from(new Set(this.allFilms.map(f => f.genero).filter(Boolean))).sort();
+      this.genres = Array.from(new Set(this.allFilms.map(f => f.genero).filter(Boolean))).sort((a, b) => a.localeCompare(b));
       this.applyFilters();
       this.applyGenre();
       this.snapFilms = this.allFilms.slice(0, MAX_SNAP);
@@ -166,7 +166,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     if (scores.size === 0) { this.recommended = []; return; }
     this.recommended = all
       .filter(f => !seen.has(f.id) && f.genero && scores.has(f.genero))
-      .sort((a, b) => (scores.get(b.genero!) ?? 0) - (scores.get(a.genero!) ?? 0))
+      .sort((a, b) => (scores.get(b.genero) ?? 0) - (scores.get(a.genero) ?? 0))
       .slice(0, 8);
   }
 

@@ -28,14 +28,14 @@ interface LoginResponse {
 })
 export class Header implements OnInit, AfterViewInit, OnDestroy {
   router = inject(Router);
-  private loginService = inject(LoginService);
-  private auth = inject(AuthService);
-  private host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private toast = inject(ToastService);
-  private movies = inject(MovieService);
-  private history = inject(SearchHistoryService);
-  private shortcuts = inject(ShortcutsService);
-  private surprise = inject(SurpriseService);
+  private readonly loginService = inject(LoginService);
+  private readonly auth = inject(AuthService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly toast = inject(ToastService);
+  private readonly movies = inject(MovieService);
+  private readonly history = inject(SearchHistoryService);
+  private readonly shortcuts = inject(ShortcutsService);
+  private readonly surprise = inject(SurpriseService);
   themeService = inject(ThemeService);
 
   scrolled     = false;
@@ -60,7 +60,7 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
   private searchSub?: Subscription;
   private historySub?: Subscription;
   private focusSub?: Subscription;
-  private searchInput$ = new Subject<string>();
+  private readonly searchInput$ = new Subject<string>();
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent) {
@@ -87,15 +87,19 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
       distinctUntilChanged(),
       switchMap(q => {
         const term = q.trim().toLowerCase();
-        if (!term) { this.searchLoading = false; this.searchResults = []; return of([] as FilmeModel[]); }
-        this.searchLoading = true;
-        return this.movies.getAllMovies();
+        if (term) {
+          this.searchLoading = true;
+          return this.movies.getAllMovies();
+        }
+        this.searchLoading = false;
+        this.searchResults = [];
+        return of([] as FilmeModel[]);
       })
     ).subscribe((all: FilmeModel[]) => {
       const term = this.searchTerm.trim().toLowerCase();
-      this.searchResults = !term ? [] : all
+      this.searchResults = term ? all
         .filter(m => m.titulo.toLowerCase().includes(term) || m.genero?.toLowerCase().includes(term))
-        .slice(0, 6);
+        .slice(0, 6) : [];
       this.searchLoading = false;
     });
   }
@@ -196,7 +200,7 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
     if (!this.user?.nome) return '?';
     const parts = this.user.nome.trim().split(/\s+/);
     const first = parts[0]?.[0] ?? '';
-    const last  = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    const last  = parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : '';
     return (first + last).toUpperCase() || '?';
   }
 

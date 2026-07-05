@@ -5,7 +5,7 @@ const KEY = 'looker:compare';
 
 @Injectable({ providedIn: 'root' })
 export class CompareService {
-  private ids$ = new BehaviorSubject<number[]>(this.load());
+  private readonly ids$ = new BehaviorSubject<number[]>(this.load());
   idsObs$ = this.ids$.asObservable();
 
   get ids(): number[] { return this.ids$.value; }

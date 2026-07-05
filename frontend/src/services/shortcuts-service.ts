@@ -22,10 +22,10 @@ const SHORTCUTS: ShortcutDef[] = [
 export class ShortcutsService {
   readonly defs = SHORTCUTS;
 
-  private helpOpen$ = new BehaviorSubject<boolean>(false);
+  private readonly helpOpen$ = new BehaviorSubject<boolean>(false);
   helpVisible$: Observable<boolean> = this.helpOpen$.asObservable();
 
-  private focusSearch$ = new Subject<void>();
+  private readonly focusSearch$ = new Subject<void>();
   searchFocusRequest$: Observable<void> = this.focusSearch$.asObservable();
 
   toggleHelp() { this.helpOpen$.next(!this.helpOpen$.value); }

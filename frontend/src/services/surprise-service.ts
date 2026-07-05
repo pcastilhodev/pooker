@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SurpriseService {
-  private open$ = new BehaviorSubject<boolean>(false);
+  private readonly open$ = new BehaviorSubject<boolean>(false);
   isOpen$ = this.open$.asObservable();
 
   open() { this.open$.next(true); }

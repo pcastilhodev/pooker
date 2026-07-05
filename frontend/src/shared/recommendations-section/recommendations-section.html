@@ -1,12 +1,12 @@
 <div class="rec-wrap" *ngIf="films.length">
   <div class="rec-title">RECOMENDADOS PARA VOCÊ</div>
   <div class="rec-row">
-    <div class="rec-card" *ngFor="let film of films" tabindex="0" (click)="go(film.id)" (keydown.enter)="go(film.id)">
+    <button type="button" class="rec-card" *ngFor="let film of films" (click)="go(film.id)">
       <div class="rec-poster">
         <img *ngIf="film.imagem_url" [src]="film.imagem_url" [alt]="film.titulo" />
       </div>
       <div class="rec-name">{{ film.titulo }}</div>
       <div class="rec-genre">{{ film.genero }}</div>
-    </div>
+    </button>
   </div>
 </div>

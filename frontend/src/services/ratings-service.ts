@@ -10,9 +10,9 @@ export interface RatingStats { count: number; average: number; userStars: number
 
 @Injectable({ providedIn: 'root' })
 export class RatingsService {
-  private auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
-  private entries$ = new BehaviorSubject<RatingEntry[]>(this.read());
+  private readonly entries$ = new BehaviorSubject<RatingEntry[]>(this.read());
 
   ratings$: Observable<RatingEntry[]> = this.entries$.asObservable();
 

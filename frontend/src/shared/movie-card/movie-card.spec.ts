@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MovieCard } from './movie-card';
 import { FilmeModel } from '../../models/filme-model';
 import { Router } from '@angular/router';
-import { CollectionsService } from '../../services/collections-service';
+import { CollectionsService, Collection } from '../../services/collections-service';
 import { CompareService } from '../../services/compare-service';
 import { BehaviorSubject } from 'rxjs';
 
@@ -52,7 +52,7 @@ describe('MovieCard', () => {
   });
 
   it('should navigate to film detail on click', () => {
-    fixture.nativeElement.querySelector('.browse-card').click();
+    fixture.nativeElement.querySelector('.browse-card-hit').click();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/movie/1']);
   });
 
@@ -67,47 +67,72 @@ describe('MovieCard', () => {
     expect(fixture.nativeElement.querySelector('img')).not.toBeNull();
   });
 
-  it('palette cycles based on the film id', () => {
-    component.film = { ...mockFilm, id: 7 };
-    expect(component.palette).toEqual({ c1: '#0d1520', c2: '#153050' });
+  describe('addToFirstCollection', () => {
+    it('should navigate to /colecoes when there are no collections', () => {
+      collectionsSpy.getAll.and.returnValue([]);
+      const evt = jasmine.createSpyObj<Event>('Event', ['stopPropagation']);
+
+      component.addToFirstCollection(evt);
+
+      expect(evt.stopPropagation).toHaveBeenCalled();
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/colecoes']);
+      expect(collectionsSpy.addFilm).not.toHaveBeenCalled();
+    });
+
+    it('should add film to the first collection when collections exist', () => {
+      const cols: Collection[] = [
+        { id: 'col-7', name: 'Favoritos', filmIds: [], createdAt: new Date().toISOString() },
+        { id: 'col-8', name: 'Outra', filmIds: [], createdAt: new Date().toISOString() },
+      ];
+      collectionsSpy.getAll.and.returnValue(cols);
+      const evt = jasmine.createSpyObj<Event>('Event', ['stopPropagation']);
+
+      component.addToFirstCollection(evt);
+
+      expect(evt.stopPropagation).toHaveBeenCalled();
+      expect(collectionsSpy.addFilm).toHaveBeenCalledWith('col-7', mockFilm.id);
+      expect(routerSpy.navigate).not.toHaveBeenCalled();
+    });
   });
 
-  it('addToFirstCollection stops propagation and adds to the first collection', () => {
-    collectionsSpy.getAll.and.returnValue([{ id: 'c1', name: 'X', filmIds: [], createdAt: '' }]);
-    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
+  describe('toggleCompare', () => {
+    it('should remove the film from comparison when it is already selected', () => {
+      compareSpy.isSelected.and.returnValue(true);
+      const evt = jasmine.createSpyObj<Event>('Event', ['stopPropagation']);
 
-    component.addToFirstCollection(evt);
+      component.toggleCompare(evt);
 
-    expect(evt.stopPropagation).toHaveBeenCalled();
-    expect(collectionsSpy.addFilm).toHaveBeenCalledWith('c1', 1);
+      expect(evt.stopPropagation).toHaveBeenCalled();
+      expect(compareSpy.remove).toHaveBeenCalledWith(mockFilm.id);
+      expect(compareSpy.add).not.toHaveBeenCalled();
+    });
+
+    it('should add the film to comparison when it is not selected', () => {
+      compareSpy.isSelected.and.returnValue(false);
+      const evt = jasmine.createSpyObj<Event>('Event', ['stopPropagation']);
+
+      component.toggleCompare(evt);
+
+      expect(evt.stopPropagation).toHaveBeenCalled();
+      expect(compareSpy.add).toHaveBeenCalledWith(mockFilm.id);
+      expect(compareSpy.remove).not.toHaveBeenCalled();
+    });
   });
 
-  it('addToFirstCollection navigates to collections page when there are none', () => {
-    collectionsSpy.getAll.and.returnValue([]);
-    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
+  describe('palette', () => {
+    it('should return a palette entry based on film id modulo 6', () => {
+      component.film = { ...mockFilm, id: 1 };
+      expect(component.palette).toEqual({ c1: '#0d1520', c2: '#153050' });
+    });
 
-    component.addToFirstCollection(evt);
+    it('should wrap around using modulo 6 for larger ids', () => {
+      component.film = { ...mockFilm, id: 7 };
+      expect(component.palette).toEqual({ c1: '#0d1520', c2: '#153050' });
+    });
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/colecoes']);
-    expect(collectionsSpy.addFilm).not.toHaveBeenCalled();
-  });
-
-  it('toggleCompare adds the film when not selected', () => {
-    compareSpy.isSelected.and.returnValue(false);
-    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
-
-    component.toggleCompare(evt);
-
-    expect(evt.stopPropagation).toHaveBeenCalled();
-    expect(compareSpy.add).toHaveBeenCalledWith(1);
-  });
-
-  it('toggleCompare removes the film when already selected', () => {
-    compareSpy.isSelected.and.returnValue(true);
-    const evt = jasmine.createSpyObj('Event', ['stopPropagation']);
-
-    component.toggleCompare(evt);
-
-    expect(compareSpy.remove).toHaveBeenCalledWith(1);
+    it('should return the first palette entry for id 0', () => {
+      component.film = { ...mockFilm, id: 0 };
+      expect(component.palette).toEqual({ c1: '#0e0818', c2: '#1a0e2e' });
+    });
   });
 });

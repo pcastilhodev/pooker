@@ -6,7 +6,7 @@ import {RegisterModel} from '../models/register-model';
   providedIn: 'root'
 })
 export class LoginService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
 
   authenticate(username: string, password: string) {

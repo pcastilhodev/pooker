@@ -44,21 +44,21 @@ const EMPTY_STATS: ProfileStats = {
   styleUrl: './profile.css'
 })
 export class Profile implements OnInit, OnDestroy {
-  private auth = inject(AuthService);
-  private router = inject(Router);
-  private favorites = inject(FavoritesService);
-  private watchlist = inject(WatchlistService);
-  private ratings = inject(RatingsService);
-  private movies = inject(MovieService);
-  private rent = inject(Rent);
-  private achievementsService = inject(AchievementsService);
-  private commentsService = inject(CommentsService);
-  private recentService = inject(RecentService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly favorites = inject(FavoritesService);
+  private readonly watchlist = inject(WatchlistService);
+  private readonly ratings = inject(RatingsService);
+  private readonly movies = inject(MovieService);
+  private readonly rent = inject(Rent);
+  private readonly achievementsService = inject(AchievementsService);
+  private readonly commentsService = inject(CommentsService);
+  private readonly recentService = inject(RecentService);
 
   user: AuthUser | null = null;
   stats: ProfileStats = { ...EMPTY_STATS };
   statsLoading = true;
-  private subs = new Subscription();
+  private readonly subs = new Subscription();
 
   allAchievements: Achievement[] = ACHIEVEMENTS;
   unlockedIds = new Set<string>();
@@ -68,8 +68,8 @@ export class Profile implements OnInit, OnDestroy {
     document.body.style.overflow = 'auto';
     this.subs.add(this.auth.user$.subscribe(u => {
       this.user = u;
-      if (!u) this.router.navigate(['']);
-      else this.loadStats();
+      if (u) this.loadStats();
+      else this.router.navigate(['']);
     }));
     this.subs.add(this.achievementsService.achievements$.subscribe(s => (this.unlockedIds = s)));
   }
@@ -161,14 +161,14 @@ export class Profile implements OnInit, OnDestroy {
     if (!this.user?.nome) return '?';
     const parts = this.user.nome.trim().split(/\s+/);
     const first = parts[0]?.[0] ?? '';
-    const last  = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    const last  = parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : '';
     return (first + last).toUpperCase() || '?';
   }
 
   get maskedCpf(): string {
     const cpf = this.user?.cpf;
     if (!cpf) return '—';
-    const digits = cpf.replace(/\D/g, '').padStart(11, '*');
+    const digits = cpf.replaceAll(/\D/g, '').padStart(11, '*');
     return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
   }
 
@@ -176,7 +176,7 @@ export class Profile implements OnInit, OnDestroy {
     const raw = this.user?.data_nascimento;
     if (!raw) return '—';
     const d = new Date(raw);
-    if (isNaN(d.getTime())) return raw;
+    if (Number.isNaN(d.getTime())) return raw;
     return d.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   }
 

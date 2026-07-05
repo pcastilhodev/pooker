@@ -1,7 +1,7 @@
 .rec-wrap { padding: 40px 52px 0; }
 .rec-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.05em; color: var(--fg); margin-bottom: 16px; }
 .rec-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
-.rec-card { min-width: 120px; cursor: pointer; flex-shrink: 0; }
+.rec-card { min-width: 120px; cursor: pointer; flex-shrink: 0; background: none; border: none; padding: 0; text-align: left; font-family: inherit; }
 .rec-card:hover .rec-poster { border-color: var(--primary); }
 .rec-poster {
   width: 120px; height: 180px; overflow: hidden; border-radius: 6px;
