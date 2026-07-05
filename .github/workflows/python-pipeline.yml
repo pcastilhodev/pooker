@@ -61,13 +61,38 @@ jobs:
         working-directory: backend/${{ matrix.service }}
         run: pytest --junitxml=report.xml -v --cov=app --cov-report=xml:coverage.xml
 
+      - name: Start Postgres for integration tests
+        id: start-integration-db
+        if: matrix.service != 'payment-service'
+        run: docker compose -f docker-compose.test.yml up -d --wait
+
+      - name: Run integration tests (real Postgres)
+        id: integration-tests
+        if: matrix.service != 'payment-service'
+        working-directory: backend/${{ matrix.service }}
+        env:
+          INTEGRATION_DATABASE_URL: postgresql://postgres:postgres@localhost:5433/trabalho_if
+          INTEGRATION_DB_HOST: localhost
+          INTEGRATION_DB_PORT: "5433"
+          INTEGRATION_DB_NAME: trabalho_if
+          INTEGRATION_DB_USER: postgres
+          INTEGRATION_DB_PASSWORD: postgres
+        run: pytest tests/integration -o addopts="" --junitxml=report-integration.xml -v --cov=app --cov-report=xml:coverage-integration.xml
+
+      - name: Stop Postgres for integration tests
+        id: stop-integration-db
+        if: always() && matrix.service != 'payment-service'
+        run: docker compose -f docker-compose.test.yml down -v
+
       - name: Upload test results
         id: upload-test-results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: python-test-results-${{ matrix.service }}
-          path: backend/${{ matrix.service }}/report.xml
+          path: |
+            backend/${{ matrix.service }}/report.xml
+            backend/${{ matrix.service }}/report-integration.xml
 
       - name: SonarQube scan + Quality Gate
         id: sonarqube

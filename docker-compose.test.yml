@@ -1,0 +1,18 @@
+services:
+  postgres-test:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: trabalho_if
+    ports:
+      # Porta dedicada (5433) para não colidir com um Postgres já rodando em
+      # 5432 na máquina (nativo ou docker-compose.local.yml).
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d trabalho_if"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
