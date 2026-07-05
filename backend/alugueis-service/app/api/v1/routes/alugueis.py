@@ -33,8 +33,10 @@ def create_aluguel(
             db=db, aluguel=aluguel, usuario_id=int(current_user.id)
         )
     except Exception as e:
+        # Detalhe genérico de propósito: não repassar a mensagem interna da
+        # exceção ao cliente (achado "Application Error Disclosure" do ZAP).
         raise HTTPException(
-            status_code=500, detail=f"Erro ao criar aluguel: {e}"
+            status_code=500, detail="Erro ao criar aluguel."
         ) from e
 
     try:
@@ -56,7 +58,7 @@ def create_aluguel(
 
     except requests.exceptions.RequestException as e:
         raise HTTPException(
-            status_code=503, detail=f"Erro ao comunicar com payment: {e}"
+            status_code=503, detail="Erro ao comunicar com payment."
         ) from e
 
     return {"aluguel": db_aluguel, "pagamento": pagamento_data}
@@ -100,8 +102,10 @@ def processar_devolucao(
     except HTTPException:
         raise
     except Exception as e:
+        # Detalhe genérico de propósito: não repassar a mensagem interna da
+        # exceção ao cliente (achado "Application Error Disclosure" do ZAP).
         raise HTTPException(
-            status_code=500, detail=f"Ocorreu um erro inesperado: {e}"
+            status_code=500, detail="Ocorreu um erro inesperado."
         ) from e
 
 

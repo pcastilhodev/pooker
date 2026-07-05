@@ -4,6 +4,7 @@ from app.models.models_user import User
 from app.schemas.schemas_user import UserCreate
 from fastapi import HTTPException
 from passlib.context import CryptContext
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -13,11 +14,22 @@ def get_password_hash(password: str) -> str:
     return str(pwd_context.hash(password))
 
 
+def _build_dto(data: UserCreate) -> UserDTO:
+    try:
+        return UserDTO.from_schema(data)
+    except ValidationError as e:
+        # 422 (erro de validação do cliente), não 500 — sem isso, uma senha
+        # curta ou CPF malformado derrubava a rota com um erro não tratado
+        # (achado "Application Error Disclosure" do scan OWASP ZAP).
+        detail = "; ".join(err["msg"] for err in e.errors())
+        raise HTTPException(status_code=422, detail=detail) from e
+
+
 def create_user(db: Session, data: UserCreate) -> User:
     existing_user = db.query(User).filter(User.email == data.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado")
-    dto = UserDTO.from_schema(data)
+    dto = _build_dto(data)
     new_user = UserFactory.create(dto)
     db.add(new_user)
     db.commit()
@@ -38,7 +50,7 @@ def update_user(db: Session, user_id: int, data: UserCreate) -> User | None:
     if not user:
         return None
 
-    dto = UserDTO.from_schema(data)
+    dto = _build_dto(data)
 
     user.nome = dto.nome  # type: ignore[assignment]
     user.cpf = dto.cpf  # type: ignore[assignment]

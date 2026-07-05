@@ -73,8 +73,10 @@ def login_user(
             "http://localhost:8081/v1/api/authenticate", json=payload, timeout=10
         )
     except Exception as e:
+        # Detalhe genérico de propósito: não repassar a mensagem interna da
+        # exceção ao cliente (achado "Application Error Disclosure" do ZAP).
         raise HTTPException(
-            status_code=500, detail=f"Erro ao conectar com Auth Service: {str(e)}"
+            status_code=500, detail="Erro ao conectar com Auth Service."
         ) from e
 
     if not response.ok:

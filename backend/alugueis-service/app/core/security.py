@@ -16,4 +16,12 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Cabeçalhos X-User-Id e X-User-Role são obrigatórios.",
         )
+    if not x_user_id.isdigit():
+        # Evita que um X-User-Id malformado derrube a rota com um ValueError
+        # não tratado ao converter para int mais adiante (500 genérico
+        # detectado pelo scan OWASP ZAP como "Application Error Disclosure").
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Cabeçalho X-User-Id inválido.",
+        )
     return User(id=x_user_id, role=x_user_role)

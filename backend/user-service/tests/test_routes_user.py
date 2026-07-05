@@ -84,6 +84,24 @@ def test_create_user_email_duplicado(client: TestClient, db_mock: MagicMock) -> 
     assert resp.json()["detail"] == "Email já cadastrado"
 
 
+def test_create_user_senha_curta_retorna_422(client: TestClient, db_mock: MagicMock) -> None:
+    db_mock.query.return_value.filter.return_value.first.return_value = None
+
+    resp = client.post("/api/v1/users/", json=_valid_payload(senha="curta"))
+
+    assert resp.status_code == 422
+    db_mock.add.assert_not_called()
+
+
+def test_create_user_cpf_invalido_retorna_422(client: TestClient, db_mock: MagicMock) -> None:
+    db_mock.query.return_value.filter.return_value.first.return_value = None
+
+    resp = client.post("/api/v1/users/", json=_valid_payload(cpf="abc"))
+
+    assert resp.status_code == 422
+    db_mock.add.assert_not_called()
+
+
 # ---------------------------------------------------------------------------
 # GET /users/ (list_users)
 # ---------------------------------------------------------------------------
