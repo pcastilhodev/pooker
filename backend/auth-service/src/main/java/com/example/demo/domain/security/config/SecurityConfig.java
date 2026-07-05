@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.demo.domain.security.repository.UserRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.CrossOriginResourcePolicyHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -57,7 +58,11 @@ public class SecurityConfig {
                     .csrf(csrf -> csrf.disable())
                     .authorizeHttpRequests(auth ->
                             auth.anyRequest().permitAll()
-                    );
+                    )
+                    // Achado "Cross-Origin-Resource-Policy Header Missing" do scan OWASP ZAP.
+                    .headers(headers -> headers.crossOriginResourcePolicy(policy ->
+                            policy.policy(CrossOriginResourcePolicyHeaderWriter.CrossOriginResourcePolicy.SAME_ORIGIN)
+                    ));
             return http.build();
         }
 }
