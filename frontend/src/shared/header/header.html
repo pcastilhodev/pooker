@@ -1,5 +1,5 @@
 <nav [class.scrolled]="scrolled" [class.hidden]="hidden">
-  <div class="nav-logo" (click)="router.navigate([''])">LOOKER</div>
+  <div class="nav-logo" tabindex="0" (click)="router.navigate([''])" (keydown.enter)="router.navigate([''])">LOOKER</div>
   <div class="nav-right">
     <a routerLink="/" class="nav-link">Filmes</a>
     <a routerLink="/colecoes" class="nav-link">Coleções</a>
@@ -32,7 +32,7 @@
           #searchInput
           class="search-input"
           type="text"
-          autofocus
+
           placeholder="Buscar por título ou gênero…"
           [value]="searchTerm"
           (input)="onSearchInput($any($event.target).value)"
@@ -56,7 +56,7 @@
               <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>
             </svg>
             <span>{{ term }}</span>
-            <span class="chip-x" (click)="removeHistory(term, $event)" aria-label="Remover">&#x2715;</span>
+            <span class="chip-x" tabindex="0" (click)="removeHistory(term, $event)" (keydown.enter)="removeHistory(term, $event)" aria-label="Remover">&#x2715;</span>
           </button>
         </div>
       </div>

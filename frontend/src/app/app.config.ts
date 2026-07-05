@@ -6,7 +6,6 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../security/http-interceptor';
 import { mockInterceptor } from '../mocks/mock-interceptor';
 
-// @ts-ignore
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

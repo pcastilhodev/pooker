@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription, combineLatest } from 'rxjs';
@@ -16,16 +16,14 @@ import { MovieCard } from '../../shared/movie-card/movie-card';
   styleUrl: './favorites.css'
 })
 export class Favorites implements OnInit, OnDestroy {
+  private movies = inject(MovieService);
+  private favorites = inject(FavoritesService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
   films: FilmeModel[] = [];
   loading = true;
   private sub?: Subscription;
-
-  constructor(
-    private movies: MovieService,
-    private favorites: FavoritesService,
-    private auth: AuthService,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     document.documentElement.style.overflow = 'auto';

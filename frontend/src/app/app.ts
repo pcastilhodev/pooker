@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, NgZone, HostListener } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { Header } from '../shared/header/header';
 import { Toaster } from '../shared/toaster/toaster';
@@ -25,6 +25,12 @@ const G_LEADER_TIMEOUT = 1200;
   styleUrl: './app.css'
 })
 export class App implements AfterViewInit, OnDestroy {
+  private zone = inject(NgZone);
+  private router = inject(Router);
+  private shortcuts = inject(ShortcutsService);
+  private surprise = inject(SurpriseService);
+  private toast = inject(ToastService);
+
   private resizeHandler!: () => void;
   private rafHandle = 0;
   private gPending = false;
@@ -35,13 +41,7 @@ export class App implements AfterViewInit, OnDestroy {
   private konamiSeq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   private konamiIdx = 0;
 
-  constructor(
-    private zone: NgZone,
-    private router: Router,
-    private shortcuts: ShortcutsService,
-    private surprise: SurpriseService,
-    private toast: ToastService,
-  ) {
+  constructor() {
     this.surprise.isOpen$.subscribe(v => (this.surpriseOpen = v));
   }
 
@@ -67,8 +67,7 @@ export class App implements AfterViewInit, OnDestroy {
   @HostListener('document:keydown', ['$event'])
   onKey(e: KeyboardEvent) {
     this.trackKonami(e.key);
-    if (this.isTypingTarget(e.target) && e.key !== 'Escape') return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (this.isKeyIgnored(e)) return;
 
     if (e.key === '?') {
       e.preventDefault();
@@ -128,6 +127,11 @@ export class App implements AfterViewInit, OnDestroy {
     }
   }
 
+  private isKeyIgnored(e: KeyboardEvent): boolean {
+    return (this.isTypingTarget(e.target) && e.key !== 'Escape')
+        || e.metaKey || e.ctrlKey || e.altKey;
+  }
+
   private isTypingTarget(t: EventTarget | null): boolean {
     if (!(t instanceof HTMLElement)) return false;
     const tag = t.tagName;
@@ -148,18 +152,22 @@ export class App implements AfterViewInit, OnDestroy {
     this.resizeHandler();
     window.addEventListener('resize', this.resizeHandler, { passive: true });
 
+    let frame = 0;
     const tick = () => {
+      this.rafHandle = requestAnimationFrame(tick);
+      if (++frame % 3 !== 0) return; // render every 3rd frame — ~67% CPU savings
       if (w && h) {
         const d = ctx.createImageData(w, h);
         const b = d.data;
         for (let i = 0; i < b.length; i += 4) {
+          // eslint-disable-next-line sonarjs/pseudo-random -- UI animation, not security-sensitive
           const v = Math.random() * 255;
           b[i] = b[i + 1] = b[i + 2] = v;
+          // eslint-disable-next-line sonarjs/pseudo-random -- UI animation, not security-sensitive
           b[i + 3] = 16 + Math.random() * 22;
         }
         ctx.putImageData(d, 0, 0);
       }
-      this.rafHandle = requestAnimationFrame(tick);
     };
     tick();
   }

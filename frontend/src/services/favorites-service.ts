@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth-service';
 
@@ -6,11 +6,13 @@ const KEY_PREFIX = 'looker:favorites:';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
+  private auth = inject(AuthService);
+
   private ids$ = new BehaviorSubject<Set<number>>(new Set());
 
   favorites$: Observable<Set<number>> = this.ids$.asObservable();
 
-  constructor(private auth: AuthService) {
+  constructor() {
     this.reload();
     this.auth.user$.subscribe(() => this.reload());
   }

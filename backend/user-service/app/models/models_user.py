@@ -1,14 +1,16 @@
-from sqlalchemy import Column, Integer, String, Date, Enum as PgEnum
+from enum import StrEnum
+
 from app.core.db_usuario import Base
-from enum import Enum
+from sqlalchemy import Column, Date, Integer, String
+from sqlalchemy import Enum as PgEnum
 
 
-class RoleEnum(str, Enum):
+class RoleEnum(StrEnum):
     admin = "admin"
     user = "user"
 
 
-class User(Base):
+class User(Base):  # type: ignore[misc]
     __tablename__ = "tb_usuarios"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -18,4 +20,6 @@ class User(Base):
     senha = Column(String(255), nullable=False)
     telefone = Column(String(20))
     data_nascimento = Column(Date)
-    role = Column(PgEnum(RoleEnum, name="role_enum"), default=RoleEnum.user, nullable=False)
+    role: Column[RoleEnum] = Column(
+        PgEnum(RoleEnum, name="role_enum"), default=RoleEnum.user, nullable=False
+    )

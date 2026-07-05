@@ -1,9 +1,9 @@
 export interface RegisterModel {
-  nome?: String,
-  cpf?: String,
-  email?: String,
-  senha?: String,
-  telefone?: String,
+  nome?: string,
+  cpf?: string,
+  email?: string,
+  senha?: string,
+  telefone?: string,
   data_nascimento?: Date,
-  role?: String
+  role?: string
 }

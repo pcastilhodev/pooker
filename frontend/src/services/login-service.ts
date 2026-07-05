@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {RegisterModel} from '../models/register-model';
 
@@ -6,11 +6,11 @@ import {RegisterModel} from '../models/register-model';
   providedIn: 'root'
 })
 export class LoginService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) { }
 
   authenticate(username: string, password: string) {
-    return this.http.post('/gateway/user/api/v1/users/login', { email: username, senha: password })
+    return this.http.post<{ token: string }>('/gateway/user/api/v1/users/login', { email: username, senha: password })
   }
 
   register(data: RegisterModel) {

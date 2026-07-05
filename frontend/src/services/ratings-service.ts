@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth-service';
 
@@ -10,11 +10,11 @@ export interface RatingStats { count: number; average: number; userStars: number
 
 @Injectable({ providedIn: 'root' })
 export class RatingsService {
+  private auth = inject(AuthService);
+
   private entries$ = new BehaviorSubject<RatingEntry[]>(this.read());
 
   ratings$: Observable<RatingEntry[]> = this.entries$.asObservable();
-
-  constructor(private auth: AuthService) {}
 
   rate(filmeId: number, stars: number): RatingStats {
     if (stars < 1 || stars > 5) stars = Math.max(1, Math.min(5, stars));

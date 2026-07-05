@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnDestroy, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MovieService } from '../../services/movie-service';
@@ -16,6 +16,10 @@ const SPIN_MS = 1800;
   styleUrl: './surprise-me.css'
 })
 export class SurpriseMe implements OnDestroy {
+  private movies = inject(MovieService);
+  private router = inject(Router);
+  private achievements = inject(AchievementsService);
+
   @Output() closed = new EventEmitter<void>();
 
   spinning = false;
@@ -25,11 +29,7 @@ export class SurpriseMe implements OnDestroy {
 
   private tickHandle?: ReturnType<typeof setInterval>;
 
-  constructor(
-    private movies: MovieService,
-    private router: Router,
-    private achievements: AchievementsService
-  ) {
+  constructor() {
     this.achievements.unlock('lucky');
     this.movies.getAllMovies().subscribe(list => {
       this.pool = list;
@@ -80,6 +80,7 @@ export class SurpriseMe implements OnDestroy {
   }
 
   private pickRandom(): FilmeModel {
+    // eslint-disable-next-line sonarjs/pseudo-random -- UI random selection, not security-sensitive
     return this.pool[Math.floor(Math.random() * this.pool.length)];
   }
 }

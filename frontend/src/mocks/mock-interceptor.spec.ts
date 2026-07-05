@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http/testing';
 import { mockInterceptor } from './mock-interceptor';
 import { MOCK_FILMES } from './mock-data';
+import { FilmeModel } from '../models/filme-model';
 
 describe('mockInterceptor', () => {
   let http: HttpClient;
@@ -49,7 +50,7 @@ describe('mockInterceptor', () => {
   });
 
   it('GET /filmes/ retorna array com 10 filmes', (done) => {
-    http.get<any[]>('/gateway/movie/v1/filmes/').subscribe((res) => {
+    http.get<FilmeModel[]>('/gateway/movie/v1/filmes/').subscribe((res) => {
       expect(res.length).toBe(10);
       expect(res[0].titulo).toBe('The Dark Knight');
       done();
@@ -58,7 +59,7 @@ describe('mockInterceptor', () => {
   });
 
   it('GET /filmes/2 retorna o filme com id 2', (done) => {
-    http.get<any>('/gateway/movie/v1/filmes/2').subscribe((res) => {
+    http.get<FilmeModel>('/gateway/movie/v1/filmes/2').subscribe((res) => {
       expect(res.id).toBe(2);
       expect(res.titulo).toBe('Inception');
       done();
@@ -67,7 +68,7 @@ describe('mockInterceptor', () => {
   });
 
   it('GET /filmes/99 retorna o primeiro filme quando id nao existe', (done) => {
-    http.get<any>('/gateway/movie/v1/filmes/99').subscribe((res) => {
+    http.get<FilmeModel>('/gateway/movie/v1/filmes/99').subscribe((res) => {
       expect(res.id).toBe(MOCK_FILMES[0].id);
       done();
     });
@@ -75,7 +76,7 @@ describe('mockInterceptor', () => {
   });
 
   it('POST /alugueis/ retorna aluguel com data de devolucao e pagamento', (done) => {
-    http.post<any>('/gateway/rent/v1/alugueis/', { filme_id: 1 }).subscribe((res) => {
+    http.post<{ aluguel: { data_prevista_devolucao: string }; pagamento: { aluguel_id: string; amount: number } }>('/gateway/rent/v1/alugueis/', { filme_id: 1 }).subscribe((res) => {
       expect(res.aluguel.data_prevista_devolucao).toBeDefined();
       expect(res.pagamento.aluguel_id).toBe('MOCK-001');
       expect(res.pagamento.amount).toBe(MOCK_FILMES[0].preco_aluguel);

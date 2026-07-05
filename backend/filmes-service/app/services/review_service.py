@@ -1,25 +1,27 @@
-from sqlalchemy.orm import Session
 from app.models.review import Review as ReviewModel
 from app.schemas.review import ReviewCreateSchema, ReviewUpdateSchema
+from sqlalchemy.orm import Session
+
 
 class ReviewService:
-    def get_reviews_for_filme(self, db: Session, filme_id: int):
+    def get_reviews_for_filme(self, db: Session, filme_id: int) -> list[ReviewModel]:
         return db.query(ReviewModel).filter(ReviewModel.filme_id == filme_id).all()
 
-    def get(self, db: Session, review_id: int):
+    def get(self, db: Session, review_id: int) -> ReviewModel | None:
         return db.query(ReviewModel).filter(ReviewModel.id == review_id).first()
 
-    def create(self, db: Session, review: ReviewCreateSchema, usuario_id: int):
-        db_review = ReviewModel(
-            **review.dict(),
-            usuario_id=usuario_id
-        )
+    def create(
+        self, db: Session, review: ReviewCreateSchema, usuario_id: int
+    ) -> ReviewModel:
+        db_review = ReviewModel(**review.dict(), usuario_id=usuario_id)
         db.add(db_review)
         db.commit()
         db.refresh(db_review)
         return db_review
 
-    def update(self, db: Session, review_id: int, review_update: ReviewUpdateSchema):
+    def update(
+        self, db: Session, review_id: int, review_update: ReviewUpdateSchema
+    ) -> ReviewModel | None:
         db_review = self.get(db, review_id)
         if db_review is None:
             return None

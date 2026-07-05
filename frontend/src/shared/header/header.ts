@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { of, Subject, Subscription } from 'rxjs';
@@ -15,6 +15,10 @@ import { ThemeService } from '../../services/theme-service';
 import { FilmeModel } from '../../models/filme-model';
 import { RegisterModel } from '../../models/register-model';
 
+interface LoginResponse {
+  token: string;
+}
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -23,6 +27,17 @@ import { RegisterModel } from '../../models/register-model';
   styleUrl: './header.css'
 })
 export class Header implements OnInit, AfterViewInit, OnDestroy {
+  router = inject(Router);
+  private loginService = inject(LoginService);
+  private auth = inject(AuthService);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private toast = inject(ToastService);
+  private movies = inject(MovieService);
+  private history = inject(SearchHistoryService);
+  private shortcuts = inject(ShortcutsService);
+  private surprise = inject(SurpriseService);
+  themeService = inject(ThemeService);
+
   scrolled     = false;
   hidden       = false;
   loginVisible = false;
@@ -46,19 +61,6 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
   private historySub?: Subscription;
   private focusSub?: Subscription;
   private searchInput$ = new Subject<string>();
-
-  constructor(
-    public router: Router,
-    private loginService: LoginService,
-    private auth: AuthService,
-    private host: ElementRef<HTMLElement>,
-    private toast: ToastService,
-    private movies: MovieService,
-    private history: SearchHistoryService,
-    private shortcuts: ShortcutsService,
-    private surprise: SurpriseService,
-    public themeService: ThemeService,
-  ) {}
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent) {
@@ -200,8 +202,8 @@ export class Header implements OnInit, AfterViewInit, OnDestroy {
 
   handleLogin(event: { username: string; password: string; remember: boolean }) {
     this.loginService.authenticate(event.username, event.password).subscribe({
-      next: (res: any) => {
-        this.auth.setToken(String(res.token));
+      next: (res: LoginResponse) => {
+        this.auth.setToken(res.token);
         this.closeLogin();
         this.toast.success(`Bem-vindo de volta, ${this.auth.user?.nome ?? ''}!`, 'Login realizado');
       },

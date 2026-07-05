@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { MovieService } from './movie-service';
 import { FilmeModel } from '../models/filme-model';
@@ -73,7 +73,7 @@ describe('MovieService', () => {
   it('getMovie deve retornar o filme correspondente ao id', () => {
     const filmeMock = { id: 7, titulo: 'Filme B' };
 
-    let resultado: any;
+    let resultado: unknown;
     service.getMovie(7).subscribe(f => (resultado = f));
 
     httpMock.expectOne('/gateway/movie/v1/filmes/7').flush(filmeMock);
@@ -81,7 +81,7 @@ describe('MovieService', () => {
   });
 
   it('getMovie deve propagar erro 404 quando filme não encontrado', () => {
-    let erroCapturado: any;
+    let erroCapturado!: HttpErrorResponse;
     service.getMovie(999).subscribe({ error: err => (erroCapturado = err) });
 
     httpMock.expectOne('/gateway/movie/v1/filmes/999').flush(

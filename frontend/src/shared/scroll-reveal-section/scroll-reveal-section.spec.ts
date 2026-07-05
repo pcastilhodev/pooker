@@ -19,10 +19,10 @@ describe('ScrollRevealSection', () => {
     originalIO = window.IntersectionObserver;
     mockObserver = jasmine.createSpyObj('IntersectionObserver', ['observe', 'disconnect']);
 
-    (window as any).IntersectionObserver = function(cb: IntersectionObserverCallback) {
+    (window as unknown as { IntersectionObserver: typeof IntersectionObserver }).IntersectionObserver = function(cb: IntersectionObserverCallback) {
       observerCallback = cb;
       return mockObserver;
-    };
+    } as unknown as typeof IntersectionObserver;
 
     await TestBed.configureTestingModule({ imports: [HostComponent] }).compileComponents();
     fixture = TestBed.createComponent(HostComponent);
@@ -30,7 +30,7 @@ describe('ScrollRevealSection', () => {
   });
 
   afterEach(() => {
-    (window as any).IntersectionObserver = originalIO;
+    (window as unknown as { IntersectionObserver: typeof IntersectionObserver }).IntersectionObserver = originalIO;
   });
 
   it('should create', () => {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -16,11 +16,13 @@ const DISMISS_KEY = 'looker:due-banner-dismissed';
   styleUrl: './due-banner.css'
 })
 export class DueBanner implements OnInit, OnDestroy {
+  private auth = inject(AuthService);
+  private rentService = inject(Rent);
+  private router = inject(Router);
+
   dueSoon: RentalItem[] = [];
   visible = false;
   private sub?: Subscription;
-
-  constructor(private auth: AuthService, private rentService: Rent, private router: Router) {}
 
   ngOnInit() {
     this.sub = this.auth.user$.subscribe(() => this.refresh());

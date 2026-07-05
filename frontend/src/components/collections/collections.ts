@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,16 +15,14 @@ import { MovieCard } from '../../shared/movie-card/movie-card';
   styleUrl: './collections.css'
 })
 export class Collections implements OnInit {
+  collectionsService = inject(CollectionsService);
+  private movieService = inject(MovieService);
+  private router = inject(Router);
+
   collections: Collection[] = [];
   allFilms: FilmeModel[] = [];
   newName = '';
   selectedId: string | null = null;
-
-  constructor(
-    public collectionsService: CollectionsService,
-    private movieService: MovieService,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     document.documentElement.style.overflow = 'auto';

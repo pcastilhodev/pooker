@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CompareService } from '../../services/compare-service';
 import { MovieService } from '../../services/movie-service';
-import { Rent } from '../../services/rent';
+import { Rent, RentResponse } from '../../services/rent';
 import { FilmeModel } from '../../models/filme-model';
+
 
 @Component({
   selector: 'app-compare',
@@ -14,15 +15,13 @@ import { FilmeModel } from '../../models/filme-model';
   styleUrl: './compare.css'
 })
 export class Compare implements OnInit {
+  compareService = inject(CompareService);
+  private movieService = inject(MovieService);
+  private rentService = inject(Rent);
+  private router = inject(Router);
+
   films: FilmeModel[] = [];
   rentLoading: Record<number, boolean> = {};
-
-  constructor(
-    public compareService: CompareService,
-    private movieService: MovieService,
-    private rentService: Rent,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     document.documentElement.style.overflow = 'auto';
@@ -37,7 +36,7 @@ export class Compare implements OnInit {
   rent(film: FilmeModel) {
     this.rentLoading[film.id] = true;
     this.rentService.getRents(film.id).subscribe({
-      next: (d: any) => { alert(`Alugado! R$ ${d.pagamento?.amount ?? film.preco_aluguel}`); },
+      next: (d: RentResponse) => { alert(`Alugado! R$ ${d.pagamento?.amount ?? film.preco_aluguel}`); },
       error: () => alert('Erro ao alugar.'),
       complete: () => { this.rentLoading[film.id] = false; }
     });

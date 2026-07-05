@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, Float, Text, Date
+from sqlalchemy import Column, Date, Float, Integer, String, Text
 from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 
-class Filme(Base):
+
+class Filme(Base):  # type: ignore[misc]
     __tablename__ = "filmes"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -21,4 +23,6 @@ class Filme(Base):
     total_copias = Column(Integer)
     copias_disponiveis = Column(Integer)
 
-    reviews = relationship("Review", back_populates="filme", cascade="all, delete-orphan")
+    reviews = relationship(
+        "Review", back_populates="filme", cascade="all, delete-orphan"
+    )

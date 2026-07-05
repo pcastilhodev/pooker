@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { Toast, ToastService } from '../../services/toast-service';
@@ -11,10 +11,10 @@ import { Toast, ToastService } from '../../services/toast-service';
   styleUrl: './toaster.css'
 })
 export class Toaster implements OnInit, OnDestroy {
+  private toastService = inject(ToastService);
+
   toasts: Toast[] = [];
   private sub?: Subscription;
-
-  constructor(private toastService: ToastService) {}
 
   ngOnInit() {
     this.sub = this.toastService.stream.subscribe(list => (this.toasts = list));

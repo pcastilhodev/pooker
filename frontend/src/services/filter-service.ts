@@ -24,15 +24,25 @@ export class FilterService {
   }
 
   apply(films: FilmeModel[], f: FilmFilters): FilmeModel[] {
-    return films.filter(m => {
-      const ano = m.ano instanceof Date ? m.ano.getFullYear() : new Date(m.ano).getFullYear();
-      if (f.generos.length && !f.generos.includes(m.genero)) return false;
-      if (ano < f.minAno || ano > f.maxAno) return false;
-      if (m.preco_aluguel < f.minPreco || m.preco_aluguel > f.maxPreco) return false;
-      if ((m.duracao_minutos ?? 0) < f.minDuracao || (m.duracao_minutos ?? 0) > f.maxDuracao) return false;
-      if (f.apenasDisponivel && m.copias_disponiveis <= 0) return false;
-      return true;
-    });
+    return films.filter(m => this.filmMatchesFilters(m, f));
+  }
+
+  private getFilmYear(m: FilmeModel): number {
+    return m.ano instanceof Date ? m.ano.getFullYear() : new Date(m.ano).getFullYear();
+  }
+
+  private isInRange(value: number, min: number, max: number): boolean {
+    return value >= min && value <= max;
+  }
+
+  private filmMatchesFilters(m: FilmeModel, f: FilmFilters): boolean {
+    const ano = this.getFilmYear(m);
+    if (f.generos.length && !f.generos.includes(m.genero)) return false;
+    if (!this.isInRange(ano, f.minAno, f.maxAno)) return false;
+    if (!this.isInRange(m.preco_aluguel, f.minPreco, f.maxPreco)) return false;
+    if (!this.isInRange(m.duracao_minutos ?? 0, f.minDuracao, f.maxDuracao)) return false;
+    if (f.apenasDisponivel && m.copias_disponiveis <= 0) return false;
+    return true;
   }
 
   extractGenres(films: FilmeModel[]): string[] {

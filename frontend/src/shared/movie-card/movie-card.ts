@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FilmeModel } from '../../models/filme-model';
@@ -22,10 +22,12 @@ const PALETTES = [
   styleUrl: './movie-card.css'
 })
 export class MovieCard {
+  private router = inject(Router);
+  collectionsService = inject(CollectionsService);
+  compareService = inject(CompareService);
+
   @Input() film!: FilmeModel;
   showActions = false;
-
-  constructor(private router: Router, public collectionsService: CollectionsService, public compareService: CompareService) {}
 
   get palette() { return PALETTES[this.film.id % 6]; }
   navigate() { this.router.navigate([`/movie/${this.film.id}`]); }

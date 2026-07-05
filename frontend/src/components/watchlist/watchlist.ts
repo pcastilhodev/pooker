@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription, combineLatest } from 'rxjs';
@@ -19,17 +19,15 @@ interface WatchRow { film: FilmeModel; addedAt: number; }
   styleUrl: './watchlist.css'
 })
 export class Watchlist implements OnInit, OnDestroy {
+  private movies = inject(MovieService);
+  private watchlist = inject(WatchlistService);
+  private auth = inject(AuthService);
+  private toast = inject(ToastService);
+  private router = inject(Router);
+
   rows: WatchRow[] = [];
   loading = true;
   private sub?: Subscription;
-
-  constructor(
-    private movies: MovieService,
-    private watchlist: WatchlistService,
-    private auth: AuthService,
-    private toast: ToastService,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     document.documentElement.style.overflow = 'auto';

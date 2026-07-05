@@ -1,9 +1,14 @@
-from pydantic import BaseModel
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel
+
 from app.models.aluguel import AluguelStatus
+
 
 class AluguelCreateSchema(BaseModel):
     filme_id: int
+
 
 class AluguelSchema(BaseModel):
     id: int
@@ -23,7 +28,7 @@ class AluguelSchema(BaseModel):
 
 class AluguelSchemaPayment(BaseModel):
     aluguel: AluguelSchema
-    pagamento: dict
+    pagamento: dict[str, Any]
 
     class Config:
         from_attributes = True

@@ -1,8 +1,11 @@
-from fastapi import APIRouter, HTTPException, Header
-from pydantic import BaseModel
+from typing import Any
+
 import requests
+from fastapi import APIRouter, Header, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter()
+
 
 # Schema minimalista para a requisição de pagamento
 class PaymentRequest(BaseModel):
@@ -10,12 +13,13 @@ class PaymentRequest(BaseModel):
     user_id: int
     amount: float
 
+
 @router.post("/payment")
 def process_payment(
     payment: PaymentRequest,
     x_user_id: str = Header(..., alias="X-User-Id"),
-    x_user_role: str = Header(..., alias="X-User-Role")
-):
+    x_user_role: str = Header(..., alias="X-User-Role"),
+) -> dict[str, Any]:
     # Validação mínima
     if payment.amount <= 0:
         raise HTTPException(status_code=400, detail="Valor inválido para pagamento")
@@ -26,22 +30,24 @@ def process_payment(
         "aluguel_id": payment.aluguel_id,
         "user_id": payment.user_id,
         "amount": payment.amount,
-        "message": "Payment processed successfully"
+        "message": "Payment processed successfully",
     }
 
     # Atualizar devolução do aluguel
-    aluguel_api_url = f"http://localhost:8001/v1/alugueis/{payment.aluguel_id}/devolucao"
+    aluguel_api_url = (
+        f"http://localhost:8001/v1/alugueis/{payment.aluguel_id}/devolucao"
+    )
 
     try:
         aluguel_response = requests.post(
             aluguel_api_url,
-            headers={
-                "X-User-Id": x_user_id,
-                "X-User-Role": x_user_role
-            }
+            headers={"X-User-Id": x_user_id, "X-User-Role": x_user_role},
+            timeout=10,
         )
         if aluguel_response.status_code != 200:
-            response["warning"] = f"Não foi possível atualizar ativo do aluguel {payment.aluguel_id}"
+            response["warning"] = (
+                f"Não foi possível atualizar ativo do aluguel {payment.aluguel_id}"
+            )
         else:
             response["aluguel_update"] = aluguel_response.json()
     except Exception as e:

@@ -1,2 +1,2 @@
-from .filme import Filme
-from .review import Review
+from .filme import Filme as Filme
+from .review import Review as Review

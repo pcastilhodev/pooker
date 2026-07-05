@@ -1,4 +1,4 @@
-import { Component, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, OnDestroy, inject } from '@angular/core';
 
 @Component({
   selector: 'app-scroll-reveal-section',
@@ -7,9 +7,9 @@ import { Component, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
   styles: [`:host { display: block; }`]
 })
 export class ScrollRevealSection implements AfterViewInit, OnDestroy {
-  private observer: IntersectionObserver | undefined;
+  private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  constructor(private readonly el: ElementRef<HTMLElement>) {}
+  private observer: IntersectionObserver | undefined;
 
   ngAfterViewInit() {
     const host = this.el.nativeElement;

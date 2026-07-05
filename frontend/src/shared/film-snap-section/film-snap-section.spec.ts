@@ -17,9 +17,9 @@ describe('FilmSnapSection', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    spyOn(gsap, 'context').and.returnValue({ revert: () => {} } as any);
-    spyOn(gsap, 'to').and.returnValue({} as any);
-    spyOn(gsap, 'fromTo').and.returnValue({} as any);
+    spyOn(gsap, 'context').and.returnValue({ revert: () => undefined } as unknown as gsap.Context);
+    spyOn(gsap, 'to').and.returnValue({} as unknown as gsap.core.Tween);
+    spyOn(gsap, 'fromTo').and.returnValue({} as unknown as gsap.core.Tween);
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     await TestBed.configureTestingModule({

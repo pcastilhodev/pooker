@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FilmeModel } from '../../models/filme-model';
@@ -11,8 +11,8 @@ import { FilmeModel } from '../../models/filme-model';
   styleUrl: './recommendations-section.css'
 })
 export class RecommendationsSection {
-  @Input() films: FilmeModel[] = [];
+  private router = inject(Router);
 
-  constructor(private router: Router) {}
+  @Input() films: FilmeModel[] = [];
   go(id: number) { this.router.navigate(['/movie', id]); }
 }

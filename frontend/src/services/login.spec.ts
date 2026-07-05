@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { LoginService } from './login-service';
 import { RegisterModel } from '../models/register-model';
@@ -45,7 +45,7 @@ describe('LoginService', () => {
   it('authenticate deve retornar resposta da API', () => {
     const respostaMock = { token: 'meu.jwt.token' };
 
-    let resultado: any;
+    let resultado: unknown;
     service.authenticate('u@u.com', 'pass').subscribe(r => (resultado = r));
 
     httpMock.expectOne('/gateway/user/api/v1/users/login').flush(respostaMock);
@@ -53,7 +53,7 @@ describe('LoginService', () => {
   });
 
   it('authenticate deve propagar erro 401 com credenciais inválidas', () => {
-    let erroCapturado: any;
+    let erroCapturado!: HttpErrorResponse;
     service.authenticate('errado@test.com', 'senhaerrada').subscribe({ error: e => (erroCapturado = e) });
 
     httpMock.expectOne('/gateway/user/api/v1/users/login').flush(
@@ -92,7 +92,7 @@ describe('LoginService', () => {
     const respostaMock = { id: 1, email: 'ana@test.com' };
     const dados: RegisterModel = { nome: 'Ana', email: 'ana@test.com', senha: 'senha' };
 
-    let resultado: any;
+    let resultado: unknown;
     service.register(dados).subscribe(r => (resultado = r));
 
     httpMock.expectOne('/gateway/user/api/v1/users/').flush(respostaMock);

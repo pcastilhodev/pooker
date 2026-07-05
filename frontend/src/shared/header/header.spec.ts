@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Header } from './header';
-import { Router, provideRouter } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { LoginService } from '../../services/login-service';
 import { provideHttpClient } from '@angular/common/http';
@@ -43,19 +43,19 @@ describe('Header', () => {
   });
 
   it('should set scrolled = true when scrollY > 40', () => {
-    component.onScroll({ scrollTop: 50 } as any);
+    component.onScroll({ scrollTop: 50 });
     expect(component.scrolled).toBeTrue();
   });
 
   it('should hide header when scrolling down past threshold', () => {
-    component.onScroll({ scrollTop: 100 } as any);
-    component.onScroll({ scrollTop: 200 } as any);
+    component.onScroll({ scrollTop: 100 });
+    component.onScroll({ scrollTop: 200 });
     expect(component.hidden).toBeTrue();
   });
 
   it('should show header when scrolling up', () => {
-    component.onScroll({ scrollTop: 200 } as any);
-    component.onScroll({ scrollTop: 100 } as any);
+    component.onScroll({ scrollTop: 200 });
+    component.onScroll({ scrollTop: 100 });
     expect(component.hidden).toBeFalse();
   });
 

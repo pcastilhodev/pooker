@@ -1,0 +1,128 @@
+# .pre-commit-config.yaml
+# Gate de qualidade pré-push. Instalar com:
+#   pre-commit install --hook-type pre-push
+#
+# Para rodar manualmente: pre-commit run --all-files --hook-stage pre-push
+
+default_stages: [pre-push]
+
+repos:
+  # ----------------------------------------------------------------
+  # Utilidades gerais
+  # ----------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        stages: [pre-push]
+      - id: end-of-file-fixer
+        stages: [pre-push]
+      - id: check-merge-conflict
+        stages: [pre-push]
+
+  # ----------------------------------------------------------------
+  # Python — Ruff (linter + formatter)
+  # ----------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.15
+    hooks:
+      - id: ruff
+        name: ruff lint (Python services)
+        args:
+          - --config=backend/pyproject.toml
+          - --no-fix
+        files: ^backend/(alugueis|filmes|payment|user)-service/.*\.py$
+        exclude: (alembic|__pycache__)
+        stages: [pre-push]
+      - id: ruff-format
+        name: ruff format check (Python services)
+        args:
+          - --config=backend/pyproject.toml
+          - --check
+        files: ^backend/(alugueis|filmes|payment|user)-service/.*\.py$
+        exclude: (alembic|__pycache__)
+        stages: [pre-push]
+
+  # ----------------------------------------------------------------
+  # Python — Mypy (tipo estrito)
+  # ----------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: mypy-alugueis
+        name: mypy --strict (alugueis-service)
+        language: system
+        entry: bash -c 'cd backend/alugueis-service && py -m mypy --strict --config-file ../pyproject.toml app/'
+        files: ^backend/alugueis-service/.*\.py$
+        exclude: alembic
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy-filmes
+        name: mypy --strict (filmes-service)
+        language: system
+        entry: bash -c 'cd backend/filmes-service && py -m mypy --strict --config-file ../pyproject.toml app/'
+        files: ^backend/filmes-service/.*\.py$
+        exclude: alembic
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy-payment
+        name: mypy --strict (payment-service)
+        language: system
+        entry: bash -c 'cd backend/payment-service && py -m mypy --strict --config-file ../pyproject.toml app/'
+        files: ^backend/payment-service/.*\.py$
+        exclude: alembic
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy-user
+        name: mypy --strict (user-service)
+        language: system
+        entry: bash -c 'cd backend/user-service && py -m mypy --strict --config-file ../pyproject.toml app/'
+        files: ^backend/user-service/.*\.py$
+        exclude: alembic
+        pass_filenames: false
+        stages: [pre-push]
+
+  # ----------------------------------------------------------------
+  # Java / Maven — auth-service (PMD + SpotBugs + Checkstyle)
+  # ----------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: maven-auth-service
+        name: Maven PMD+SpotBugs+Checkstyle (auth-service)
+        language: system
+        entry: bash -c 'cd backend/auth-service && ./mvnw pmd:check spotbugs:check checkstyle:check -q --no-transfer-progress'
+        files: ^backend/auth-service/.*\.(java|xml)$
+        pass_filenames: false
+        stages: [pre-push]
+
+  # ----------------------------------------------------------------
+  # Java / Gradle — api-gateway (PMD + SpotBugs + Checkstyle)
+  # ----------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: gradle-api-gateway
+        name: Gradle check (api-gateway)
+        language: system
+        entry: bash -c 'cd backend/api-gateway && ./gradlew pmdMain checkstyleMain spotbugsMain --no-daemon -q'
+        files: ^backend/api-gateway/.*\.(java|gradle)$
+        pass_filenames: false
+        stages: [pre-push]
+
+  # ----------------------------------------------------------------
+  # TypeScript / Angular — ESLint + tsc
+  # ----------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: eslint-frontend
+        name: ESLint --max-warnings=0 (frontend)
+        language: system
+        entry: bash -c 'cd frontend && npx ng lint'
+        files: ^frontend/src/.*\.(ts|html)$
+        pass_filenames: false
+        stages: [pre-push]
+      - id: tsc-frontend
+        name: tsc --noEmit (frontend)
+        language: system
+        entry: bash -c 'cd frontend && npx tsc --noEmit -p tsconfig.app.json'
+        files: ^frontend/src/.*\.ts$
+        pass_filenames: false
+        stages: [pre-push]

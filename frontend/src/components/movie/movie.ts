@@ -1,12 +1,11 @@
-import {
-  Component, OnInit, OnDestroy, NgZone, ElementRef
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FilmeModel, CastMember } from '../../models/filme-model';
 import { MovieService } from '../../services/movie-service';
-import { Rent } from '../../services/rent';
+import { Rent, RentResponse } from '../../services/rent';
 import { ToastService } from '../../services/toast-service';
 import { ScrollRevealSection } from '../../shared/scroll-reveal-section/scroll-reveal-section';
 import { MovieCard } from '../../shared/movie-card/movie-card';
@@ -24,6 +23,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
 
 const PALETTES = [
   { c1: '#0e0818', c2: '#1a0e2e', c3: '#2a1240', accent: 'rgba(120,80,200,0.28)' },
@@ -55,6 +55,21 @@ const REVIEWS_MOCK = [
   styleUrl: './movie.css'
 })
 export class Movie implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private movieService = inject(MovieService);
+  private rentService = inject(Rent);
+  private zone = inject(NgZone);
+  private el = inject(ElementRef);
+  private toast = inject(ToastService);
+  private favorites = inject(FavoritesService);
+  private ratings = inject(RatingsService);
+  private auth = inject(AuthService);
+  private recent = inject(RecentService);
+  private commentsSvc = inject(CommentsService);
+  private tmdbService = inject(TmdbService);
+  private recommendationService = inject(RecommendationService);
+
   film:         FilmeModel | undefined;
   similarFilms: FilmeModel[] = [];
   rentLoading   = false;
@@ -68,23 +83,6 @@ export class Movie implements OnInit, OnDestroy {
 
   private ctx: gsap.Context | undefined;
   private favSub?: Subscription;
-
-  constructor(
-    private route:                 ActivatedRoute,
-    private router:                Router,
-    private movieService:          MovieService,
-    private rentService:           Rent,
-    private zone:                  NgZone,
-    private el:                    ElementRef,
-    private toast:                 ToastService,
-    private favorites:             FavoritesService,
-    private ratings:               RatingsService,
-    private auth:                  AuthService,
-    private recent:                RecentService,
-    private commentsSvc:           CommentsService,
-    private tmdbService:           TmdbService,
-    private recommendationService: RecommendationService
-  ) {}
 
   comments: MovieComment[] = [];
   newComment = '';
@@ -141,8 +139,8 @@ export class Movie implements OnInit, OnDestroy {
       ScrollTrigger.getAll().forEach(t => t.kill());
       window.scrollTo(0, 0);
       this.recommendationService.trackView(id);
-      this.movieService.getMovie(id).subscribe((data: any) => {
-        this.film = data as FilmeModel;
+      this.movieService.getMovie(id).subscribe((data: FilmeModel) => {
+        this.film = data;
         this.recent.track(id);
         this.loadSimilar();
         this.refreshRating();
@@ -151,10 +149,7 @@ export class Movie implements OnInit, OnDestroy {
         this.favSub = this.favorites.favorites$.subscribe(set => {
           this.isFavorite = !!this.film && set.has(this.film.id);
         });
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-          requestAnimationFrame(() => this.runAnimations());
-        }, 0);
+        setTimeout(() => this.initAfterLoad(), 0);
         this.trailerKey = null;
         this.trailerLoading = true;
         this.tmdbService.getTrailerKey(this.film.titulo).subscribe(key => {
@@ -226,7 +221,7 @@ export class Movie implements OnInit, OnDestroy {
     if (!this.film) return;
     this.rentLoading = true;
     this.rentService.getRents(this.film.id).subscribe({
-      next: (data: any) => {
+      next: (data: RentResponse) => {
         const iso = data.aluguel.data_prevista_devolucao.replace(/(\.\d{3})\d+/, '$1');
         const devolucao = new Date(iso).toLocaleDateString('pt-BR');
         this.toast.success(
@@ -234,7 +229,7 @@ export class Movie implements OnInit, OnDestroy {
           'Aluguel confirmado'
         );
       },
-      error: (err: any) => {
+      error: (err: HttpErrorResponse) => {
         this.rentLoading = false;
         if (err.status === 401) { this.toast.warn('Faça login para alugar este filme.', 'Acesso necessário'); return; }
         this.toast.error('Não foi possível concluir o aluguel. Tente novamente.', 'Erro');
@@ -244,6 +239,11 @@ export class Movie implements OnInit, OnDestroy {
   }
 
   goBack() { this.router.navigate(['/']); }
+
+  private initAfterLoad(): void {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => this.runAnimations());
+  }
 
   private runAnimations() {
     this.ctx?.revert();
