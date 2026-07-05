@@ -1,6 +1,4 @@
-import sys
 from collections.abc import Iterator
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,18 +6,13 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture
 def client() -> Iterator[TestClient]:
-    # app.main chama Base.metadata.create_all(bind=engine) na importação, o que
-    # tentaria abrir uma conexão real com o Postgres. Isso é irrelevante para o
-    # que queremos testar aqui (a instância do FastAPI e o health check), então
-    # substituímos create_all por um no-op só durante a importação do módulo.
-    sys.modules.pop("app.main", None)
-    with patch("sqlalchemy.schema.MetaData.create_all", return_value=None):
-        from app.main import app
+    # app.main registra Base.metadata.create_all(bind=engine) no lifespan, que só
+    # roda com `with TestClient(...)`. Usando o TestClient "solto" (sem `with`),
+    # o lifespan não é acionado e o teste não tenta abrir uma conexão real com
+    # o Postgres, irrelevante para o que queremos testar aqui.
+    from app.main import app
 
-    with TestClient(app) as test_client:
-        yield test_client
-
-    sys.modules.pop("app.main", None)
+    yield TestClient(app)
 
 
 def test_health_check_retorna_status_ok(client: TestClient) -> None:
