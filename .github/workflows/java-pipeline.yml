@@ -90,7 +90,7 @@ jobs:
               $targetPid = Get-Content "$env:RUNNER_TEMP\api-gateway.pid" -ErrorAction SilentlyContinue
               if ($targetPid) {
                 Write-Host "---- jstack pid $targetPid (aos 30s de espera) ----"
-                & jstack $targetPid 2>&1 | Write-Host
+                try { & jstack $targetPid 2>$null | Write-Host } catch { Write-Host "jstack falhou: $_" }
               }
             }
             Start-Sleep -Seconds 2
@@ -247,7 +247,7 @@ jobs:
               $targetPid = Get-Content "$env:RUNNER_TEMP\auth-service.pid" -ErrorAction SilentlyContinue
               if ($targetPid) {
                 Write-Host "---- jstack pid $targetPid (aos 40s de espera) ----"
-                & jstack $targetPid 2>&1 | Write-Host
+                try { & jstack $targetPid 2>$null | Write-Host } catch { Write-Host "jstack falhou: $_" }
               }
             }
             Start-Sleep -Seconds 2
