@@ -69,7 +69,8 @@ jobs:
         working-directory: backend/api-gateway
         run: |
           $jar = Get-ChildItem -Path "build/libs" -Filter "api-gateway-*.jar" | Where-Object { $_.Name -notlike "*-plain.jar" } | Select-Object -First 1
-          $proc = Start-Process -PassThru -NoNewWindow -FilePath java -ArgumentList "-jar", $jar.FullName
+          $logPath = "$env:RUNNER_TEMP\api-gateway.log"
+          $proc = Start-Process -PassThru -NoNewWindow -FilePath java -ArgumentList "-jar", $jar.FullName -RedirectStandardOutput $logPath -RedirectStandardError "$env:RUNNER_TEMP\api-gateway.err.log"
           $proc.Id | Out-File -FilePath "$env:RUNNER_TEMP\api-gateway.pid"
 
       - id: wait-target
@@ -85,7 +86,24 @@ jobs:
             }
             Start-Sleep -Seconds 2
           }
-          if (-not $ready) { throw "api-gateway nao respondeu a tempo em http://localhost:8080/" }
+          if (-not $ready) {
+            Write-Host "---- api-gateway stdout ----"
+            Get-Content "$env:RUNNER_TEMP\api-gateway.log" -ErrorAction SilentlyContinue
+            Write-Host "---- api-gateway stderr ----"
+            Get-Content "$env:RUNNER_TEMP\api-gateway.err.log" -ErrorAction SilentlyContinue
+            throw "api-gateway nao respondeu a tempo em http://localhost:8080/"
+          }
+
+      - id: upload-apigateway-log
+        name: Upload API Gateway boot log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apigateway-boot-log
+          path: |
+            ${{ runner.temp }}\api-gateway.log
+            ${{ runner.temp }}\api-gateway.err.log
+          if-no-files-found: ignore
 
       - id: zap-scan
         name: Run OWASP ZAP baseline scan
@@ -201,7 +219,8 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: postgres
         run: |
           $jar = Get-ChildItem -Path "target" -Filter "*.jar" | Where-Object { $_.Name -notlike "*sources*" } | Select-Object -First 1
-          $proc = Start-Process -PassThru -NoNewWindow -FilePath java -ArgumentList "-jar", $jar.FullName, "--server.port=8081"
+          $logPath = "$env:RUNNER_TEMP\auth-service.log"
+          $proc = Start-Process -PassThru -NoNewWindow -FilePath java -ArgumentList "-jar", $jar.FullName, "--server.port=8081" -RedirectStandardOutput $logPath -RedirectStandardError "$env:RUNNER_TEMP\auth-service.err.log"
           $proc.Id | Out-File -FilePath "$env:RUNNER_TEMP\auth-service.pid"
 
       - id: wait-target
@@ -215,7 +234,24 @@ jobs:
             } catch {}
             Start-Sleep -Seconds 2
           }
-          if (-not $ready) { throw "auth-service nao respondeu a tempo em http://localhost:8081/" }
+          if (-not $ready) {
+            Write-Host "---- auth-service stdout ----"
+            Get-Content "$env:RUNNER_TEMP\auth-service.log" -ErrorAction SilentlyContinue
+            Write-Host "---- auth-service stderr ----"
+            Get-Content "$env:RUNNER_TEMP\auth-service.err.log" -ErrorAction SilentlyContinue
+            throw "auth-service nao respondeu a tempo em http://localhost:8081/"
+          }
+
+      - id: upload-auth-service-log
+        name: Upload Auth Service boot log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-service-boot-log
+          path: |
+            ${{ runner.temp }}\auth-service.log
+            ${{ runner.temp }}\auth-service.err.log
+          if-no-files-found: ignore
 
       - id: zap-scan
         name: Run OWASP ZAP baseline scan
